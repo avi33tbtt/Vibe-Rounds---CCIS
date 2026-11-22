@@ -37,7 +37,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 |----|-----------|------|--------|------|------------|------------------|
 | 0.0 | (this repo) | Plan, tracker, core rules, decisions, Phase 0 chunk files | DONE | 2026-11-22 |  | Delivered as documents. |
 | 0.1 | chunk-0.1-scaffold-ci.md | Repo scaffold and CI | DONE | 2026-11-22 | 4 small files | package.json, .gitignore, test/smoke.test.js, .github/workflows/ci.yml. npm test passes (Node 22); breakage check seen failing. |
-| 0.2 | chunk-0.2-spec-draft.md | CCIS specification draft 0.1 (words, requirement ids) | TODO |  | 3 markdown files | No schemas. |
+| 0.2 | chunk-0.2-spec-draft.md | CCIS specification draft 0.1 (words, requirement ids) | DONE | 2026-11-22 | 3 markdown files | ccis/SPEC.md (92 reqs, matrix), ccis/CHANGELOG.md, ccis/README.md. Words only; book fetched from the EMR repo. |
 | 0.3 | chunk-0.3-import-contract.md | Import contract in words | TODO |  | 1 markdown file | Needs: 0.2. No field-level shapes. |
 | 0.4 | chunk-0.4-use-case.md | Snake envenomation use-case dossier | TODO |  | 1 markdown file | Needs: 0.2. Parameters stay disabled. |
 | 0.5 | chunk-0.5-traceability.md | Traceability and acceptance checklist | TODO |  | 1 markdown file | Needs: 0.2 to 0.4. |

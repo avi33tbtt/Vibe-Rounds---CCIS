@@ -44,7 +44,9 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | R0 | (user) | Review gate: approve SPEC draft, import contract, use case | DONE | 2026-11-23 |  | Recorded at owner's instruction; no clinician review yet; gaps G-01/03/04/05 deferred to their rows. See DECISIONS.md. |
 | 1.1 | chunk-1.1-schemas-core.md | Schemas: manifest, element, terminology binding (chunk file first) | DONE | 2026-11-23 | 1 chunk file | 3 schemas, Ajv standalone validators (no eval), 12 fixtures, 17 tests pass; 3 breakage checks seen failing. D-015 to D-017. CI now runs npm ci. |
 | 1.2 | chunk-1.2-schemas-pathway.md | Schemas: pathway, decision node (explicit indeterminate and missing-data branches) | DONE | 2026-11-23 | 1 chunk file | 2 schemas (pathway, decision node), 7 fixtures, 25 tests pass; 3 breakage checks seen failing. D-018, D-019: state tests only, no values. |
-| 1.3 to 1.6 | (written when reached) | Schemas and reference artefacts (rest of Phase 1) | TODO |  |  | Stage 2. Next: 1.3 (write its chunk file first). Each row unlocks after the one before it. |
+| 1.3 | chunk-1.3-schemas-analytics.md | Schemas: analytics package (inputs, parameters, expression tree, outputs, failure behaviour, evidence) | IN PROGRESS | 2026-11-23 | 1 chunk file | Chunk file written (docs only); awaiting your approval. Proposes G-04 result kinds. Next "do next" builds it. |
+| 1.3a | (written when reached) | Schema: execution manifest (split from 1.3 for size) | LOCKED |  |  | Unlocks after 1.3. |
+| 1.4 to 1.6 | (written when reached) | Schemas and reference artefacts (rest of Phase 1) | LOCKED |  |  | Stage 2. Each row unlocks after the one before it. |
 | 2.1 to 2.4 | (written when reached) | Validator and compiler | LOCKED |  |  | Stage 2. |
 | 3.1 to 3.11 | (written when reached) | Importer, compatibility, executor, run records, local marketplace, CLI, browser app, hardening, slice, CCIS 0.1.0 | LOCKED |  |  | Stage 2. 3.11 ends with the user's limitations review. |
 | 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | After 0.1.0. |

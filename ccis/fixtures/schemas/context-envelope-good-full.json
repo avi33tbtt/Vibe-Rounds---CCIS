@@ -1,0 +1,350 @@
+{
+  "envelope": {
+    "version": "0.1.0",
+    "exportedAt": "2026-01-01T10:00:00+00:00",
+    "producer": {
+      "system": "synthetic-emr",
+      "version": "0.1.0"
+    }
+  },
+  "inclusions": {
+    "identity": false,
+    "narrative": false,
+    "enteredInError": false
+  },
+  "case": {
+    "ref": "case-synthetic-0001"
+  },
+  "applied": {
+    "elements": [
+      {
+        "id": "synthetic.demo-element",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      }
+    ],
+    "pathways": [
+      {
+        "id": "synthetic.demo-pathway",
+        "type": "pathway",
+        "version": "0.2.0"
+      }
+    ]
+  },
+  "observations": [
+    {
+      "id": "o1",
+      "concept": {
+        "id": "synthetic.demo-concept",
+        "codes": []
+      },
+      "kind": "quantity",
+      "effective": {
+        "value": "2026-01-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-01-01T08:05:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": 1.5,
+      "unit": "1"
+    },
+    {
+      "id": "o2",
+      "concept": {
+        "id": "synthetic.demo-concept",
+        "codes": []
+      },
+      "kind": "integer",
+      "effective": {
+        "value": "2026-01-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "state": "unknown"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": 3,
+      "unit": "1"
+    },
+    {
+      "id": "o3",
+      "concept": {
+        "id": "synthetic.demo-concept",
+        "codes": []
+      },
+      "kind": "boolean",
+      "effective": {
+        "value": "2026-01-01T08:00:00",
+        "zone": "unknown"
+      },
+      "recorded": {
+        "value": "2026-01-01T08:05:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": true
+    },
+    {
+      "id": "o4",
+      "concept": {
+        "id": "synthetic.demo-concept",
+        "codes": [
+          {
+            "system": "synthetic-system",
+            "code": "synthetic-code",
+            "verification": "unverified"
+          }
+        ]
+      },
+      "kind": "code",
+      "effective": {
+        "value": "2026-01-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-01-01T08:05:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": {
+        "system": "synthetic-system",
+        "code": "synthetic-code"
+      }
+    },
+    {
+      "id": "o5",
+      "concept": {
+        "id": "synthetic.demo-concept",
+        "codes": []
+      },
+      "kind": "string",
+      "effective": {
+        "value": "2026-01-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-01-01T08:05:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "informant-reported",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": "synthetic text"
+    },
+    {
+      "id": "o6",
+      "concept": {
+        "id": "synthetic.demo-concept",
+        "codes": []
+      },
+      "kind": "quantity",
+      "effective": {
+        "value": "2026-01-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-01-01T08:05:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "state": "not-collected"
+    },
+    {
+      "id": "o7",
+      "concept": {
+        "id": "synthetic.demo-concept",
+        "codes": []
+      },
+      "kind": "quantity",
+      "effective": {
+        "value": "2026-01-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-01-01T08:05:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "derived",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": 2.0,
+      "unit": "1",
+      "derivation": {
+        "formula": "synthetic-formula",
+        "version": "0.1.0",
+        "from": [
+          "o1",
+          "o2"
+        ]
+      }
+    },
+    {
+      "id": "o8",
+      "concept": {
+        "id": "synthetic.demo-concept",
+        "codes": []
+      },
+      "kind": "quantity",
+      "effective": {
+        "value": "2026-01-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-01-01T08:05:00Z",
+        "zone": "stated"
+      },
+      "status": "corrected",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": 1.6,
+      "unit": "1",
+      "correctionOf": "o1"
+    },
+    {
+      "id": "o9",
+      "concept": {
+        "id": "synthetic.demo-concept",
+        "codes": []
+      },
+      "kind": "datetime",
+      "effective": {
+        "value": "2026-01-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-01-01T08:05:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": {
+        "value": "2026-01-01T07:30:00Z",
+        "zone": "stated"
+      }
+    },
+    {
+      "id": "o10",
+      "concept": {
+        "id": "synthetic.demo-concept",
+        "codes": []
+      },
+      "kind": "date",
+      "effective": {
+        "value": "2026-01-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-01-01T08:05:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": "2026-01-01"
+    }
+  ],
+  "events": [
+    {
+      "id": "e1",
+      "type": "unclassified",
+      "time": {
+        "value": "2026-01-01T09:00:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "imported",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      }
+    },
+    {
+      "id": "e2",
+      "type": "synthetic.demo-event",
+      "period": {
+        "start": {
+          "value": "2026-01-01T09:00:00Z",
+          "zone": "stated"
+        },
+        "end": {
+          "value": "2026-01-01T09:30:00Z",
+          "zone": "stated"
+        }
+      },
+      "status": "final",
+      "sourceClass": "device",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      }
+    }
+  ]
+}

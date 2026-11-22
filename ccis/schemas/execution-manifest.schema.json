@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ccis.invalid/schemas/execution-manifest.schema.json",
+  "title": "CCIS execution manifest",
+  "description": "What one run needs: the exact, pinned versions the compiler resolved (CCIS-REQ-064, 065). A declaration only. No integrity fields: gap G-05, decided at row 2.4.",
+  "type": "object",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^x-": {}
+  },
+  "required": ["package", "standard", "engine", "operatorSet", "dependencies", "mandatoryExtensions", "executionProfile", "outputContractVersion", "compiledFrom"],
+  "properties": {
+    "package": {
+      "description": "The analytics package or pathway being run, at an exact version.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^x-": {} },
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/artefactId" },
+        "version": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/semver" }
+      }
+    },
+    "standard": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^x-": {} },
+      "required": ["version"],
+      "properties": { "version": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/semver" } }
+    },
+    "engine": {
+      "description": "The engine range the compiled form needs. The run record holds the exact engine that ran (CCIS-REQ-011, 075).",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^x-": {} },
+      "required": ["range"],
+      "properties": { "range": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/versionRange" } }
+    },
+    "fhir": {
+      "description": "Only where FHIR Mode applies.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^x-": {} },
+      "required": ["range"],
+      "properties": { "range": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/versionRange" } }
+    },
+    "operatorSet": {
+      "description": "Name and exact version of the operator set (CCIS-REQ-063, 075).",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^x-": {} },
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "version": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/semver" }
+      }
+    },
+    "dependencies": {
+      "description": "Exact pins. A range or a mutable name such as latest is rejected (CCIS-REQ-064). The array is required; it may be empty.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "patternProperties": { "^x-": {} },
+        "required": ["id", "type", "version"],
+        "properties": {
+          "id": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/artefactId" },
+          "type": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/artefactType" },
+          "version": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/semver" }
+        }
+      }
+    },
+    "mandatoryExtensions": {
+      "description": "Extensions an engine must understand, else it fails safely (CCIS-REQ-016, 065).",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^x-[a-z0-9][a-z0-9-]*$" }
+    },
+    "executionProfile": { "$ref": "https://ccis.invalid/schemas/analytics.schema.json#/properties/executionProfile" },
+    "outputContractVersion": {
+      "description": "Version of the output contract the results are checked against (CCIS-REQ-070, 075).",
+      "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/semver"
+    },
+    "compiledFrom": {
+      "description": "Names the authoring route only; carries no content.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^x-": {} },
+      "required": ["authoringRoute", "authoringVersion"],
+      "properties": {
+        "authoringRoute": { "enum": ["native", "fhir", "ai-assisted"] },
+        "authoringVersion": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/semver" }
+      }
+    }
+  }
+}

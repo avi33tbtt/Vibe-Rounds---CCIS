@@ -1,0 +1,33 @@
+{
+  "envelope": {
+    "version": "0.1.0",
+    "exportedAt": "2026-01-01T10:00:00+00:00",
+    "producer": {
+      "system": "synthetic-emr",
+      "version": "0.1.0"
+    }
+  },
+  "inclusions": {
+    "identity": false,
+    "narrative": false,
+    "enteredInError": false
+  },
+  "importer": {
+    "version": "0.1.0"
+  },
+  "standard": {
+    "version": "0.1.0"
+  },
+  "outcome": "refused",
+  "refusalReason": "newer major version of the envelope",
+  "appliedVersions": [],
+  "records": [],
+  "counts": {
+    "accepted": 0,
+    "rejected": 0,
+    "unmapped": 0,
+    "ambiguous": 0,
+    "total": 0
+  },
+  "ignored": []
+}

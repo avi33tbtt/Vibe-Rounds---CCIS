@@ -1,0 +1,24 @@
+{
+  "envelope": {
+    "version": "0.1.0",
+    "exportedAt": "2026-01-01T10:00:00+00:00",
+    "producer": {
+      "system": "synthetic-emr",
+      "version": "0.1.0"
+    }
+  },
+  "inclusions": {
+    "identity": false,
+    "narrative": false,
+    "enteredInError": false
+  },
+  "case": {
+    "ref": "case-synthetic-0001"
+  },
+  "applied": {
+    "elements": [],
+    "pathways": []
+  },
+  "observations": [],
+  "events": []
+}

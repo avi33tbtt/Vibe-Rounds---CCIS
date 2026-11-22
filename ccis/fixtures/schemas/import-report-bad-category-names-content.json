@@ -1,0 +1,100 @@
+{
+  "outcome": "read",
+  "envelope": {
+    "version": "0.1.0",
+    "exportedAt": "2026-01-01T10:00:00+00:00",
+    "producer": {
+      "system": "synthetic-emr",
+      "version": "0.1.0"
+    }
+  },
+  "inclusions": {
+    "identity": false,
+    "narrative": false,
+    "enteredInError": false
+  },
+  "importer": {
+    "version": "0.1.0"
+  },
+  "standard": {
+    "version": "0.1.0"
+  },
+  "appliedVersions": [
+    {
+      "id": "synthetic.demo-element",
+      "type": "contextual-element",
+      "version": "0.1.0",
+      "held": true
+    },
+    {
+      "id": "synthetic.demo-pathway",
+      "type": "pathway",
+      "version": "0.2.0",
+      "held": false
+    }
+  ],
+  "records": [
+    {
+      "ref": "o1",
+      "recordKind": "observation",
+      "category": "accepted",
+      "notes": [
+        "recorded time unknown"
+      ]
+    },
+    {
+      "ref": "o2",
+      "recordKind": "observation",
+      "category": "rejected",
+      "reasons": [
+        {
+          "code": "excluded-category",
+          "category": "narrative",
+          "content": "synthetic text"
+        }
+      ]
+    },
+    {
+      "ref": "o3",
+      "recordKind": "observation",
+      "category": "unmapped",
+      "reasons": [
+        {
+          "code": "no-verified-mapping"
+        }
+      ]
+    },
+    {
+      "ref": "o4",
+      "recordKind": "observation",
+      "category": "ambiguous",
+      "reasons": [
+        {
+          "code": "two-meanings"
+        }
+      ],
+      "decision": {
+        "choice": "first-meaning",
+        "decidedBy": "synthetic-reviewer-role"
+      }
+    },
+    {
+      "ref": "r1",
+      "recordKind": "reference",
+      "category": "accepted"
+    }
+  ],
+  "counts": {
+    "accepted": 2,
+    "rejected": 1,
+    "unmapped": 1,
+    "ambiguous": 1,
+    "total": 5
+  },
+  "ignored": [
+    {
+      "path": "/x-added",
+      "reason": "unrecognised optional addition"
+    }
+  ]
+}

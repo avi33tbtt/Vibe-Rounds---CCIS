@@ -2,13 +2,21 @@
 
 Newest first. The standard follows semantic versioning (CCIS-REQ-012 in `SPEC.md`; the amendment rule below implements CCIS-REQ-019).
 
+## A-001 (2026-11-23): informant source class (gap G-01)
+
+- **Requirements affected:** CCIS-REQ-036 (every value carries a source class from a closed set); clarifies, does not change, CCIS-REQ-037.
+- **Change:** the source-class set gains one value, `informant-reported`: a value reported by someone other than the patient (for example a companion giving a bite time). It is distinct from `patient-reported`, is never merged into it, and is never treated as verified. The set is now: patient-reported, informant-reported, clinician-entered, clinician-verified, imported, device, derived, ai-proposed.
+- **Reason:** the use-case dossier (`docs/USE-CASE-SNAKE.md`, question 5) found that an informant's report fits none of the seven classes without being merged into another.
+- **Raised by:** task 1.4 (`plan-chunks/chunk-1.4-schemas-envelope-report.md`).
+- **Approved:** by the project owner on 2026-11-23, by approving that chunk file ("do next"). `ccis/SPEC.md` text is not edited; this entry is the amendment.
+
 ## A-002 (2026-11-23): kinds of result (gap G-04)
 
 - **Requirements affected:** CCIS-REQ-070 (outputs checked against a declared output contract); clarifies, does not change, CCIS-REQ-066.
 - **Change:** an output contract declares one kind per output: `value` (a typed quantity, time or integer with unit), `classification` (one of declared labels) or `table` (declared columns). `series` is not part of 0.1.0. Any output may also end in one of five declared non-value states: `needs-data`, `indeterminate`, `not-applicable`, `conflict`, `parameter-not-enabled`. A state is reported, never converted into a value.
 - **Reason:** the book (Ch6 section 7.2) names several kinds of result, and the spec only required that outputs match a declared contract.
 - **Raised by:** task 1.3 (`plan-chunks/chunk-1.3-schemas-analytics.md`).
-- **Approved:** by the project owner on 2026-11-23, by approving that chunk file ("proceed"). `ccis/SPEC.md` text is not edited; this entry is the amendment. `A-001` is reserved for gap G-01 (informant source class) and has not been raised.
+- **Approved:** by the project owner on 2026-11-23, by approving that chunk file ("proceed"). `ccis/SPEC.md` text is not edited; this entry is the amendment. `A-001` (gap G-01) was raised at row 1.4.
 
 ## 0.1.0-draft (2026-11-22)
 

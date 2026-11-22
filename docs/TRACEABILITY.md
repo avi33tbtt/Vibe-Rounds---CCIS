@@ -137,7 +137,7 @@ Concepts the book contains that the specification does not yet require. "When" s
 
 | Id | Concept | What is missing | Proposed handling | When |
 |----|---------|-----------------|-------------------|------|
-| G-01 | Informant source class | A bite time reported by a companion has no source class of its own (raised in docs/USE-CASE-SNAKE.md, question 5). | Decide at R0. Would be amendment A-001. | 0.1.0 slice |
+| G-01 | Informant source class | A bite time reported by a companion has no source class of its own (raised in docs/USE-CASE-SNAKE.md, question 5). | Closed by amendment A-001 (row 1.4, 2026-11-23). | 0.1.0 slice |
 | G-02 | Independence rule | Ch7 s12.2 and plan row 6.2: an author is never the reviewer. Not yet a requirement. | Add with row 6.2. | Phase 6 |
 | G-03 | Batch runs | Ch6 s7: several analytics on one context; each keeps its own contract, parameters and result; shared work must not leak between them. Not yet a requirement. | Decide before row 3.5. | 0.1.0 slice |
 | G-04 | Result kinds | Ch6 s7.2: values, classifications, tables, series. The spec only says outputs are checked against a declared contract. | Closed by amendment A-002 (row 1.3, 2026-11-23). | 0.1.0 slice |

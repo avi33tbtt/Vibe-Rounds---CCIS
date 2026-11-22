@@ -1,4 +1,4 @@
-# CCIS schemas (rows 1.1 to 1.3)
+# CCIS schemas (rows 1.1 to 1.4)
 
 JSON Schema 2020-12. Prototype. Synthetic data only. Not for clinical use.
 
@@ -10,6 +10,9 @@ JSON Schema 2020-12. Prototype. Synthetic data only. Not for clinical use.
 | `pathway.schema.json` | CCIS-REQ-025, 027. Stages are `information` or `report` only; no field can hold an action, order, dose or number; timing names a parameter id, never a value. |
 | `decision-node.schema.json` | CCIS-REQ-026. Every outcome has a `next` (stage or end); every node contains an `indeterminate` outcome. |
 | `analytics.schema.json` | CCIS-REQ-028, 029, 033, 042, 043, 066, 069, 070, 073. Parameters declare id, kind, units, range or choices and `enabledByDefault: false`, and carry no value or default. The expression tree uses a closed operator whitelist and has no numeric literal: numbers come only from inputs, parameters or a declared, versioned conversion. Output kinds: `value`, `classification`, `table` (A-002). One expression tree per output. No field for a recommendation. |
+| `execution-manifest.schema.json` | CCIS-REQ-011, 016, 063 to 065, 069, 070, 075. What one run needs: exact pins only (no ranges, no `latest`), exact operator set, engine range, mandatory extensions, execution profile (shared with the analytics schema by `$ref`), output contract version, authoring route. No checksum or integrity fields (G-05). |
+| `context-envelope.schema.json` | IMP-010 to IMP-081; CCIS-REQ-032 to 038, 040 to 042, 083. One case: pseudonymous reference, exact applied versions, observations (kind, unit, effective and recorded time with zone state, status, source class, provenance, value or one of five states, never both), classified events, codes with verification state. No field for identity or narrative; inclusions are fixed to `false`. No integrity field (IMP-014 open until G-05). |
+| `import-report.schema.json` | IMP-100 to IMP-108, 112 to 115; CCIS-REQ-044, 084. Each record in exactly one of accepted, rejected, unmapped, ambiguous; reasons name a category, never the content; a refused envelope imports nothing. |
 
 Validators are generated (`npm run build`) into `ccis/validators/ccis-validators.js`, committed, and checked for staleness by the tests. Nothing compiles a schema at runtime.
 
@@ -20,3 +23,8 @@ Validators are generated (`npm run build`) into `ccis/validators/ccis-validators
 **Decision-node limits (D-018).** Outcome tests are state tests only: `present`, `absent`, `unknown`, `not-collected`, `not-applicable`, `explicitly-negative`, `entered-in-error`, `conflicting`. "Present" means a record exists; it says nothing about its value. Tests on values wait for the expression tree (row 1.3). Phase 2 validator, additionally: every `next.stage` and transition target exists; every outcome `input` is one of the node's inputs; outcomes cover every state a node input can be in; no unreachable stage; every `needs` key exists in the referenced element; timing `parameter` ids exist in the required analytics. Graph-wide checks (dead ends, bounded cycles) are gap G-09, row 5.3.
 
 **Analytics: left to the Phase 2 validator.** Operator arity and argument types; every `ref` and `output` id resolves; every declared parameter and input is used; each `onMissing` and output state is consistent with the computation; unit consistency and explicit conversions (REQ-042, 043); `time-zone` conversions name known zones; execution-profile feasibility; that a computation depending on a disabled parameter reports `parameter-not-enabled` rather than a value (REQ-072, a runtime rule, enforced by the executor in Phase 3). The execution manifest is row 1.3a. No integrity or checksum fields: gap G-05.
+
+**Execution manifest: left to the Phase 2 compiler and validator.** Every dependency resolves and matches the package manifest's references; the operator set exists in the engine; the profile is no looser than the package's own; compilation fails closed when a pin cannot be resolved (CCIS-REQ-065); canonical form and checksum (G-05, row 2.4).
+
+
+**Envelope and report: left to later rows.** Counts add up to the record count and every envelope record appears once in the report (IMP-105; importer, row 3.1); every `correctionOf`, concept, `derivation.from` and applied id resolves (IMP-021); an applied version the app does not hold is reported (IMP-107); unit and zone checks beyond the pattern; the pseudonym is not derived from an identifier (IMP-020; the EMR's B5 and the importer); envelope major-version handling and unknown critical fields (IMP-111 to 116); an entered-in-error record is rejected by the importer by default (IMP-091); integrity (IMP-014, gap G-05).

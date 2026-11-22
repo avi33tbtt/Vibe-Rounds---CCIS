@@ -1,0 +1,28 @@
+{
+  "package": {
+    "id": "synthetic.demo-analytics",
+    "version": "0.1.0"
+  },
+  "standard": {
+    "version": "0.1.0"
+  },
+  "engine": {
+    "range": "^0.1.0"
+  },
+  "operatorSet": {
+    "name": "ccis-core-ops",
+    "version": "0.1.0"
+  },
+  "dependencies": [],
+  "mandatoryExtensions": [],
+  "executionProfile": {
+    "maxSteps": 1000,
+    "maxDepth": 16,
+    "maxOutputBytes": 65536
+  },
+  "outputContractVersion": "0.1.0",
+  "compiledFrom": {
+    "authoringRoute": "native",
+    "authoringVersion": "0.1.0"
+  }
+}

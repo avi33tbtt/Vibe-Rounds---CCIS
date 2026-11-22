@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { manifest, element, terminologyBinding, decisionNode, pathway, analytics } from '../ccis/validators/ccis-validators.js';
+import { manifest, element, terminologyBinding, decisionNode, pathway, analytics, executionManifest, contextEnvelope, importReport } from '../ccis/validators/ccis-validators.js';
 
-const validators = { manifest, element, terminologyBinding, decisionNode, pathway, analytics };
+const validators = { manifest, element, terminologyBinding, decisionNode, pathway, analytics, executionManifest, contextEnvelope, importReport };
 const dir = new URL('../ccis/fixtures/schemas/', import.meta.url);
 const load = (f) => JSON.parse(readFileSync(new URL(f, dir), 'utf8'));
 const index = load('index.json');
@@ -106,6 +106,75 @@ test('the analytics fixtures carry no numeric literal and no parameter value any
   const walk = (n) => { if (n && typeof n === 'object') { if ('literal' in n) assert.notEqual(typeof n.literal, 'number'); Object.values(n).forEach(walk); } };
   walk(an.computation);
   for (const p of an.parameters) for (const k of ['default', 'value', 'suggested']) assert.equal(k in p, false);
+});
+
+test('mutations: execution manifest defects are rejected (REQ-011, 016, 063 to 065, 069, 070, 075)', () => {
+  const em = load('execution-manifest-good-full.json');
+  const cases = [
+    ['missing operatorSet', (x) => { delete x.operatorSet; }],
+    ['operatorSet version a range', (x) => { x.operatorSet.version = '^0.1.0'; }],
+    ['empty package id', (x) => { x.package.id = ''; }],
+    ['package version a range', (x) => { x.package.version = '>=0.1.0'; }],
+    ['authoringRoute outside the three', (x) => { x.compiledFrom.authoringRoute = 'manual'; }],
+    ['maxSteps zero', (x) => { x.executionProfile.maxSteps = 0; }],
+    ['missing outputContractVersion', (x) => { delete x.outputContractVersion; }],
+    ['missing dependencies array', (x) => { delete x.dependencies; }],
+    ['engine as an exact-less string', (x) => { x.engine = '^0.1.0'; }],
+    ['mandatory extension without x- prefix', (x) => { x.mandatoryExtensions = ['note']; }],
+  ];
+  for (const [what, fn] of cases) { const x = clone(em); fn(x); assert.equal(run('executionManifest', x).ok, false, `should reject: ${what}`); }
+  assert.equal(run('executionManifest', em).ok, true);
+  const ext = clone(em); ext['x-note'] = 1; assert.equal(run('executionManifest', ext).ok, true);
+});
+
+test('mutations: context envelope defects are rejected (IMP-030 to 051, 090)', () => {
+  const ev = load('context-envelope-good-full.json');
+  const cases = [
+    ['sourceClass outside the eight', (x) => { x.observations[0].sourceClass = 'guessed'; }],
+    ['extra personal field on provenance', (x) => { x.observations[0].provenance.performer = 'synthetic'; }],
+    ['derived without derivation', (x) => { x.observations[0].sourceClass = 'derived'; delete x.observations[0].derivation; }],
+    ['recorded a bare time with no state', (x) => { x.observations[0].recorded = '2026-01-01T08:05:00Z'; }],
+    ['unit on a boolean', (x) => { x.observations[2].unit = '1'; }],
+    ['value type does not match kind', (x) => { x.observations[0].value = 'text'; }],
+    ['event with both time and period', (x) => { x.events[0].period = x.events[1].period; }],
+    ['unknown critical top-level field', (x) => { x.narrative = 'synthetic'; }],
+    ['case reference too short', (x) => { x.case.ref = 'a1'; }],
+    ['code without verification state', (x) => { delete x.observations[3].concept.codes[0].verification; }],
+    ['exportedAt without an offset', (x) => { x.envelope.exportedAt = '2026-01-01T10:00:00'; }],
+    ['entered-in-error as an inclusion flag', (x) => { x.inclusions.enteredInError = true; }],
+  ];
+  for (const [what, fn] of cases) { const x = clone(ev); fn(x); assert.equal(run('contextEnvelope', x).ok, false, `should reject: ${what}`); }
+  assert.equal(run('contextEnvelope', ev).ok, true);
+  const ext = clone(ev); ext['x-note'] = 1; assert.equal(run('contextEnvelope', ext).ok, true);
+});
+
+test('mutations: import report defects are rejected (IMP-100 to 108)', () => {
+  const rp = load('import-report-good-read.json');
+  const cases = [
+    ['record without recordKind', (x) => { delete x.records[0].recordKind; }],
+    ['counts missing ambiguous', (x) => { delete x.counts.ambiguous; }],
+    ['negative count', (x) => { x.counts.accepted = -1; }],
+    ['held as a string', (x) => { x.appliedVersions[0].held = 'yes'; }],
+    ['decision on a non-ambiguous record', (x) => { x.records[0].decision = { choice: 'a', decidedBy: 'role' }; }],
+    ['read outcome with a refusal reason', (x) => { x.refusalReason = 'synthetic'; }],
+    ['inclusions with identity true', (x) => { x.inclusions.identity = true; }],
+    ['empty reasons on an unmapped record', (x) => { x.records[2].reasons = []; }],
+  ];
+  for (const [what, fn] of cases) { const x = clone(rp); fn(x); assert.equal(run('importReport', x).ok, false, `should reject: ${what}`); }
+  assert.equal(run('importReport', rp).ok, true);
+});
+
+test('the source-class set is identical in the element and envelope schemas (A-001)', () => {
+  const rd = (f) => JSON.parse(readFileSync(new URL(`../ccis/schemas/${f}`, import.meta.url), 'utf8'));
+  const a = rd('element.schema.json'); const b = rd('context-envelope.schema.json');
+  const find = (o) => { if (o && typeof o === 'object') { if (Array.isArray(o.enum) && o.enum.includes('patient-reported')) return o.enum; for (const v of Object.values(o)) { const r = find(v); if (r) return r; } } };
+  assert.deepEqual([...find(a)].sort(), [...find(b)].sort());
+  assert.ok(find(a).includes('informant-reported'));
+});
+
+test('the execution manifest carries no checksum, hash or signature field (G-05)', () => {
+  const s = JSON.parse(readFileSync(new URL('../ccis/schemas/execution-manifest.schema.json', import.meta.url), 'utf8'));
+  for (const k of Object.keys(s.properties)) assert.equal(/checksum|hash|signature|digest/i.test(k), false, k);
 });
 
 test('generated validators contain no eval, Function, dynamic import or runtime imports (D-005, D-006)', () => {

@@ -243,5 +243,185 @@
       "where": "executionProfile"
     },
     "diagnostic": "REQ-069: an execution profile is declared"
+  },
+  {
+    "file": "execution-manifest-good-minimal.json",
+    "schema": "executionManifest",
+    "valid": true
+  },
+  {
+    "file": "execution-manifest-good-full.json",
+    "schema": "executionManifest",
+    "valid": true
+  },
+  {
+    "file": "execution-manifest-bad-range-pin.json",
+    "schema": "executionManifest",
+    "valid": false,
+    "expect": {
+      "keyword": "pattern",
+      "where": "/version"
+    },
+    "diagnostic": "REQ-064: dependency pins are exact, not ranges"
+  },
+  {
+    "file": "execution-manifest-bad-latest.json",
+    "schema": "executionManifest",
+    "valid": false,
+    "expect": {
+      "keyword": "pattern",
+      "where": "/version"
+    },
+    "diagnostic": "REQ-064: no mutable reference such as latest"
+  },
+  {
+    "file": "execution-manifest-bad-no-profile.json",
+    "schema": "executionManifest",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "executionProfile"
+    },
+    "diagnostic": "REQ-069: an execution profile is declared"
+  },
+  {
+    "file": "execution-manifest-bad-unknown-field.json",
+    "schema": "executionManifest",
+    "valid": false,
+    "expect": {
+      "keyword": "additionalProperties",
+      "where": "criticalFlag"
+    },
+    "diagnostic": "REQ-015: unknown critical field rejected"
+  },
+  {
+    "file": "execution-manifest-bad-checksum.json",
+    "schema": "executionManifest",
+    "valid": false,
+    "expect": {
+      "keyword": "additionalProperties",
+      "where": "checksum"
+    },
+    "diagnostic": "G-05: no integrity fields before row 2.4"
+  },
+  {
+    "file": "context-envelope-good-minimal.json",
+    "schema": "contextEnvelope",
+    "valid": true
+  },
+  {
+    "file": "context-envelope-good-full.json",
+    "schema": "contextEnvelope",
+    "valid": true
+  },
+  {
+    "file": "context-envelope-bad-range-version.json",
+    "schema": "contextEnvelope",
+    "valid": false,
+    "expect": {
+      "keyword": "pattern",
+      "where": "/version"
+    },
+    "diagnostic": "IMP-030: applied versions are exact"
+  },
+  {
+    "file": "context-envelope-bad-inclusion-true.json",
+    "schema": "contextEnvelope",
+    "valid": false,
+    "expect": {
+      "keyword": "const",
+      "where": "narrative"
+    },
+    "diagnostic": "IMP-090, 096: exclusions declared, none included in 0.1.0"
+  },
+  {
+    "file": "context-envelope-bad-name-field.json",
+    "schema": "contextEnvelope",
+    "valid": false,
+    "expect": {
+      "keyword": "additionalProperties",
+      "where": "name"
+    },
+    "diagnostic": "IMP-020, 091: no identity field exists"
+  },
+  {
+    "file": "context-envelope-bad-quantity-no-unit.json",
+    "schema": "contextEnvelope",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "unit"
+    },
+    "diagnostic": "IMP-042: a quantity has a unit"
+  },
+  {
+    "file": "context-envelope-bad-value-and-state.json",
+    "schema": "contextEnvelope",
+    "valid": false,
+    "expect": {
+      "keyword": "not",
+      "where": "/observations"
+    },
+    "diagnostic": "IMP-051: a value or a state, never both"
+  },
+  {
+    "file": "context-envelope-bad-time-no-zone-state.json",
+    "schema": "contextEnvelope",
+    "valid": false,
+    "expect": {
+      "keyword": "type",
+      "where": "effective"
+    },
+    "diagnostic": "IMP-046: a time states its zone or says unknown"
+  },
+  {
+    "file": "import-report-good-read.json",
+    "schema": "importReport",
+    "valid": true
+  },
+  {
+    "file": "import-report-good-refused.json",
+    "schema": "importReport",
+    "valid": true
+  },
+  {
+    "file": "import-report-bad-two-categories.json",
+    "schema": "importReport",
+    "valid": false,
+    "expect": {
+      "keyword": "enum",
+      "where": "/category"
+    },
+    "diagnostic": "IMP-100: exactly one of four categories"
+  },
+  {
+    "file": "import-report-bad-rejected-no-reason.json",
+    "schema": "importReport",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "reasons"
+    },
+    "diagnostic": "IMP-102: a rejected record has a reason"
+  },
+  {
+    "file": "import-report-bad-refused-with-records.json",
+    "schema": "importReport",
+    "valid": false,
+    "expect": {
+      "keyword": "maxItems",
+      "where": "/records"
+    },
+    "diagnostic": "IMP-113, 114: a refused envelope imports nothing"
+  },
+  {
+    "file": "import-report-bad-category-names-content.json",
+    "schema": "importReport",
+    "valid": false,
+    "expect": {
+      "keyword": "additionalProperties",
+      "where": "content"
+    },
+    "diagnostic": "IMP-091: a reason names a category, never the content"
   }
 ]

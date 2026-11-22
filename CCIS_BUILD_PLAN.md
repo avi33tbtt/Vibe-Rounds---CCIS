@@ -1,205 +1,309 @@
-# CCIS Build Plan
+# CCIS Build Plan (final, standalone app)
 
-Repo: https://github.com/avi33tbtt/Vibe-Rounds---CCIS
-Based on: https://github.com/avi33tbtt/Vibe-Rounds---EMR-Enhancer-App/ (its tracker, chunk files, conventions and the Track C rows C0 to C9)
-Research: https://github.com/avi33tbtt/Vibe-Rounds---EMR-Enhancer-App/tree/main/Research
+Repo: https://github.com/avi33tbtt/Vibe-Rounds---CCIS (starts from zero)
+Research: https://github.com/avi33tbtt/Vibe-Rounds---EMR-Enhancer-App/tree/main/Research (book, Chapters 1 to 10)
+Host app that produces the data: https://github.com/avi33tbtt/Vibe-Rounds---EMR-Enhancer-App/
 
 Prototype. Synthetic data only. Not for clinical use.
 
 ---
 
-## 1. What CCIS is, and how this plan relates to the EMR app
+## 0. The plan in ten lines
 
-CCIS (Clinical Context Intelligence Standard) is the declarative standard for clinical context elements, pathways, decision nodes and analytics packages, plus the toolchain that makes it trustworthy: validator, compiler, constrained runtime, run records and a test marketplace.
+1. This repo is a **separate app**: the **Contextual Clinical Intelligence App** plus the **CCIS standard** it runs on (book Ch6 to Ch10). It is not a module of the EMR Enhancer.
+2. It never touches the EMR's database or code. It **imports an export file** that the EMR Enhancer produces (the "context envelope"). This repo owns the receiving contract and the synthetic fixtures; the EMR conforms to it later.
+3. It is **local-first**: one static browser app plus a Node CLI, pure JavaScript, no server and no database in the first version. Patient data stays on the user's device.
+4. The engine is **deterministic and constrained**: a whitelist interpreter over declarative packages. No `eval`, no network, no file access, no clock reads. Unknown never becomes false or normal.
+5. Knowledge comes from **packages** (elements, pathways, analytics) validated by one pipeline and pinned by checksum. A local test marketplace comes first, GitHub-hosted releases later.
+6. First end-to-end slice: **snake envenomation process metrics** (bite-to-ASV interval and 20-minute clotting-test documentation completeness). No doses, no bands.
+7. **Schemas, validator rules, compiler details, storage formats and API/CLI contracts are done at a later stage** (section 4). Phase 0 is documents only.
+8. Work is done in small chunks, one per chat, with the EMR app's "do next" protocol.
+9. The first release target is **CCIS 0.1.0**: the whole slice runs with one command and reruns byte-identically.
+10. Expansion (templates, decision graphs, cohorts, FHIR Mode, authoring routes, governance, EMR cohort exporter) comes only after 0.1.0.
 
-The EMR Enhancer app is the **host**: it holds patients, cases, element sets, observations, notes and the server-side context envelope. CCIS is the **standard and engine** that consumes that context and runs reusable packages against it.
+---
 
-What this repo takes from the EMR app, unchanged in spirit:
+## 1. What is being built, and the boundaries
 
-| From the EMR app | Used here as |
+Three things exist in the ecosystem. Only the middle one is this repo.
+
+| | EMR Enhancer (other repo) | **CCIS app + standard (this repo)** | Marketplace (later, own repo) |
+|---|---|---|---|
+| Job | Create and keep the contextual patient record; export it | Import context, check compatibility, run packages, show results with provenance; define and validate the standard | Distribute versioned knowledge packages |
+| Holds patient data | Yes (its database) | Only what the user imports, on their device | **Never** |
+| Talks to the others by | An export file | Reads the export file; reads package index and releases | Static index plus immutable releases |
+
+Rules that follow from the book (Ch6 section 1, Ch8 section 11, Ch10 section 5):
+
+- The app must not assume access to the EMR's database or runtime. Only a documented export package crosses the boundary.
+- The marketplace holds definitions, code, documentation and **synthetic** fixtures only. Never patient records, never cohort membership.
+- The EMR cohort exporter is the last item of the whole programme. The cohort engine is built and tested on synthetic fixtures first.
+
+---
+
+## 2. What this plan is built from
+
+**From the book**
+- Ch6: app architecture, import pipeline, compatibility in three levels, engine subsystems, operator library, status lifecycle, privacy boundaries, one-app-with-modules (no microservices).
+- Ch7: the standard: artefact families, native mode and FHIR mode, three equal authoring routes, five assurance dimensions, runtime sequence, execution record.
+- Ch8: templates, decision-node analytics, research-to-package workflow, cohort rules with three-valued eligibility, the package contract.
+- Ch9: schemas, the eight-layer validator, reference artefacts, smallest runtime, acceptance tests, phases 0 to 6.
+- Ch10: expansion order and the maturity definition.
+- Ch5: the canonical model (observation semantics, effective vs recorded time, provenance classes, three version dimensions). CCIS uses this as the **meaning** of the import contract, without copying the EMR's tables.
+
+**From the EMR repo** (conventions kept)
+- Small chunk files, one per chat, each with a size guard; the "do next" tracker; `01-core.md` rules; `DECISIONS.md` (max 3 rows per task); `node --test`; CI on every push; "never mark DONE unless verified"; at most 3 deliberate-breakage checks; synthetic data only; escaping and no-inline-handler (CSP) discipline in the UI; a safety-test pack for rules that must never break.
+
+**Conflicts found and how they are resolved**
+| Conflict | Resolution |
 |---|---|
-| Small chunk files, one per chat, with a "Size guard" | Same. Plan chunks live in `plan-chunks/` |
-| Slim tracker with the **"do next"** protocol | `CCIS_TASK_TRACKER.md` (created in Phase 0) |
-| `01-core.md` rules that never change | `plan-chunks/01-core.md` (CCIS version, section 4 below) |
-| `DECISIONS.md` archive, max 3 rows per task | Same |
-| Node.js (>=20), flat layout, `node --test`, no framework for tests | Same |
-| CI on every push (`.github/workflows/ci.yml`) | Same, no database needed for the pure libraries |
-| "Never mark DONE unless implemented and verified" | Same |
-| Mutation checks (break it, see the test fail, restore) | Same, at most 3 per task |
-| Safety-test pack idea (rules that must never break) | A CCIS safety pack, built when there is code to guard |
-
-Decision carried over from the EMR tracker (2026-11-22): **CCIS libraries are pure JS with no database access**, so they can live in this repo, be published separately, and be tested without PostgreSQL. Anything that needs the database (run records, the context service) lives in the EMR app and calls CCIS as a library.
+| The EMR tracker puts CCIS code inside the EMR repo, run records in the EMR database and `ci.html` in the EMR app. The book says separate app. | Standalone, as you decided. The EMR tracker rows C0 to C9 and D1 to D7 are **moved here**; only the EMR-side exporter rows stay there (section 9). |
+| Book Ch6 slice is diabetes + CKD; Ch9 and the EMR decisions use snake envenomation. | Snake envenomation first (decided 2026-11-22; pure timing and completeness, no thresholds). Diabetes + CKD becomes the **second demo** in Phase 4 to prove multi-context and combined analytics. |
+| EMR plan says libraries are "pure JS, no DB" but runs them inside Express. | Keep pure JS, but the app itself has no server in v0.1. |
+| Book Ch9 says freeze the spec before schemas; schema work always finds spec gaps. | The spec is **prototype-baselined** in Phase 0 (reviewed, approved). Gaps found later are logged as numbered amendments in `ccis/CHANGELOG.md` and need your approval. The real freeze is CCIS 0.1.0. |
+| EMR C5a needs the EMR's B5 context service before runtime work can start. | Not needed any more: this repo defines the import contract and fixtures itself, so nothing waits on the EMR. |
 
 ---
 
-## 2. Deferred to a later stage: schema and other formal contracts
+## 3. Decisions (also copied into `DECISIONS.md`)
 
-**Schemas and related formal artefacts will be done at a later stage, not now.** This plan covers the project, the specification intent, conventions, the first use case and the order of work. It does not define:
-
-- the JSON Schemas (manifest, element, terminology binding, pathway, decision node, analytics package, execution manifest, validation record, run result);
-- the database schema and migrations (run records, marketplace index tables, anything stored);
-- the validator's rule catalogue (CCIS-V-nnn IDs and their exact wording), because it depends on the schemas;
-- the canonical-form and checksum algorithm of the compiler, because it depends on the schemas;
-- the API contracts between the EMR app and CCIS (request and response shapes);
-- the FHIR Mode mapping tables and the cohort data package contract.
-
-Why: the specification must be written and approved first, and the EMR app's own server-side model (cases, element-set versions, observations, context envelope: its Track B) is not built yet. Freezing schemas now would mean freezing them against a moving target.
-
-Everything below is arranged so that these items slot in at **Stage 2 (section 5)** without changing Stage 0 or Stage 1. Nothing in Stage 0 or Stage 1 may contain a schema, a migration or an API shape. If a task seems to need one, stop and add it as a Stage 2 row instead.
-
----
-
-## 3. Scope and the first use case
-
-**In scope (eventually):** the eight artefact types (manifest, contextual element, terminology binding, pathway, decision node, analytics package, execution manifest, run result), validation, compilation, a constrained deterministic executor, immutable run records, a local test marketplace and a result viewer.
-
-**Out of scope for the first baseline (CCIS 0.1):** cohort analytics, FHIR Mode round-trip, templates catalogue, LLM drafting, research-to-package, population-level access. These are the later D-series rows in the EMR tracker and come after the baseline.
-
-**First vertical slice (fixed, as in the EMR plan):** snake envenomation process metrics.
-
-- bite-to-ASV interval;
-- 20-minute whole-blood clotting test documentation completeness.
-
-Thresholds are **parameters supplied by the local clinician and arrive disabled**. No doses, bands or thresholds come from any model, from this plan or from the example fixtures.
+| ID | Decision | Why | Alternative not taken |
+|---|---|---|---|
+| D-001 | Standalone repo and app; integration only through an export file | Book Ch6; independent development; clean privacy boundary | Library inside the EMR repo |
+| D-002 | Local-first: static browser app + Node CLI; no server, no database in 0.1 | Patient data stays on the device (Ch6 section 9); GitHub Pages friendly (Ch9 section 7); no auth/DB burden for a first slice | Express + PostgreSQL like the EMR (needed only if multi-user, population-level access control or shared run history is required; revisit in Phase 5) |
+| D-003 | JavaScript, ES modules, flat root-level `ccis-*.js` files plus `ccis/` for spec, schemas, examples, fixtures; Node 22 in CI | Same module runs in Node and in the browser with no build step; matches the book's flat layout | TypeScript (can be added later; not needed to prove the contract) |
+| D-004 | Core libraries are pure: no network, no file access, no clock reads, no randomness. Evaluation time and ids are **inputs** | Determinism and byte-identical reruns | Reading the clock inside the engine |
+| D-005 | Schemas: JSON Schema 2020-12. Validators are generated at development time (Ajv standalone, to be verified in row 1.1) and committed, so the browser app ships no schema compiler and no `eval` | A strict CSP forbids runtime code generation; also the "no eval" rule | Compiling schemas in the browser |
+| D-006 | Execution = whitelist interpreter over a declarative expression tree; no `eval`, `Function`, dynamic import | Ch7 section 6, Ch9 section 8 | Packages carrying code |
+| D-007 | Results are three-valued (true / false / indeterminate) and absent, unknown, not collected, not applicable, negative and entered-in-error stay distinct | Ch6 section 6.3, Ch8 section 6.2 | Treating missing as zero or normal |
+| D-008 | First slice: snake envenomation process metrics; thresholds are parameters supplied by a local clinician and arrive **disabled** | No doses or bands from any model | Diabetes + CKD first |
+| D-009 | Run records are immutable, content-addressed and hold the input snapshot, so a rerun from the record is byte-identical | Ch7 section 13.2 | Mutable history |
+| D-010 | Browser app makes **no network requests at all** until row 4.1; after that only to the declared marketplace host, never with patient data. Enforced by CSP `connect-src` and a test | Ch6 section 9 | Open network access |
+| D-011 | AI is off and absent in 0.1.0. When added (row 4.3) it only drafts, behind an explicit switch, from a whitelist payload, and can never publish or validate | Ch7 section 9.1, Ch10 section 9 | LLM in the loop from the start |
+| D-012 | Package lifecycle uses the book's statuses; assurance dimensions are recorded separately and never collapsed into one "validated" badge | Ch7 section 10 and 12 | Single badge |
 
 ---
 
-## 4. Core rules for this repo (`plan-chunks/01-core.md`)
+## 4. DEFERRED: schemas and other formal contracts (later stage)
 
-Copy of the EMR core rules, trimmed to what applies to CCIS.
+**Schemas, the database/storage design and the other formal contracts are deliberately done at a later stage, not in Phase 0.** Phase 0 produces documents in words only. The following are **not** defined now and must not appear in Phase 0 outputs:
 
-**Product:** a standard plus toolchain. Not a clinical application. Not a place where patient data lives.
+- JSON Schemas for: package manifest, contextual element, terminology binding, pathway, decision node, analytics package, execution manifest, validation record, **context envelope and import report**, run result, run record.
+- Field-level shape of the EMR export (Phase 0 states only what it must carry, in words).
+- The validator's rule catalogue (the stable CCIS-V-nnn ids and their wording).
+- The compiler's canonical form and checksum algorithm.
+- Run-record and marketplace-index storage formats (file layout, IndexedDB design).
+- CLI command surface and the exact module APIs.
+- FHIR Mode mapping tables, the cohort definition schema, the cohort package contract.
 
-**Architecture**
-- Packages are **declarative data only**: no code, no network, no filesystem, no patient data access.
-- The executor has no `eval`, no `Function`, no dynamic `require`. Operators are a whitelist.
-- Results are three-valued: true, false, indeterminate. **Unknown never becomes false or normal.**
-- Same input gives byte-identical output.
-- Versioning is semver. A breaking change is a new major. Unknown critical fields are rejected. Extensions use the `x-` namespace.
-- The EMR app's own model is the system of record. FHIR R4 is an export boundary only.
-
-**Safety**
-- Synthetic data only until the go-live gate.
-- No LLM-supplied doses, thresholds or protocol bands. AI only drafts, and drafts are never auto-published.
-- Rules and bands arrive disabled until a local clinician enables them.
-- Requirements carry stable IDs (CCIS-REQ-nnn). Validator rules carry stable IDs (CCIS-V-nnn) once Stage 2 defines them.
-
-**Data and provenance**
-- Run records are immutable. Reruns from a stored snapshot reproduce the same output.
-- Approver and author identities come from the host session, never from a package body.
-
-**Process**
-- One chunk per chat. Size guard respected. Never mark DONE unless verified.
-- Never edit an existing chunk file once written. Add a new row instead.
+They are done in **Stage 2 (Phases 1 to 3)**, which starts only when you say so after approving the Phase 0 documents (gate R0). Nothing in Phase 0 depends on them. If a Phase 0 task seems to need one, stop and add a Stage 2 row instead.
 
 ---
 
-## 5. Stages and chunks
+## 5. Architecture (modules and data flow)
 
-The chunk IDs mirror the EMR tracker (C0 to C9) so the two plans stay comparable. Rows marked **DEFERRED** are Stage 2 and are not started until the specification is approved and the EMR app's Track B prerequisites are done.
+### 5.1 Data flow (the runtime sequence from Ch7 section 13)
 
-### Stage 0: Foundation (do now, no code)
+```
+EMR export file --> [Importer] --> canonical context + import report
+                                        |
+ selected elements / pathway  ----------+
+                                        v
+ local catalogue / marketplace --> [Compatibility resolver] --> compatible / with limitations /
+ (pinned, checksummed packages)         |                        needs data / incompatible / not eligible
+                                        v  (user selects one or many)
+                                   [Planner] --> [Executor: whitelist interpreter + operators]
+                                        v
+                               [Result validator] --> [Run record: immutable, with snapshot]
+                                        v
+                           [Results workspace: values, trace, evidence, provenance, limitations]
+```
 
-| ID | Task | Output | Size guard |
-|----|------|--------|------------|
-| P0 | Repo scaffolding: `.gitignore`, `package.json` (no dependencies yet), `plan-chunks/`, CI workflow that runs `node --test` | 4 small files | no source code |
-| P1 | Tracker and protocol: `CCIS_TASK_TRACKER.md` with the "do next" protocol adapted from the EMR tracker, `DECISIONS.md` (empty log), `plan-chunks/01-core.md` from section 4 | 3 markdown files | docs only |
-| C0 | Specification baseline, **intent level**: `ccis/SPEC.md` (normative core with CCIS-REQ-nnn IDs, versioning policy, security boundary, list of validator layers by name only), `ccis/CHANGELOG.md`, `ccis/README.md`; fix the first use case (section 3); list the eight artefact types and their **required metadata in words**, not as schemas | 3 markdown files | no schemas, no code |
-| C0r | Review gate: the user reads the spec, approves freezing it for prototype work | approval recorded in `DECISIONS.md` | none |
+### 5.2 Modules (root-level files; all pure)
 
-### Stage 1: Spec-only scaffolding that does not need schemas (next)
+| File | Responsibility | Stage |
+|---|---|---|
+| `ccis-schema.js` (+ generated validators) | Load/compile-time schema access | 2 |
+| `ccis-validate.js` | Eight-layer validator, machine-readable diagnostics, CLI | 2 |
+| `ccis-compile.js` | Canonical form, checksum, equivalence | 2 |
+| `ccis-terminology.js` | Code-system, unit and mapping resolution (shared by authoring, marketplace, runtime) | 2 to 3 |
+| `ccis-import.js` | Export file to canonical context + import report | 3 |
+| `ccis-compat.js` | Compatibility resolver with explanations | 3 |
+| `ccis-exec.js` | Expression interpreter, operator library, decision-node walker, rule trace | 3 |
+| `ccis-run.js` | Planner, batch runs, result validation, run records | 3 |
+| `ccis-market.js` | Publish, resolve, pin, verify; lint for patient data | 3 (local), 4 (GitHub) |
+| `app.js`, `index.html`, `ui-*.js` | Browser app (no inline handlers, shared escaper) | 3 |
+| `cli.js` | Node CLI over the same modules | 3 |
 
-| ID | Task | Output | Size guard |
-|----|------|--------|------------|
-| S1 | Glossary and traceability: map each chapter (7 to 10) concept to a requirement ID and to a later chunk | 1 markdown file | docs only |
-| S2 | Reference-use-case narrative: the snake envenomation example written as prose and a worked example (inputs named, no numeric thresholds), plus the list of synthetic fixture cases to be created later | 1 markdown file | docs only |
-| S3 | Host contract **intent**: what CCIS expects from the EMR app (a minimal context envelope, in words), mapped to EMR tracker rows B5 and C5a. No field-level shapes | 1 markdown file | docs only |
-| S4 | Conformance and acceptance criteria written as a checklist (the Ch9 definition of done), with no test code | 1 markdown file | docs only |
+### 5.3 Artefact families (Ch7 section 3.3) and lifecycle
 
-### Stage 2: Formal contracts and toolchain (**DEFERRED**, schemas etc. are done here)
+Contextual Element, Element Group, Pathway (with Decision Nodes), Analytics Package, Terminology Package, Test/Validation Package. Each independently versioned; references name exact versions or ranges and are never copied in.
 
-Starts only when: C0r approved, S1 to S4 done, and the EMR app has its Track B context service (B5) available to design against.
+Lifecycle statuses: Draft, Submitted, In Review, Reviewed, Validated, Conditionally Validated, Deprecated, Withdrawn, Rejected. Assurance is recorded per dimension (structural, semantic, clinical review, execution, security/privacy), each attached to an exact package version and scope.
 
-| ID | Task | EMR-tracker equivalent | Needs |
-|----|------|------------------------|-------|
-| C1a | JSON Schemas: manifest, element, terminology binding (+ Ajv pinned, schema loader, tests) | C1a | C0r |
-| C1b | JSON Schemas: pathway, decision node | C1b | C1a |
-| C1c | JSON Schemas: analytics package, execution manifest, validation record, run result | C1c | C1b |
-| C2a / C2b | Reference artefacts (valid) and invalid examples per validator layer, synthetic fixtures | C2a, C2b | C1c |
-| C3a to C3c | Validator, 8 layers, stable CCIS-V-nnn diagnostics, CLI | C3a to C3c | C2b |
-| C4 | Compiler: canonical form, checksum, equivalence | C4 | C3c |
-| DB1 | Database design for run records and marketplace index (migrations belong in the EMR app, numbered, restricted role, no DELETE/TRUNCATE on clinical data) | part of C6 | C4, EMR B5 |
-| API1 | API contracts CCIS to EMR app (context envelope in, run result out) | part of C5a, C6 | C4, EMR B5 |
+### 5.4 Compatibility outcomes (Ch7 section 11)
 
-### Stage 3: Runtime and first vertical slice (**DEFERRED**)
+Compatible; Compatible with limitations; Needs data; Incompatible; Not eligible. Each with reasons. Six checks: artefact, semantic, schema, data readiness, runtime, assurance suitability. Never from text similarity.
 
-| ID | Task | Needs |
-|----|------|-------|
-| C5a | Runtime: import the context envelope | EMR B5, C4 |
-| C5b | Compatibility resolver | C5a |
-| C5c | Constrained deterministic executor and decision path (no `eval`, three-valued, step and depth limits, byte-identical reruns) | C5b |
-| C6 | Immutable run records + API (lives in the EMR app, uses the CCIS library) | C5c, EMR B5 |
-| C7 | Local test marketplace: publish, resolve, pin | C4 |
-| C8 | Result viewer | C6 |
-| C9 | Vertical slice: author, validate, publish, import a real server case, resolve, run, store, read back, rerun identical; negative tests for undeclared network, filesystem and patient data; freeze **CCIS 0.1.0** with a known-limitations list the user reviews | C6, C7, C8 |
+### 5.5 What the import contract must carry (in words; shape is deferred)
 
-### Stage 4: Expansion (after the 0.1 baseline)
-
-Same as the EMR tracker's D-series: templates and catalogue (D1), decision graphs and governed LLM drafting (D2), research to package (D3), cohort definition, evaluator, analytics and access (D4), FHIR Mode (D5), governance (D6), evaluation (D7), cohort package contract and exporter (D8). Chunk files are written only when reached.
+Case reference (pseudonymous), applied element and pathway ids **with exact versions**, observations with value, unit, effective time, recorded time, status, source class (patient-reported, clinician-entered/verified, imported, device, derived, AI-proposed) and provenance, clinical events, terminology codes with verification state, envelope version, export time. Identity and narrative are **excluded by default**. Entered-in-error is excluded by default. The import report lists accepted, rejected, unmapped and ambiguous records.
 
 ---
 
 ## 6. Repository layout
 
-Created in Stage 0 and Stage 1 (docs and scaffolding only):
+At the end of Phase 0 (documents and scaffolding only):
 
 ```
 README.md
-CCIS_BUILD_PLAN.md          this file
-CCIS_TASK_TRACKER.md        slim tracker + "do next" protocol (P1)
-DECISIONS.md                decisions log, max 3 rows per task (P1)
-plan-chunks/                one file per chunk, never edited after writing
+CCIS_BUILD_PLAN.md      this file
+CCIS_TASK_TRACKER.md    protocol + task table
+DECISIONS.md            decisions log
+plan-chunks/            one file per chunk; written just in time; never edited once the row has started
   01-core.md
-  chunk-*.md
-ccis/
-  SPEC.md                   normative core (C0)
-  CHANGELOG.md
-  README.md
-docs/                       S1 to S4
-.github/workflows/ci.yml    runs node --test
-package.json
+  chunk-0.*.md
+docs/                   IMPORT-CONTRACT.md, USE-CASE-SNAKE.md, TRACEABILITY.md
+ccis/                   SPEC.md, CHANGELOG.md, README.md
+.github/workflows/ci.yml
+package.json  .gitignore  test/
 ```
 
-Added at Stage 2 and later (not now): `ccis/schemas/`, `ccis-schema.js`, `ccis-validate.js`, `ccis-compile.js`, `ccis-runtime.js`, `ccis-exec.js`, `ccis/reference/`, `ccis/fixtures/`, `test/ccis-*.test.js`.
+Added in Stage 2 and later: `ccis/schemas/ examples/ fixtures/ templates/`, the `ccis-*.js` modules, `index.html`, `app.js`, `cli.js`, `market/` (local test marketplace with the same layout as the future marketplace repo), `test/`.
 
 ---
 
-## 7. Working protocol (adapted from the EMR tracker)
+## 7. Phases and chunks
 
-Trigger phrase: **"do next"**. One task per trigger, small sessions.
+Phases follow Book Ch9 section 9 (0 to 6). IDs are `phase.number`. **"Chunk brief" below is what a chunk file is written from, when the row is reached** (chunk files are written just in time so that earlier findings are not frozen into wrong plans). Phase 0 chunk files already exist in `plan-chunks/`.
 
-1. Refresh the repo first (`git pull` or a fresh shallow clone). Do not pick a task before this succeeds.
-2. Read only `CCIS_TASK_TRACKER.md`, `plan-chunks/01-core.md` and the single chunk file named in the next task.
-3. Pick the first row with status `TODO` or `IN PROGRESS`.
-4. Size check before building. If the task does not fit its size guard, stop, propose the split, add rows. Do not half-build.
-5. **Do not start any Stage 2 row** until its "Needs" are DONE and the spec freeze is approved.
-6. Verify lightly: `npm test` once, at most 3 deliberate-breakage checks.
-7. Deliver only new or changed files, with the tracker updated (DONE, date, files, one line of notes).
-8. Other commands: `status`, `redo <id>`, `skip <id>`, `split <id>`.
+### Phase 0: Foundation and specification baseline  (NOW, no schemas)
+
+| ID | Task | Output | Size guard |
+|----|------|--------|-----------|
+| 0.1 | Repo scaffold and CI | `package.json` (ESM, no dependencies), `.gitignore`, `test/smoke.test.js`, `.github/workflows/ci.yml` (Node 22, `npm test`) | 4 small files |
+| 0.2 | Specification draft 0.1 | `ccis/SPEC.md` (requirement ids CCIS-REQ-nnn, scope, security boundary, versioning policy, epistemic and provenance rules, lifecycle, compatibility outcomes, failure behaviour, validator layers by name), `ccis/CHANGELOG.md`, `ccis/README.md` | 3 markdown files |
+| 0.3 | Import contract in words | `docs/IMPORT-CONTRACT.md` (section 5.5 expanded; import report semantics; what the EMR must provide; versioning of the envelope) | 1 markdown file |
+| 0.4 | Use-case dossier | `docs/USE-CASE-SNAKE.md`: element, pathway, two decision nodes, two analytics in words; disabled parameters; fixture classes; open clinician owner | 1 markdown file |
+| 0.5 | Traceability and acceptance checklist | `docs/TRACEABILITY.md`: book concept to requirement id to later row; the Ch9 section 8 acceptance list as a checklist | 1 markdown file |
+| R0 | **Review gate**: you read SPEC, IMPORT-CONTRACT, USE-CASE and approve the baseline | decision recorded in `DECISIONS.md` | none |
+
+### Phase 1: Schemas and reference artefacts  (DEFERRED, Stage 2; starts after R0)
+
+| ID | Chunk brief | Needs |
+|----|-------------|-------|
+| 1.1 | Schemas: manifest, element, terminology binding. Add the single pinned dev dependency (Ajv), a build script that emits committed standalone validators; verify standalone generation works for 2020-12 and needs no runtime `eval`. Good/bad fixtures | R0 |
+| 1.2 | Schemas: pathway, decision node (explicit indeterminate and missing-data branches) | 1.1 |
+| 1.3 | Schemas: analytics package (inputs, parameters, expression tree, outputs, failure behaviour, evidence), execution manifest | 1.2 |
+| 1.4 | Schemas: **context envelope**, import report, validation record, run result, run record | 1.3 |
+| 1.5 | Valid reference artefacts (snake element, 2-node pathway, 2 analytics) and synthetic fixtures (normal, boundary, missing, conflicting, out-of-scope, unit-conversion), each with an independently hand-calculated expected result | 1.4 |
+| 1.6 | Invalid examples, one per validator layer, with expected diagnostics; a FHIR-Mode example with mapping report and declared limits | 1.5 |
+
+### Phase 2: Validator and compiler  (DEFERRED)
+
+| ID | Chunk brief | Needs |
+|----|-------------|-------|
+| 2.1 | Validator layers 1 to 3 (syntax, structure, reference integrity), library + CLI, diagnostics with severity, stable rule id, JSON path, message, hint | 1.6 |
+| 2.2 | Layers 4 to 5 (semantic: units, types, time, terminology; graph and compatibility: traversable pathways, bounded cycles, no dangling branches) | 2.1 |
+| 2.3 | Layers 6 to 8 (executable safety: whitelist only, no code strings; test verification against fixtures; governance claims match exact version and scope) + report writer | 2.2 |
+| 2.4 | Compiler: canonical form, checksum, equivalence harness (same artefact from three routes gives identical canonical bytes); fail closed | 2.3 |
+
+### Phase 3: Minimal runtime, app shell and the first vertical slice  (DEFERRED)
+
+| ID | Chunk brief | Needs |
+|----|-------------|-------|
+| 3.1 | `ccis-import.js`: envelope to canonical context + import report; no silent loss; entered-in-error rejected by default; unit normalisation only through declared conversions | 2.4 |
+| 3.2 | `ccis-compat.js`: six checks, five outcomes with reasons, "never guess a mapping"; execution policy v0 (which statuses may run; preview banner) | 3.1 |
+| 3.3 | `ccis-exec.js` part 1: expression interpreter, operator whitelist, three-valued logic, step and depth limits, no eval | 3.2 |
+| 3.4 | `ccis-exec.js` part 2: operator library v0 (interval between events, presence/completeness, count, first/last/min/max, coalesce) and decision-node walker with rule trace; reference packages reproduce hand-calculated results | 3.3 |
+| 3.5 | `ccis-run.js`: planner, batch of several analytics on one context without mutating the source, result validation, immutable content-addressed run records with snapshot, rerun-from-record is byte-identical | 3.4 |
+| 3.6 | `ccis-market.js` + `market/` local test marketplace: publish (needs passing validator report and checksum), resolve, pin; lint refuses patient records and cohort data | 2.4 |
+| 3.7 | CLI: validate, import, list compatible, run, show | 3.5, 3.6 |
+| 3.8 | Browser app 1: import workspace, import report, context and pathway selector, compatibility catalogue with explanations (including the "needs data" and "incompatible" views) | 3.7 |
+| 3.9 | Browser app 2: multi-select run, results workspace (values with units, decision path with rule trace, missingness, scope, limitations, provenance), export of run record | 3.8 |
+| 3.10 | Browser hardening: strict CSP including `connect-src 'none'`, shared escaper, no inline handlers, jsdom tests plus one real-browser smoke test | 3.9 |
+| 3.11 | Slice acceptance and **CCIS 0.1.0**: one-command end-to-end test; removing one required observation changes the analytic to needs data; changing a package version or the input creates a distinct run record; negative tests (no undeclared network/file/patient data access; marketplace lint); freeze 0.1.0, limitations list. **You review the limitations list before Phase 4** | 3.10 |
+
+### Phase 4: Authoring routes and distribution  (after 0.1.0)
+
+| ID | Chunk brief |
+|----|-------------|
+| 4.1 | GitHub distribution client: fetch index and immutable releases, verify checksum and pin, failed verification blocks use; `connect-src` opened to that host only; test proves no patient data in any request |
+| 4.2 | Code-authoring SDK and typed builders; equivalence test across routes |
+| 4.3 | Governed LLM drafting (off by default, whitelist payload, drafts only, source references required, cannot publish or validate) |
+| 4.4 | Form-based GUI authoring writing the same canonical artefact (visual decision-graph builder stays later) |
+| 4.5 | Second demo: diabetes + CKD, multi-context, a combined analytic; proves composition and failure policy |
+
+### Phase 5: Reusable analytics, decision graphs, cohorts  (after 4.x)
+
+| ID | Chunk brief |
+|----|-------------|
+| 5.1 | Analytics templates 1 to 3 (threshold, trend, score) with all fixture classes; parameters disabled |
+| 5.2 | Templates 4 to 6 (monitoring gap, eligibility, follow-up due); catalogue discovery with status labels. Medication-safety and staging stay BLOCKED until a named clinician supplies rules |
+| 5.3 | Decision graphs: typed nodes and edges, static checks (no dead ends, bounded cycles, every missing/stale/conflicting input routed), executor with path and reasons |
+| 5.4 | Research-to-package pipeline (extract, clarify, draft, map, generate, verify): drafts only, every rule traceable to a source passage |
+| 5.5 | Cohort definition, three-valued evaluator, manifest with reasons and counts, on a ~30-patient synthetic set |
+| 5.6 | Cohort analytics, aggregation, provenance; small-cell masking (default 5, clinical owner to confirm) |
+| 5.7 | Access model for population-level work: purpose, separate permissions, audit. **Needs a decision on whether a server is introduced (D-002).** |
+
+### Phase 6: Interoperability, governance, integration  (last)
+
+| ID | Chunk brief |
+|----|-------------|
+| 6.1 | FHIR Mode: capability matrix, SDC boundary, conversion with loss report, round-trip tests only where claimed |
+| 6.2 | Governance: review records, scoped validation records, deprecation and withdrawal, signing, migration guides |
+| 6.3 | Evaluation in CI: reliability metrics (validation failures, reproducibility, version drift, provenance completeness) kept separate from clinical measures |
+| 6.4 | Cohort data package contract + import path + contract test with a stub exporter; then the real EMR exporter is accepted only through this path |
 
 ---
 
-## 8. Acceptance gates
+## 8. Tests and safety strategy
 
-**Gate A (end of Stage 0):** spec is internally consistent, every requirement has an ID, the user approves the freeze.
-**Gate B (end of Stage 2):** every schema compiles; the validator gives the expected diagnostics for every invalid example; the compiler is deterministic.
-**Gate C (end of Stage 3, CCIS 0.1.0):** the whole slice runs with one command and reproduces its result; unsafe package behaviour is blocked by negative tests; limitations list reviewed by the user.
-**Go-live gate (inherited from the EMR app, unchanged):** clinical safety sign-off, tested encrypted restore, security hardening and CI pass, AI server-side and off by default, device-software and health-data rules checked, terminology licences checked. CCIS is not used on real patient data before this gate.
+- **Conformance suite** = valid examples pass; each invalid example fails with its expected diagnostics; three authoring routes give identical canonical bytes; reruns are byte-identical.
+- **Safety pack** (built progressively, grows with code): unknown never becomes false/normal; entered-in-error and AI-proposed data never counted as verified fact; no eval/Function/dynamic import anywhere in shipped files (source scan); package execution cannot reach network, filesystem or undeclared inputs; marketplace lint refuses patient data; no clock or randomness in pure modules (source scan); CSP present and `connect-src` as decided; every clinical claim names exact version, population, setting and intended use.
+- **Hand-calculated expectations**: every fixture result is calculated independently and recorded beside the fixture.
+- **CI**: GitHub Actions, Node 22, one command (`npm test`); real-browser smoke test is required in CI and skipped locally only if no Chrome.
+- Software conformance never implies clinical safety; the two are recorded in separate fields.
 
 ---
 
-## 9. Open items for the user
+## 9. The interface with the EMR Enhancer (what changes there)
 
-1. Confirm the Stage 0 and Stage 1 split, and that everything in section 2 stays deferred.
-2. Confirm CCIS libraries stay in this repo (as planned) rather than inside the EMR app repo.
-3. Approve (later, at C0r) the frozen specification before any Stage 2 work.
+Nothing is built in the EMR from this plan except the exporter, later. Recommended edits to the EMR repo tracker (do when convenient):
+
+1. Mark EMR rows C0 to C9 and D1 to D7 as **MOVED to the CCIS repo** (this plan replaces them).
+2. Keep **B5** (context service) and **D8b** (cohort exporter). Re-describe B5's envelope as "must conform to `docs/IMPORT-CONTRACT.md` of the CCIS repo, checked by the CCIS fixtures".
+3. Close the EMR open question "where do the CCIS libraries live": answered, separate repo.
+4. Until B5 exists, the CCIS app is developed on synthetic exports written by hand from the contract.
+
+---
+
+## 10. Gates
+
+- **R0** (end of Phase 0): you approve SPEC draft, IMPORT-CONTRACT and the use case.
+- **Gate B** (end of Phase 2): all schemas compile; every invalid example gives its expected diagnostics; compiler deterministic.
+- **Gate C** (3.11, CCIS 0.1.0): one-command slice reproduces its result; negative tests pass; you review the limitations list.
+- **Before any real patient data**: clinical safety sign-off, security review, privacy assessment, terminology licences checked, device-software and health-data rules checked, independent clinical review of any package labelled validated. Until then synthetic data only.
+
+---
+
+## 11. Open questions
+
+1. **Clinician owner** for the snake-envenomation parameters (interval target, clotting-test timing). Until named, all parameters stay disabled and the packages are demonstrations of mechanics only.
+2. **Stack confirmation (D-002)**: local-first with no server and no database. If you expect multiple users or shared history early, say so now; it changes Phase 3 storage and Phase 5.
+3. **Naming**: "CCIS" is a working name (book Ch7 section 3); decide before any public release.
+4. **Where the marketplace repo lives** (a third repo, `clinical-intelligence-marketplace` in the book); needed only at row 4.1.
+5. **Licence and terminology licensing** (SNOMED, CPT and others have terms): checked before any code system beyond synthetic/local is used.
+
+---
+
+## 12. Main risks
+
+| Risk | Handling |
+|---|---|
+| Schemas reveal gaps in the spec | Numbered amendments in CHANGELOG with your approval; freeze only at 0.1.0 |
+| Import contract drifts from what the EMR will really export | Contract lives here with fixtures; EMR exporter must pass them (row 6.4, and B5 early) |
+| Scope creep into LLM, cohorts, FHIR before the slice works | These rows are after 3.11; the tracker forbids starting them |
+| Browser storage loss of run records | Run records are exportable files; the UI prompts to export |
+| "Validated" misread as clinically safe | Separate assurance fields; UI shows scope; prototype banner everywhere |
+| Free-tier session limits | Small chunks, size guards, just-in-time chunk files |

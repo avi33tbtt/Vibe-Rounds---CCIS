@@ -1,22 +1,25 @@
 # Vibe-Rounds---CCIS
 
-**CCIS: Clinical Context Intelligence Standard.** A declarative, versioned standard (with validator, compiler and constrained runtime) for reusable clinical context, pathways and analytics packages. It is the standard layer behind the Vibe Rounds EMR Enhancer app.
+**CCIS** is the Contextual Clinical Intelligence App and the **Clinical Context Intelligence Standard** it runs on. It is a separate app from the EMR Enhancer: it imports an export file from the EMR Enhancer, discovers compatible knowledge packages, and runs them through a deterministic, constrained engine with full provenance.
 
-> Status: planning. Prototype only. Synthetic data only, not for clinical use.
+> Status: planning (Phase 0). Prototype. Synthetic data only, not for clinical use.
 
-## Documents
+## Start here
 
-- [`CCIS_BUILD_PLAN.md`](CCIS_BUILD_PLAN.md): the build plan, modelled on the EMR Enhancer app. **Schemas, database design and other formal contracts are deliberately deferred to a later stage** (see the plan, section 2).
+- [`CCIS_BUILD_PLAN.md`](CCIS_BUILD_PLAN.md): the build plan (decisions, architecture, phases, gates). **Schemas and other formal contracts are deliberately deferred to a later stage** (section 4).
+- [`CCIS_TASK_TRACKER.md`](CCIS_TASK_TRACKER.md): the task list and the "do next" working protocol.
+- [`DECISIONS.md`](DECISIONS.md): decisions log.
+- [`plan-chunks/`](plan-chunks/): one small plan file per task.
 
 ## Research
 
-The research behind CCIS (the ten-chapter book, from context-aware EMRs to the CCIS standard) lives in the EMR Enhancer repository:
+The research behind CCIS (the ten-chapter book, from context-aware EMRs to the CCIS standard and platform scaling) is in the EMR Enhancer repository:
 
 - Research folder: https://github.com/avi33tbtt/Vibe-Rounds---EMR-Enhancer-App/tree/main/Research
 
 ## Related repository
 
-- EMR Enhancer app (the host application and the pattern this repo follows): https://github.com/avi33tbtt/Vibe-Rounds---EMR-Enhancer-App/
+- EMR Enhancer (produces the contextual patient export that this app imports): https://github.com/avi33tbtt/Vibe-Rounds---EMR-Enhancer-App/
 
 ## License
 

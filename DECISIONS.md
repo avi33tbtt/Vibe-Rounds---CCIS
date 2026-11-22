@@ -17,4 +17,5 @@ Max 3 rows per task. Append at the bottom.
 | 2026-11-22 | 0.0 | D-011 AI off and absent in 0.1.0; later drafts only. | Governance. |
 | 2026-11-22 | 0.0 | D-012 Lifecycle statuses from the book; assurance dimensions recorded separately. | No single "validated" badge. |
 | 2026-11-22 | 0.0 | Schemas, validator rule catalogue, compiler algorithm, storage formats and CLI/API contracts are deferred to Stage 2. | User instruction. |
+| 2026-11-22 | 0.0 | Plan briefs 4.4, 5.2, 5.4, 6.2 and 6.3 restored detail from the retired EMR rows D1c, D2b, D3, D6 and D7 (status-label rules, reviewer independence, release gate, evaluation limits, Avinash hypothesis). | The EMR Track C/D rows were moved here; nothing may be lost in the move. |
 | 2026-11-22 | 0.0 | Spec is prototype-baselined in Phase 0; gaps found later are numbered amendments in `ccis/CHANGELOG.md` with user approval; true freeze at CCIS 0.1.0. | Schema work always exposes spec gaps. |

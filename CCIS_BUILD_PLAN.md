@@ -231,7 +231,7 @@ Phases follow Book Ch9 section 9 (0 to 6). IDs are `phase.number`. **"Chunk brie
 | 4.1 | GitHub distribution client: fetch index and immutable releases, verify checksum and pin, failed verification blocks use; `connect-src` opened to that host only; test proves no patient data in any request |
 | 4.2 | Code-authoring SDK and typed builders; equivalence test across routes |
 | 4.3 | Governed LLM drafting (off by default, whitelist payload, drafts only, source references required, cannot publish or validate) |
-| 4.4 | Form-based GUI authoring writing the same canonical artefact (visual decision-graph builder stays later) |
+| 4.4 | Form-based GUI authoring writing the same canonical artefact, with live validator diagnostics, a readable graph preview and a diff against the previous version (visual decision-graph builder stays later) |
 | 4.5 | Second demo: diabetes + CKD, multi-context, a combined analytic; proves composition and failure policy |
 
 ### Phase 5: Reusable analytics, decision graphs, cohorts  (after 4.x)
@@ -239,9 +239,9 @@ Phases follow Book Ch9 section 9 (0 to 6). IDs are `phase.number`. **"Chunk brie
 | ID | Chunk brief |
 |----|-------------|
 | 5.1 | Analytics templates 1 to 3 (threshold, trend, score) with all fixture classes; parameters disabled |
-| 5.2 | Templates 4 to 6 (monitoring gap, eligibility, follow-up due); catalogue discovery with status labels. Medication-safety and staging stay BLOCKED until a named clinician supplies rules |
+| 5.2 | Templates 4 to 6 (monitoring gap, eligibility, follow-up due). Catalogue discovery: filters by clinical concept, decision node, pathway, population, required data, setting, evidence status and compatibility; status labels draft, reviewed, validated, deprecated; `validated` needs a validation record naming exact version, population, setting and use (schema-valid alone never reaches it); deprecation stores a replacement pointer and resolve warns. Medication-safety and staging stay BLOCKED until a named clinician supplies rules |
 | 5.3 | Decision graphs: typed nodes and edges, static checks (no dead ends, bounded cycles, every missing/stale/conflicting input routed), executor with path and reasons |
-| 5.4 | Research-to-package pipeline (extract, clarify, draft, map, generate, verify): drafts only, every rule traceable to a source passage |
+| 5.4 | Research-to-package pipeline (extract, clarify, draft, map, generate, verify): drafts only, every rule traceable to a source passage; a human confirms each mapping; population, setting and intended use are mandatory; the user pastes the text (no paper ingestion yet); an untraceable rule is rejected and the package cannot reach `validated` without a human validation record |
 | 5.5 | Cohort definition, three-valued evaluator, manifest with reasons and counts, on a ~30-patient synthetic set |
 | 5.6 | Cohort analytics, aggregation, provenance; small-cell masking (default 5, clinical owner to confirm) |
 | 5.7 | Access model for population-level work: purpose, separate permissions, audit. **Needs a decision on whether a server is introduced (D-002).** |
@@ -251,8 +251,8 @@ Phases follow Book Ch9 section 9 (0 to 6). IDs are `phase.number`. **"Chunk brie
 | ID | Chunk brief |
 |----|-------------|
 | 6.1 | FHIR Mode: capability matrix, SDC boundary, conversion with loss report, round-trip tests only where claimed |
-| 6.2 | Governance: review records, scoped validation records, deprecation and withdrawal, signing, migration guides |
-| 6.3 | Evaluation in CI: reliability metrics (validation failures, reproducibility, version drift, provenance completeness) kept separate from clinical measures |
+| 6.2 | Governance: `GOVERNANCE.md` and `CONTRIBUTING.md` (contribution process, reviewer roles, **independence rule: an author is never the reviewer**, review decision record format, release checklist, deprecation policy, security response); scoped validation records, deprecation and withdrawal, signing, migration guides; a small release script (`ccis-release.js`) so a dry-run release is blocked when the conformance suite, a validation record for any `validated` package, a changelog entry or a reviewer decision record is missing |
+| 6.3 | Evaluation in CI: conformance as its own CI check; reliability metrics (validation failures, reproducibility of identical reruns, fixture coverage by class, runtime step and time budget, version drift, provenance completeness, every validator rule has a test) kept separate from clinical measures; CI fails on a reproducibility break. Write `ccis/EVALUATION.md`: what is measured, what is NOT measured (clinical correctness), failure modes watched. Before any implementation of it, record the book's "Avinash Principle" (Ch5 B11) as a hypothesis with an operational definition, comparator and failure modes |
 | 6.4 | Cohort data package contract + import path + contract test with a stub exporter; then the real EMR exporter is accepted only through this path |
 
 ---

@@ -153,5 +153,95 @@
       "where": "value"
     },
     "diagnostic": "Timing names a parameter, never a number"
+  },
+  {
+    "file": "analytics-good-minimal.json",
+    "schema": "analytics",
+    "valid": true
+  },
+  {
+    "file": "analytics-good-full.json",
+    "schema": "analytics",
+    "valid": true
+  },
+  {
+    "file": "analytics-bad-parameter-value.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "additionalProperties",
+      "where": "default"
+    },
+    "diagnostic": "REQ-029: a parameter carries no value or default"
+  },
+  {
+    "file": "analytics-bad-parameter-enabled.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "const",
+      "where": "enabledByDefault"
+    },
+    "diagnostic": "REQ-029: parameters arrive disabled"
+  },
+  {
+    "file": "analytics-bad-duration-no-units.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "units"
+    },
+    "diagnostic": "REQ-029: a duration parameter declares units"
+  },
+  {
+    "file": "analytics-bad-operator.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "enum",
+      "where": "/op"
+    },
+    "diagnostic": "D-006: operator must be on the whitelist"
+  },
+  {
+    "file": "analytics-bad-numeric-literal.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "type",
+      "where": "/literal"
+    },
+    "diagnostic": "No numeric literal in the expression tree"
+  },
+  {
+    "file": "analytics-bad-input-no-onmissing.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "onMissing"
+    },
+    "diagnostic": "REQ-033: every input declares missing-data behaviour"
+  },
+  {
+    "file": "analytics-bad-output-kind.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "enum",
+      "where": "/kind"
+    },
+    "diagnostic": "A-002: output kinds are value, classification, table"
+  },
+  {
+    "file": "analytics-bad-no-profile.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "executionProfile"
+    },
+    "diagnostic": "REQ-069: an execution profile is declared"
   }
 ]

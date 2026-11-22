@@ -7,7 +7,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import standaloneCode from 'ajv/dist/standalone/index.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const names = { manifest: 'manifest', element: 'element', terminologyBinding: 'terminology-binding', decisionNode: 'decision-node', pathway: 'pathway' };
+const names = { manifest: 'manifest', element: 'element', terminologyBinding: 'terminology-binding', decisionNode: 'decision-node', pathway: 'pathway', analytics: 'analytics' };
 const out = join(root, 'ccis', 'validators', 'ccis-validators.js');
 
 const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false, code: { source: true, esm: true } });

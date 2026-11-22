@@ -38,7 +38,7 @@
 | Ch6 | 6.3 Preserve temporal and epistemic meaning | Covered | REQ-032, REQ-033, REQ-035, REQ-036, REQ-037 | 3.1, 3.4 |  |
 | Ch6 | 7 Running many analytics and presenting results | Partial | REQ-071, REQ-073 | 3.5, 3.9 | Batch isolation is not specified (G-03). |
 | Ch6 | 7.1 Execution lifecycle | Covered | REQ-064, REQ-070, REQ-071, REQ-075 | 3.5 | Batch and shared intermediates: G-03. |
-| Ch6 | 7.2 Result types | Partial | REQ-070 | 1.4, 3.5 | Kinds of result are not specified (G-04). |
+| Ch6 | 7.2 Result types | Partial | REQ-070 | 1.4, 3.5 | Kinds of result: amendment A-002 (G-04 closed). |
 | Ch6 | 7.3 Results are not recommendations by default | Covered | REQ-005, REQ-073 | 3.9, 3.11 |  |
 | Ch6 | 8 Review, validation and lifecycle governance | Covered | REQ-046, REQ-047, REQ-048, REQ-049, REQ-050, REQ-051, REQ-052, REQ-053, REQ-054 | 2.3, 6.2 |  |
 | Ch6 | 8.1 Validation is scoped, not a universal badge | Covered | REQ-048, REQ-049, REQ-050, REQ-052 | 2.3, 5.2, 6.2 |  |
@@ -140,7 +140,7 @@ Concepts the book contains that the specification does not yet require. "When" s
 | G-01 | Informant source class | A bite time reported by a companion has no source class of its own (raised in docs/USE-CASE-SNAKE.md, question 5). | Decide at R0. Would be amendment A-001. | 0.1.0 slice |
 | G-02 | Independence rule | Ch7 s12.2 and plan row 6.2: an author is never the reviewer. Not yet a requirement. | Add with row 6.2. | Phase 6 |
 | G-03 | Batch runs | Ch6 s7: several analytics on one context; each keeps its own contract, parameters and result; shared work must not leak between them. Not yet a requirement. | Decide before row 3.5. | 0.1.0 slice |
-| G-04 | Result kinds | Ch6 s7.2: values, classifications, tables, series. The spec only says outputs are checked against a declared contract. | Decide before row 1.3 or 1.4. | 0.1.0 slice |
+| G-04 | Result kinds | Ch6 s7.2: values, classifications, tables, series. The spec only says outputs are checked against a declared contract. | Closed by amendment A-002 (row 1.3, 2026-11-23). | 0.1.0 slice |
 | G-05 | Package integrity | Checksums, pin verification and signing (Ch6 s3.3; plan rows 2.4, 3.6, 4.1, 6.2). The spec requires pinned versions but not integrity checks. | Decide before row 2.4. | 0.1.0 slice |
 | G-06 | Marketplace layout and index | Ch6 s3.2 and s3.3: repository organisation, index, mandatory manifest. | Add with row 3.6 or 4.1. | Phase 3 and 4 |
 | G-07 | Result ranking | Ch7 s11.3: how compatible packages are ordered. Must not rely on text similarity (REQ-060). | Add with row 3.2. | Phase 3 |

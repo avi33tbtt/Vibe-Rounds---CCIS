@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { manifest, element, terminologyBinding, decisionNode, pathway } from '../ccis/validators/ccis-validators.js';
+import { manifest, element, terminologyBinding, decisionNode, pathway, analytics } from '../ccis/validators/ccis-validators.js';
 
-const validators = { manifest, element, terminologyBinding, decisionNode, pathway };
+const validators = { manifest, element, terminologyBinding, decisionNode, pathway, analytics };
 const dir = new URL('../ccis/fixtures/schemas/', import.meta.url);
 const load = (f) => JSON.parse(readFileSync(new URL(f, dir), 'utf8'));
 const index = load('index.json');
@@ -72,6 +72,40 @@ test('mutations: pathway and decision node defects are rejected (REQ-025, 026, 0
   for (const [name, data, what] of cases) assert.equal(run(name, data).ok, false, `should reject: ${what}`);
   assert.equal(run('decisionNode', node).ok, true);
   assert.equal(run('pathway', { ...pw, 'x-note': 1 }).ok, true);
+});
+
+test('mutations: analytics defects are rejected (REQ-005, 028, 029, 033, 042, 066, 070, 073)', () => {
+  const an = load('analytics-good-full.json');
+  const cases = [
+    ['recommendation field on the package', (x) => { x.recommendation = 'Synthetic'; }],
+    ['empty outputs', (x) => { x.outputs = []; }],
+    ['carries without limitations', (x) => { x.outputs[0].carries = ['warnings', 'missingDataNotes']; }],
+    ['manifest type not analytics-package', (x) => { x.manifest.type = 'pathway'; }],
+    ['ref without id', (x) => { x.computation[0].expr.args[0] = { ref: 'input' }; }],
+    ['node with both op and ref', (x) => { x.computation[0].expr.args[0] = { op: 'not', args: [{ literal: true }], ref: 'input' }; }],
+    ['bare number as an argument', (x) => { x.computation[0].expr.args.push(5); }],
+    ['unknown ref kind', (x) => { x.computation[0].expr.args[0] = { ref: 'file', id: 'startTime' }; }],
+    ['value output without unit', (x) => { delete x.outputs[0].unit; }],
+    ['classification with one label', (x) => { x.outputs[1].labels = ['only']; }],
+    ['table output without columns', (x) => { x.outputs[1].kind = 'table'; delete x.outputs[1].labels; }],
+    ['choice parameter without choices', (x) => { delete x.parameters[1].allowedChoices; }],
+    ['parameter with a value', (x) => { x.parameters[1].value = 'accept'; }],
+    ['linear conversion without factor', (x) => { delete x.conversions[0].factor; }],
+    ['numeric input without units', (x) => { x.inputs[0].type = 'quantity'; }],
+    ['non-value state outside the five', (x) => { x.inputs[0].onMissing = 'zero'; }],
+    ['zero execution limit', (x) => { x.executionProfile.maxSteps = 0; }],
+    ['analytics context reference without range', (x) => { delete x.context[0].ref.range; }],
+  ];
+  for (const [what, fn] of cases) { const x = clone(an); fn(x); assert.equal(run('analytics', x).ok, false, `should reject: ${what}`); }
+  assert.equal(run('analytics', an).ok, true);
+  const ext = clone(an); ext['x-note'] = 1; assert.equal(run('analytics', ext).ok, true);
+});
+
+test('the analytics fixtures carry no numeric literal and no parameter value anywhere', () => {
+  const an = load('analytics-good-full.json');
+  const walk = (n) => { if (n && typeof n === 'object') { if ('literal' in n) assert.notEqual(typeof n.literal, 'number'); Object.values(n).forEach(walk); } };
+  walk(an.computation);
+  for (const p of an.parameters) for (const k of ['default', 'value', 'suggested']) assert.equal(k in p, false);
 });
 
 test('generated validators contain no eval, Function, dynamic import or runtime imports (D-005, D-006)', () => {

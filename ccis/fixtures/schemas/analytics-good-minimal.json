@@ -1,0 +1,113 @@
+{
+  "manifest": {
+    "id": "synthetic.demo-analytics",
+    "name": "Synthetic demo analytics",
+    "type": "analytics-package",
+    "version": "0.1.0",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft"
+  },
+  "question": "Synthetic question about the record",
+  "intendedUsers": [
+    "Synthetic reviewer"
+  ],
+  "population": "Synthetic population",
+  "limitations": {
+    "statement": "Synthetic limitations statement",
+    "items": []
+  },
+  "operatorSet": {
+    "name": "ccis-core-ops",
+    "version": "0.1.0"
+  },
+  "interpretation": {
+    "meaning": "Describes the record only",
+    "prohibited": [
+      "Do not use as a recommendation"
+    ]
+  },
+  "executionProfile": {
+    "maxSteps": 1000,
+    "maxDepth": 16,
+    "maxOutputBytes": 65536
+  },
+  "evidence": {
+    "statement": "No external evidence is claimed",
+    "sources": []
+  },
+  "provenance": {
+    "origin": "Synthetic",
+    "basis": "Synthetic"
+  },
+  "context": [
+    {
+      "ref": {
+        "id": "synthetic.demo-element",
+        "type": "contextual-element",
+        "range": "^0.1.0"
+      },
+      "fields": [
+        "startTime",
+        "endTime"
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "key": "startTime",
+      "element": "synthetic.demo-element",
+      "field": "startTime",
+      "type": "datetime",
+      "onMissing": "needs-data"
+    },
+    {
+      "key": "endTime",
+      "element": "synthetic.demo-element",
+      "field": "endTime",
+      "type": "datetime",
+      "onMissing": "needs-data"
+    }
+  ],
+  "parameters": [],
+  "computation": [
+    {
+      "output": "elapsed",
+      "expr": {
+        "op": "time-diff",
+        "args": [
+          {
+            "ref": "input",
+            "id": "startTime"
+          },
+          {
+            "ref": "input",
+            "id": "endTime"
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "elapsed",
+      "kind": "value",
+      "valueType": "time",
+      "unit": "min",
+      "states": [
+        "needs-data",
+        "indeterminate",
+        "not-applicable"
+      ],
+      "carries": [
+        "warnings",
+        "limitations",
+        "missingDataNotes"
+      ]
+    }
+  ]
+}

@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { manifest, element, terminologyBinding, decisionNode, pathway, analytics, executionManifest, contextEnvelope, importReport } from '../ccis/validators/ccis-validators.js';
+import { manifest, element, terminologyBinding, decisionNode, pathway, analytics, executionManifest, contextEnvelope, importReport, validationRecord, runResult, runRecord } from '../ccis/validators/ccis-validators.js';
 
-const validators = { manifest, element, terminologyBinding, decisionNode, pathway, analytics, executionManifest, contextEnvelope, importReport };
+const validators = { manifest, element, terminologyBinding, decisionNode, pathway, analytics, executionManifest, contextEnvelope, importReport, validationRecord, runResult, runRecord };
 const dir = new URL('../ccis/fixtures/schemas/', import.meta.url);
 const load = (f) => JSON.parse(readFileSync(new URL(f, dir), 'utf8'));
 const index = load('index.json');
@@ -170,6 +170,47 @@ test('the source-class set is identical in the element and envelope schemas (A-0
   const find = (o) => { if (o && typeof o === 'object') { if (Array.isArray(o.enum) && o.enum.includes('patient-reported')) return o.enum; for (const v of Object.values(o)) { const r = find(v); if (r) return r; } } };
   assert.deepEqual([...find(a)].sort(), [...find(b)].sort());
   assert.ok(find(a).includes('informant-reported'));
+});
+
+test('mutations: validation record, run result and run record defects are rejected (REQ-047 to 053, 069, 072, 075 to 078)', () => {
+  const vr = load('validation-record-good-full.json');
+  const rs = load('run-result-good-value.json');
+  const rc = load('run-record-good-completed.json');
+  const groups = [
+    ['validationRecord', vr, [
+      ['unknown layer name', (x) => { x.layers.extra = { outcome: 'passed', diagnostics: [] }; }],
+      ['assessedBy missing on not-met', (x) => { delete x.assurance.clinical.assessedBy; }],
+      ['missing standard version', (x) => { delete x.standard.version; }],
+      ['met with no evidence', (x) => { x.assurance.structural.evidence = []; }],
+      ['passed with a failed layer', (x) => { x.outcome = 'passed'; }],
+    ]],
+    ['runResult', rs, [
+      ['result kind outside the three', (x) => { x.kind = 'series'; }],
+      ['value kind with a label shape', (x) => { x.value = { label: 'x' }; }],
+      ['state outside the five', (x) => { delete x.value; x.state = 'normal'; }],
+      ['dependency listed on a non-dependent state', (x) => { delete x.value; x.state = 'needs-data'; x.dependsOnParameters = ['a']; }],
+    ]],
+    ['runRecord', rc, [
+      ['enabled parameter without a value', (x) => { delete x.parameters[1].value; }],
+      ['disabled parameter with a value', (x) => { x.parameters[0].value = 'x'; }],
+      ['personal field on the snapshot', (x) => { x.snapshot.name = 'synthetic'; }],
+      ['corrects is not a token', (x) => { x.corrects = 'has space'; }],
+      ['failure on a completed record', (x) => { x.failure = { rule: 'steps', message: 'm' }; }],
+      ['missing import report', (x) => { delete x.importReport; }],
+      ['missing standard version', (x) => { delete x.standard.version; }],
+    ]],
+  ];
+  for (const [name, base, cases] of groups) {
+    assert.equal(run(name, base).ok, true, `${name} base should be valid`);
+    for (const [what, fn] of cases) { const x = clone(base); fn(x); assert.equal(run(name, x).ok, false, `${name} should reject: ${what}`); }
+  }
+});
+
+test('records and results carry no checksum, hash or signature field (G-05)', () => {
+  for (const f of ['validation-record', 'run-result', 'run-record']) {
+    const s = JSON.parse(readFileSync(new URL(`../ccis/schemas/${f}.schema.json`, import.meta.url), 'utf8'));
+    for (const k of Object.keys(s.properties)) assert.equal(/checksum|hash|signature|digest/i.test(k), false, `${f}: ${k}`);
+  }
 });
 
 test('the execution manifest carries no checksum, hash or signature field (G-05)', () => {

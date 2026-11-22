@@ -1,0 +1,66 @@
+{
+  "subject": {
+    "id": "synthetic.demo-analytics",
+    "type": "analytics-package",
+    "version": "0.1.0"
+  },
+  "standard": {
+    "version": "0.1.0"
+  },
+  "validator": {
+    "name": "synthetic-validator",
+    "version": "0.1.0"
+  },
+  "outcome": "passed",
+  "layers": {
+    "syntax": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "structural": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "reference-integrity": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "semantic": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "graph-and-compatibility": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "executable-safety": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "test-verification": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "governance": {
+      "outcome": "passed",
+      "diagnostics": []
+    }
+  },
+  "assurance": {
+    "structural": {
+      "result": "not-assessed"
+    },
+    "semantic": {
+      "result": "not-assessed"
+    },
+    "clinical": {
+      "result": "not-assessed"
+    },
+    "execution": {
+      "result": "not-assessed"
+    },
+    "security-privacy": {
+      "result": "not-assessed"
+    }
+  }
+}

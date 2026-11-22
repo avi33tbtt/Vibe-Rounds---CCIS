@@ -423,5 +423,135 @@
       "where": "content"
     },
     "diagnostic": "IMP-091: a reason names a category, never the content"
+  },
+  {
+    "file": "validation-record-good-minimal.json",
+    "schema": "validationRecord",
+    "valid": true
+  },
+  {
+    "file": "validation-record-good-full.json",
+    "schema": "validationRecord",
+    "valid": true
+  },
+  {
+    "file": "validation-record-bad-diagnostic-no-ruleid.json",
+    "schema": "validationRecord",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "ruleId"
+    },
+    "diagnostic": "REQ-089: every diagnostic has a stable rule id"
+  },
+  {
+    "file": "validation-record-bad-met-no-scope.json",
+    "schema": "validationRecord",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "scope"
+    },
+    "diagnostic": "REQ-049: met always carries its scope"
+  },
+  {
+    "file": "validation-record-bad-assurance-missing-dimension.json",
+    "schema": "validationRecord",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "execution"
+    },
+    "diagnostic": "REQ-048: five separate assurance dimensions"
+  },
+  {
+    "file": "validation-record-bad-failed-layer-no-error.json",
+    "schema": "validationRecord",
+    "valid": false,
+    "expect": {
+      "keyword": "contains",
+      "where": "diagnostics"
+    },
+    "diagnostic": "REQ-089: a failed layer reports at least one error"
+  },
+  {
+    "file": "run-result-good-value.json",
+    "schema": "runResult",
+    "valid": true
+  },
+  {
+    "file": "run-result-good-parameter-not-enabled.json",
+    "schema": "runResult",
+    "valid": true
+  },
+  {
+    "file": "run-result-bad-value-and-state.json",
+    "schema": "runResult",
+    "valid": false,
+    "expect": {
+      "keyword": "oneOf",
+      "where": ""
+    },
+    "diagnostic": "REQ-066: a value or a state, never both"
+  },
+  {
+    "file": "run-result-bad-missing-limitations.json",
+    "schema": "runResult",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "limitations"
+    },
+    "diagnostic": "REQ-073: results carry their limitations"
+  },
+  {
+    "file": "run-result-bad-parameter-not-enabled-no-dependency.json",
+    "schema": "runResult",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "dependsOnParameters"
+    },
+    "diagnostic": "REQ-072: report the disabled-parameter dependency"
+  },
+  {
+    "file": "run-record-good-completed.json",
+    "schema": "runRecord",
+    "valid": true
+  },
+  {
+    "file": "run-record-good-failed.json",
+    "schema": "runRecord",
+    "valid": true
+  },
+  {
+    "file": "run-record-bad-failed-with-results.json",
+    "schema": "runRecord",
+    "valid": false,
+    "expect": {
+      "keyword": "maxItems",
+      "where": "/results"
+    },
+    "diagnostic": "REQ-069: a failed run presents no partial result"
+  },
+  {
+    "file": "run-record-bad-no-evaluation-time-zone.json",
+    "schema": "runRecord",
+    "valid": false,
+    "expect": {
+      "keyword": "const",
+      "where": "zone"
+    },
+    "diagnostic": "REQ-075: supplied evaluation time with a stated zone"
+  },
+  {
+    "file": "run-record-bad-engine-range.json",
+    "schema": "runRecord",
+    "valid": false,
+    "expect": {
+      "keyword": "pattern",
+      "where": "/engine/version"
+    },
+    "diagnostic": "REQ-011, 075: the exact engine that ran"
   }
 ]

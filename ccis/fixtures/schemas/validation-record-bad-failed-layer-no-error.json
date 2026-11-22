@@ -1,0 +1,92 @@
+{
+  "subject": {
+    "id": "synthetic.demo-analytics",
+    "type": "analytics-package",
+    "version": "0.1.0"
+  },
+  "standard": {
+    "version": "0.1.0"
+  },
+  "validator": {
+    "name": "synthetic-validator",
+    "version": "0.1.0"
+  },
+  "outcome": "failed",
+  "layers": {
+    "syntax": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "structural": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "reference-integrity": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "semantic": {
+      "outcome": "failed",
+      "diagnostics": [
+        {
+          "severity": "warning",
+          "ruleId": "synthetic.rule-two",
+          "path": "/computation",
+          "message": "Synthetic message",
+          "hint": "Synthetic hint"
+        }
+      ]
+    },
+    "graph-and-compatibility": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "executable-safety": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "test-verification": {
+      "outcome": "passed",
+      "diagnostics": []
+    },
+    "governance": {
+      "outcome": "not-run",
+      "reason": "awaiting earlier layers",
+      "diagnostics": []
+    }
+  },
+  "assurance": {
+    "structural": {
+      "result": "met",
+      "assessedBy": "synthetic-validator-role",
+      "evidence": [
+        "synthetic evidence"
+      ],
+      "scope": {
+        "version": "0.1.0",
+        "population": "Synthetic population",
+        "setting": "Synthetic setting",
+        "intendedUse": "Synthetic descriptive use"
+      },
+      "conditions": [
+        "synthetic condition"
+      ]
+    },
+    "semantic": {
+      "result": "not-assessed"
+    },
+    "clinical": {
+      "result": "not-met",
+      "assessedBy": "synthetic-reviewer-role",
+      "evidence": [
+        "synthetic evidence"
+      ]
+    },
+    "execution": {
+      "result": "not-assessed"
+    },
+    "security-privacy": {
+      "result": "not-assessed"
+    }
+  }
+}

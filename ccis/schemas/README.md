@@ -1,4 +1,4 @@
-# CCIS schemas (rows 1.1 to 1.4)
+# CCIS schemas (rows 1.1 to 1.4a)
 
 JSON Schema 2020-12. Prototype. Synthetic data only. Not for clinical use.
 
@@ -13,6 +13,9 @@ JSON Schema 2020-12. Prototype. Synthetic data only. Not for clinical use.
 | `execution-manifest.schema.json` | CCIS-REQ-011, 016, 063 to 065, 069, 070, 075. What one run needs: exact pins only (no ranges, no `latest`), exact operator set, engine range, mandatory extensions, execution profile (shared with the analytics schema by `$ref`), output contract version, authoring route. No checksum or integrity fields (G-05). |
 | `context-envelope.schema.json` | IMP-010 to IMP-081; CCIS-REQ-032 to 038, 040 to 042, 083. One case: pseudonymous reference, exact applied versions, observations (kind, unit, effective and recorded time with zone state, status, source class, provenance, value or one of five states, never both), classified events, codes with verification state. No field for identity or narrative; inclusions are fixed to `false`. No integrity field (IMP-014 open until G-05). |
 | `import-report.schema.json` | IMP-100 to IMP-108, 112 to 115; CCIS-REQ-044, 084. Each record in exactly one of accepted, rejected, unmapped, ambiguous; reasons name a category, never the content; a refused envelope imports nothing. |
+| `validation-record.schema.json` | CCIS-REQ-047 to 053, 088 to 090. The validator report (eight named layers, diagnostics with severity, stable rule id, path, message, hint) plus five separate assurance members; `met` always carries its scope; roles, never names. Defines the shared `diagnostic`. |
+| `run-result.schema.json` | CCIS-REQ-066, 070, 072, 073. One output: value, classification or table, or one of five declared non-value states, never both; always carries warnings, limitations and missing-data notes; `parameter-not-enabled` lists the parameters it depends on. |
+| `run-record.schema.json` | CCIS-REQ-075 to 078. One run of one package: exact versions including the exact engine, selected context, input snapshot (envelope definitions, so no identity or narrative), parameters with enabled flag (a value only when enabled), supplied evaluation time with stated zone, diagnostics, import report, results. A failed record holds no results. No checksum or content address (G-05). |
 
 Validators are generated (`npm run build`) into `ccis/validators/ccis-validators.js`, committed, and checked for staleness by the tests. Nothing compiles a schema at runtime.
 
@@ -28,3 +31,5 @@ Validators are generated (`npm run build`) into `ccis/validators/ccis-validators
 
 
 **Envelope and report: left to later rows.** Counts add up to the record count and every envelope record appears once in the report (IMP-105; importer, row 3.1); every `correctionOf`, concept, `derivation.from` and applied id resolves (IMP-021); an applied version the app does not hold is reported (IMP-107); unit and zone checks beyond the pattern; the pseudonym is not derived from an identifier (IMP-020; the EMR's B5 and the importer); envelope major-version handling and unknown critical fields (IMP-111 to 116); an entered-in-error record is rejected by the importer by default (IMP-091); integrity (IMP-014, gap G-05).
+
+**Validation record, run result and run record: left to later rows.** Outputs match the package's declared contract (CCIS-REQ-070; Phase 2 and row 3.5); parameter ids exist and match the package; the snapshot is exactly what the computation read; a rerun is byte-identical (CCIS-REQ-077; row 3.5); immutability and content addressing (CCIS-REQ-076; gap G-05, rows 2.4 and 3.5); who may record assurance and the independence rule (G-02; row 6.2); batch runs sharing a context (G-03; before row 3.5); decision-path rule trace (row 3.4).

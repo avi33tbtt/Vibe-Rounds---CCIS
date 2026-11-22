@@ -42,8 +42,8 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 0.4 | chunk-0.4-use-case.md | Snake envenomation use-case dossier | DONE | 2026-11-22 | 1 markdown file | docs/USE-CASE-SNAKE.md: 9 facts, 2-node pathway, 2 analytics, 6 disabled parameters, fixture classes. No thresholds. D-013, D-014. |
 | 0.5 | chunk-0.5-traceability.md | Traceability and acceptance checklist | DONE | 2026-11-22 | 1 markdown file | docs/TRACEABILITY.md: 113 book headings mapped, 14 gaps (G-01 to G-14), 26-item checklist, 27 deferred items, requirement index. |
 | R0 | (user) | Review gate: approve SPEC draft, import contract, use case | DONE | 2026-11-23 |  | Recorded at owner's instruction; no clinician review yet; gaps G-01/03/04/05 deferred to their rows. See DECISIONS.md. |
-| 1.1 | chunk-1.1-schemas-core.md | Schemas: manifest, element, terminology binding (chunk file first) | IN PROGRESS | 2026-11-23 | 1 chunk file | Chunk file written (docs only); awaiting your approval. Next "do next" builds it. Needs: R0. |
-| 1.2 to 1.6 | (written when reached) | Schemas and reference artefacts (rest of Phase 1) | LOCKED |  |  | Stage 2. Each row unlocks after the one before it. |
+| 1.1 | chunk-1.1-schemas-core.md | Schemas: manifest, element, terminology binding (chunk file first) | DONE | 2026-11-23 | 1 chunk file | 3 schemas, Ajv standalone validators (no eval), 12 fixtures, 17 tests pass; 3 breakage checks seen failing. D-015 to D-017. CI now runs npm ci. |
+| 1.2 to 1.6 | (written when reached) | Schemas and reference artefacts (rest of Phase 1) | TODO |  |  | Stage 2. Next: 1.2 (write its chunk file first). Each row unlocks after the one before it. |
 | 2.1 to 2.4 | (written when reached) | Validator and compiler | LOCKED |  |  | Stage 2. |
 | 3.1 to 3.11 | (written when reached) | Importer, compatibility, executor, run records, local marketplace, CLI, browser app, hardening, slice, CCIS 0.1.0 | LOCKED |  |  | Stage 2. 3.11 ends with the user's limitations review. |
 | 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | After 0.1.0. |

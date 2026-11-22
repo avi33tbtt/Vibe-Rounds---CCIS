@@ -1,0 +1,138 @@
+{
+  "manifest": {
+    "id": "synthetic.demo-element",
+    "name": "Synthetic demo element",
+    "type": "contextual-element",
+    "version": "0.1.0",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft"
+  },
+  "intent": {
+    "purpose": "Synthetic purpose",
+    "setting": "Synthetic setting",
+    "population": "Synthetic population",
+    "exclusions": [],
+    "rationale": "Synthetic rationale"
+  },
+  "fields": [
+    {
+      "key": "eventTime",
+      "label": "Synthetic event time",
+      "type": "datetime",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "timeSemantics": "event-time",
+      "epistemic": [
+        "absent",
+        "unknown"
+      ],
+      "sourceClasses": [
+        "clinician-entered"
+      ]
+    },
+    {
+      "key": "syntheticQuantity",
+      "label": "Synthetic quantity",
+      "type": "quantity",
+      "cardinality": {
+        "min": 0,
+        "max": "unbounded"
+      },
+      "units": [
+        "min",
+        "h"
+      ],
+      "precision": {
+        "decimals": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "device",
+        "derived"
+      ],
+      "constraints": [
+        "Synthetic descriptive constraint"
+      ]
+    },
+    {
+      "key": "syntheticCode",
+      "label": "Synthetic code",
+      "type": "code",
+      "cardinality": {
+        "min": 1,
+        "max": 1
+      },
+      "binding": {
+        "codeSystem": {
+          "id": "https://example.invalid/cs",
+          "version": "1"
+        },
+        "code": "S1",
+        "display": "Synthetic",
+        "mapping": {
+          "status": "mapped"
+        }
+      },
+      "epistemic": [
+        "explicitly-negative",
+        "not-applicable"
+      ],
+      "sourceClasses": [
+        "imported"
+      ]
+    }
+  ],
+  "provenance": {
+    "origin": "Synthetic",
+    "basis": "Synthetic"
+  },
+  "modules": [
+    {
+      "id": "extra",
+      "appliesWhen": "Synthetic condition",
+      "fields": [
+        {
+          "key": "syntheticFlag",
+          "label": "Synthetic flag",
+          "type": "boolean",
+          "cardinality": {
+            "min": 0,
+            "max": 1
+          },
+          "epistemic": [
+            "unknown"
+          ],
+          "sourceClasses": [
+            "patient-reported"
+          ]
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "kind": "refines",
+      "from": "syntheticQuantity",
+      "to": "eventTime"
+    }
+  ],
+  "tests": [
+    {
+      "id": "synthetic.demo-tests",
+      "type": "test-validation-package",
+      "range": "^0.1.0"
+    }
+  ]
+}

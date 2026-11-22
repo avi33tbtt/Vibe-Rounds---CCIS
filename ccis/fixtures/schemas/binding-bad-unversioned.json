@@ -1,0 +1,9 @@
+{
+  "codeSystem": {
+    "id": "https://example.invalid/cs"
+  },
+  "code": "S1",
+  "mapping": {
+    "status": "mapped"
+  }
+}

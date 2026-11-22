@@ -1,0 +1,16 @@
+{
+  "codeSystem": {
+    "id": "https://example.invalid/cs",
+    "version": "2026-01"
+  },
+  "valueSet": {
+    "id": "https://example.invalid/vs",
+    "noVersionPublished": true
+  },
+  "code": "S1",
+  "mapping": {
+    "status": "lossy",
+    "confidence": 0.6,
+    "note": "Synthetic: broader concept"
+  }
+}

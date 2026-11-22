@@ -1,0 +1,43 @@
+{
+  "manifest": {
+    "id": "synthetic.demo-element",
+    "name": "Synthetic demo element",
+    "type": "contextual-element",
+    "version": "0.1.0",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft"
+  },
+  "intent": {
+    "purpose": "Synthetic purpose",
+    "setting": "Synthetic setting",
+    "population": "Synthetic population",
+    "exclusions": [],
+    "rationale": "Synthetic rationale"
+  },
+  "fields": [
+    {
+      "key": "syntheticQuantity",
+      "label": "Synthetic quantity",
+      "type": "quantity",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "epistemic": [
+        "unknown"
+      ],
+      "sourceClasses": [
+        "device"
+      ]
+    }
+  ],
+  "provenance": {
+    "origin": "Synthetic",
+    "basis": "Synthetic"
+  }
+}

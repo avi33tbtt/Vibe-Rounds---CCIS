@@ -1,0 +1,101 @@
+{
+  "id": "agent-documented",
+  "question": "Is the synthetic agent administration documented, with its time?",
+  "inputs": [
+    {
+      "key": "agentGiven",
+      "element": "synthetic.demo-element",
+      "field": "agentGiven"
+    },
+    {
+      "key": "agentStartTime",
+      "element": "synthetic.demo-element",
+      "field": "agentStartTime"
+    }
+  ],
+  "outcomes": [
+    {
+      "id": "given-with-time",
+      "kind": "answer",
+      "when": [
+        {
+          "input": "agentGiven",
+          "is": "present"
+        },
+        {
+          "input": "agentStartTime",
+          "is": "present"
+        }
+      ]
+    },
+    {
+      "id": "given-no-time",
+      "kind": "answer",
+      "when": [
+        {
+          "input": "agentGiven",
+          "is": "present"
+        },
+        {
+          "input": "agentStartTime",
+          "is": "absent"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "not-given",
+      "kind": "answer",
+      "when": [
+        {
+          "input": "agentGiven",
+          "is": "explicitly-negative"
+        }
+      ],
+      "next": {
+        "end": true
+      }
+    },
+    {
+      "id": "nothing-recorded",
+      "kind": "missing-data",
+      "when": [
+        {
+          "input": "agentGiven",
+          "is": "absent"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "records-conflict",
+      "kind": "conflicting",
+      "when": [
+        {
+          "input": "agentGiven",
+          "is": "conflicting"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "cannot-say",
+      "kind": "indeterminate",
+      "when": [
+        {
+          "input": "agentGiven",
+          "is": "unknown"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    }
+  ]
+}

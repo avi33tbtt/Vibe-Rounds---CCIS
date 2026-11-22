@@ -1,0 +1,347 @@
+{
+  "manifest": {
+    "id": "synthetic.demo-pathway",
+    "name": "Synthetic demo pathway",
+    "type": "pathway",
+    "version": "0.1.0",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft"
+  },
+  "scope": "Synthetic scope",
+  "intendedUse": "Synthetic documentation workflow; describes information needed only",
+  "exclusions": [],
+  "elements": [
+    {
+      "id": "synthetic.demo-element",
+      "type": "contextual-element",
+      "range": "^0.1.0"
+    }
+  ],
+  "stages": [
+    {
+      "id": "presentation",
+      "label": "Presentation",
+      "kind": "information",
+      "entry": [
+        "Synthetic entry criterion"
+      ],
+      "exit": [
+        "Synthetic exit criterion"
+      ],
+      "needs": [
+        "presentationTime",
+        "arrivalTime"
+      ]
+    },
+    {
+      "id": "clotting-documentation",
+      "label": "Clotting-test documentation",
+      "kind": "information",
+      "entry": [
+        "Synthetic entry criterion"
+      ],
+      "exit": [
+        "Synthetic exit criterion"
+      ],
+      "needs": [
+        "testPerformed",
+        "resultRecorded"
+      ]
+    },
+    {
+      "id": "asv-documentation",
+      "label": "Agent administration documentation",
+      "kind": "information",
+      "entry": [
+        "Synthetic entry criterion"
+      ],
+      "exit": [
+        "Synthetic exit criterion"
+      ],
+      "needs": [
+        "agentGiven",
+        "agentStartTime"
+      ]
+    },
+    {
+      "id": "gap-report",
+      "label": "Gap report",
+      "kind": "report",
+      "entry": [
+        "Synthetic entry criterion"
+      ],
+      "exit": [
+        "Synthetic exit criterion"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "test-documented",
+      "question": "Is the synthetic test documented as performed, and is its result documented?",
+      "inputs": [
+        {
+          "key": "testPerformed",
+          "element": "synthetic.demo-element",
+          "field": "testPerformed"
+        },
+        {
+          "key": "resultRecorded",
+          "element": "synthetic.demo-element",
+          "field": "resultRecorded"
+        }
+      ],
+      "preconditions": [
+        "Synthetic precondition"
+      ],
+      "outcomes": [
+        {
+          "id": "with-result",
+          "kind": "answer",
+          "when": [
+            {
+              "input": "testPerformed",
+              "is": "present"
+            },
+            {
+              "input": "resultRecorded",
+              "is": "present"
+            }
+          ],
+          "next": {
+            "stage": "asv-documentation"
+          }
+        },
+        {
+          "id": "without-result",
+          "kind": "answer",
+          "when": [
+            {
+              "input": "testPerformed",
+              "is": "present"
+            },
+            {
+              "input": "resultRecorded",
+              "is": "absent"
+            }
+          ],
+          "next": {
+            "stage": "asv-documentation"
+          },
+          "note": "Flagged: result not documented"
+        },
+        {
+          "id": "not-performed",
+          "kind": "answer",
+          "when": [
+            {
+              "input": "testPerformed",
+              "is": "explicitly-negative"
+            }
+          ],
+          "next": {
+            "stage": "asv-documentation"
+          }
+        },
+        {
+          "id": "nothing-recorded",
+          "kind": "missing-data",
+          "when": [
+            {
+              "input": "testPerformed",
+              "is": "absent"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "records-conflict",
+          "kind": "conflicting",
+          "when": [
+            {
+              "input": "testPerformed",
+              "is": "conflicting"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "cannot-say",
+          "kind": "indeterminate",
+          "when": [
+            {
+              "input": "testPerformed",
+              "is": "unknown"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        }
+      ]
+    },
+    {
+      "id": "agent-documented",
+      "question": "Is the synthetic agent administration documented, with its time?",
+      "inputs": [
+        {
+          "key": "agentGiven",
+          "element": "synthetic.demo-element",
+          "field": "agentGiven"
+        },
+        {
+          "key": "agentStartTime",
+          "element": "synthetic.demo-element",
+          "field": "agentStartTime"
+        }
+      ],
+      "outcomes": [
+        {
+          "id": "given-with-time",
+          "kind": "answer",
+          "when": [
+            {
+              "input": "agentGiven",
+              "is": "present"
+            },
+            {
+              "input": "agentStartTime",
+              "is": "present"
+            }
+          ],
+          "next": {
+            "end": true
+          }
+        },
+        {
+          "id": "given-no-time",
+          "kind": "answer",
+          "when": [
+            {
+              "input": "agentGiven",
+              "is": "present"
+            },
+            {
+              "input": "agentStartTime",
+              "is": "absent"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "not-given",
+          "kind": "answer",
+          "when": [
+            {
+              "input": "agentGiven",
+              "is": "explicitly-negative"
+            }
+          ],
+          "next": {
+            "end": true
+          }
+        },
+        {
+          "id": "nothing-recorded",
+          "kind": "missing-data",
+          "when": [
+            {
+              "input": "agentGiven",
+              "is": "absent"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "records-conflict",
+          "kind": "conflicting",
+          "when": [
+            {
+              "input": "agentGiven",
+              "is": "conflicting"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "cannot-say",
+          "kind": "indeterminate",
+          "when": [
+            {
+              "input": "agentGiven",
+              "is": "unknown"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        }
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "from": "presentation",
+      "to": "clotting-documentation"
+    },
+    {
+      "from": "clotting-documentation",
+      "to": "asv-documentation",
+      "via": "test-documented"
+    },
+    {
+      "from": "clotting-documentation",
+      "to": "gap-report",
+      "via": "test-documented"
+    },
+    {
+      "from": "asv-documentation",
+      "to": "gap-report",
+      "via": "agent-documented"
+    }
+  ],
+  "timing": [
+    {
+      "id": "presentation-to-agent",
+      "description": "Synthetic window",
+      "between": {
+        "from": "presentation",
+        "to": "asv-documentation"
+      },
+      "parameter": "targetInterval"
+    }
+  ],
+  "analytics": [
+    {
+      "ref": {
+        "id": "synthetic.analytic-interval",
+        "type": "analytics-package",
+        "range": "^0.1.0"
+      },
+      "requirement": "required"
+    },
+    {
+      "ref": {
+        "id": "synthetic.analytic-completeness",
+        "type": "analytics-package",
+        "range": "^0.1.0"
+      },
+      "requirement": "optional"
+    }
+  ]
+}

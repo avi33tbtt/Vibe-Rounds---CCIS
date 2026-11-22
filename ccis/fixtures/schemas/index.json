@@ -1,0 +1,157 @@
+[
+  {
+    "file": "manifest-good-minimal.json",
+    "schema": "manifest",
+    "valid": true
+  },
+  {
+    "file": "manifest-good-full.json",
+    "schema": "manifest",
+    "valid": true
+  },
+  {
+    "file": "manifest-bad-missing-field.json",
+    "schema": "manifest",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "publisher"
+    },
+    "diagnostic": "REQ-010: publisher is required"
+  },
+  {
+    "file": "manifest-bad-unknown-field.json",
+    "schema": "manifest",
+    "valid": false,
+    "expect": {
+      "keyword": "additionalProperties",
+      "where": "criticalFlag"
+    },
+    "diagnostic": "REQ-015: unknown critical field rejected"
+  },
+  {
+    "file": "manifest-bad-semver.json",
+    "schema": "manifest",
+    "valid": false,
+    "expect": {
+      "keyword": "pattern",
+      "where": "/version"
+    },
+    "diagnostic": "REQ-012: version must be semver"
+  },
+  {
+    "file": "manifest-bad-reference-no-version.json",
+    "schema": "manifest",
+    "valid": false,
+    "expect": {
+      "keyword": "oneOf",
+      "where": "/references/0"
+    },
+    "diagnostic": "REQ-014: reference needs exact version or range"
+  },
+  {
+    "file": "element-good-minimal.json",
+    "schema": "element",
+    "valid": true
+  },
+  {
+    "file": "element-good-full.json",
+    "schema": "element",
+    "valid": true
+  },
+  {
+    "file": "element-bad-numeric-no-units.json",
+    "schema": "element",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "units"
+    },
+    "diagnostic": "REQ-042: numeric field declares units"
+  },
+  {
+    "file": "binding-good.json",
+    "schema": "terminologyBinding",
+    "valid": true
+  },
+  {
+    "file": "binding-bad-unversioned.json",
+    "schema": "terminologyBinding",
+    "valid": false,
+    "expect": {
+      "keyword": "oneOf",
+      "where": "/codeSystem"
+    },
+    "diagnostic": "REQ-041: version pinned or noVersionPublished stated"
+  },
+  {
+    "file": "binding-bad-label-only.json",
+    "schema": "terminologyBinding",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "codeSystem"
+    },
+    "diagnostic": "REQ-040: display label alone is not a binding"
+  },
+  {
+    "file": "pathway-good-minimal.json",
+    "schema": "pathway",
+    "valid": true
+  },
+  {
+    "file": "pathway-good-full.json",
+    "schema": "pathway",
+    "valid": true
+  },
+  {
+    "file": "decision-node-bad-no-indeterminate.json",
+    "schema": "decisionNode",
+    "valid": false,
+    "expect": {
+      "keyword": "contains",
+      "where": "/outcomes"
+    },
+    "diagnostic": "REQ-026: a node needs an indeterminate outcome"
+  },
+  {
+    "file": "decision-node-bad-outcome-no-next.json",
+    "schema": "decisionNode",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "next"
+    },
+    "diagnostic": "REQ-026: no outcome may lead nowhere"
+  },
+  {
+    "file": "pathway-bad-action-field.json",
+    "schema": "pathway",
+    "valid": false,
+    "expect": {
+      "keyword": "additionalProperties",
+      "where": "action"
+    },
+    "diagnostic": "REQ-027: a pathway cannot carry an action"
+  },
+  {
+    "file": "pathway-bad-stage-no-exit.json",
+    "schema": "pathway",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "exit"
+    },
+    "diagnostic": "REQ-025: a stage declares exit criteria"
+  },
+  {
+    "file": "pathway-bad-timing-number.json",
+    "schema": "pathway",
+    "valid": false,
+    "expect": {
+      "keyword": "additionalProperties",
+      "where": "value"
+    },
+    "diagnostic": "Timing names a parameter, never a number"
+  }
+]

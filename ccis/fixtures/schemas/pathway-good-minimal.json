@@ -1,0 +1,38 @@
+{
+  "manifest": {
+    "id": "synthetic.demo-pathway",
+    "name": "Synthetic demo pathway",
+    "type": "pathway",
+    "version": "0.1.0",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft"
+  },
+  "scope": "Synthetic scope",
+  "intendedUse": "Synthetic documentation workflow; describes information needed only",
+  "exclusions": [],
+  "elements": [
+    {
+      "id": "synthetic.demo-element",
+      "type": "contextual-element",
+      "range": "^0.1.0"
+    }
+  ],
+  "stages": [
+    {
+      "id": "only-stage",
+      "label": "Synthetic stage",
+      "kind": "information",
+      "entry": [
+        "Synthetic entry criterion"
+      ],
+      "exit": [
+        "Synthetic exit criterion"
+      ]
+    }
+  ]
+}

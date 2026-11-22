@@ -1,0 +1,33 @@
+{
+  "id": "synthetic.demo-pathway",
+  "name": "Synthetic demo element",
+  "type": "pathway",
+  "version": "1.2.3-rc.1",
+  "publisher": {
+    "name": "Synthetic test publisher"
+  },
+  "standard": {
+    "version": "0.1.0"
+  },
+  "status": "in-review",
+  "requires": {
+    "engine": ">=0.1.0 <1.0.0",
+    "fhir": "^4.0.1"
+  },
+  "references": [
+    {
+      "id": "synthetic.demo-element",
+      "type": "contextual-element",
+      "range": "^0.1.0"
+    },
+    {
+      "id": "synthetic.demo-terms",
+      "type": "terminology-package",
+      "version": "2.0.0"
+    }
+  ],
+  "mandatoryExtensions": [
+    "x-synthetic-note"
+  ],
+  "x-synthetic-note": "extension content"
+}

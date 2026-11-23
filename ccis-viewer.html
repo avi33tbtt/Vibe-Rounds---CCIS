@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-N4R6df1GMl5DxHLA3JurCFgpC1QZr8NF1i03z9ZXmrA='; style-src 'sha256-etTWmghHfF1rP9GRtKb4TTI/jUC0nKg0hUyEQkt1Bvk='; img-src 'none'; connect-src 'none'; font-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-YzUzxQr2jJI2g2SDBF+ybWG+6tVNC1b9I17CD4r2odY='; style-src 'sha256-etTWmghHfF1rP9GRtKb4TTI/jUC0nKg0hUyEQkt1Bvk='; img-src 'none'; connect-src 'none'; font-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CCIS demo result viewer</title>
 <!-- DEMO RUNNER: replaced by rows 2.x and 3.x. Prototype. Synthetic data only. Not for clinical use. -->
@@ -37,6 +37,17 @@ ul { margin:.2rem 0; padding-left:1.4rem; } .error { background:var(--bad-bg); c
 <p class="muted">Open a run record (.json) written by <code>ccis-cli.js</code>. The file is read on this device only; this page makes no network requests.</p>
 <p><label for="file">Run record file </label><input type="file" id="file" accept=".json,application/json"></p>
 <div id="out" aria-live="polite"></div>
+<section id="cohort-section">
+<h2>Cohort (staged)</h2>
+<p class="card" id="cohort-label">Staged: aggregate of the demo runner over synthetic fixtures; not the cohort engine (rows 5.x).</p>
+<p class="muted">Open <code>ccis/demo/cohort-demo.json</code>, written by <code>node scripts/demo-batch.js</code>. It holds counts only, never case contents.</p>
+<p><label for="cohort-file">Staged cohort file </label><input type="file" id="cohort-file" accept=".json,application/json"></p>
+<div id="cohort" aria-live="polite"></div>
+</section>
+<section id="second-package">
+<h2>Second package</h2>
+<div class="card"><h3>Second package: coming</h3><p class="muted">A roadmap card only. It has no function in this demo.</p></div>
+</section>
 </main>
 <script>
 (function () {
@@ -197,8 +208,69 @@ ul { margin:.2rem 0; padding-left:1.4rem; } .error { background:var(--bad-bg); c
     reader.readAsText(f);
   }
 
+  var COHORT_LABEL = 'Staged: aggregate of the demo runner over synthetic fixtures; not the cohort engine (rows 5.x)';
+  var isCount = function (n) { return typeof n === 'number' && isFinite(n) && n >= 0 && Math.floor(n) === n; };
+  function isCounts(o) {
+    return isObj(o) && Object.keys(o).every(function (k) { return isCount(o[k]); });
+  }
+  function isOutputs(o) {
+    return isObj(o) && Object.keys(o).every(function (k) { return isCounts(o[k]); });
+  }
+  function isCohort(d) {
+    return isObj(d) && d.label === COHORT_LABEL && isCount(d.caseCount) && isCounts(d.byStatus) && isOutputs(d.total) &&
+      isObj(d.classes) && Object.keys(d.classes).every(function (k) {
+        var c = d.classes[k];
+        return isObj(c) && isCount(c.cases) && isCounts(c.byStatus) && isOutputs(c.outputs);
+      });
+  }
+  function countTable(outputs) {
+    var rows = [];
+    Object.keys(outputs).sort().forEach(function (o) {
+      Object.keys(outputs[o]).sort().forEach(function (s) {
+        rows.push(el('tr', '', [el('td', '', [o]), el('td', '', [badge(s)]), el('td', '', [String(outputs[o][s])])]));
+      });
+    });
+    return el('div', 'scroll', [el('table', '', [
+      el('thead', '', [el('tr', '', ['Output', 'State', 'Cases'].map(function (h) { return el('th', '', [h]); }))]),
+      el('tbody', '', rows)
+    ])]);
+  }
+  function renderCohort(d) {
+    var box = document.getElementById('cohort');
+    box.replaceChildren();
+    if (!isCohort(d)) {
+      box.appendChild(el('p', 'error', ['This file is not a staged cohort file this viewer can read.']));
+      return false;
+    }
+    box.appendChild(el('p', 'card', [COHORT_LABEL + '.']));
+    var st = Object.keys(d.byStatus).sort().map(function (k) { return k + ': ' + d.byStatus[k]; }).join(', ');
+    box.appendChild(facts([['Cases run', String(d.caseCount)], ['Run status', st || 'none']]));
+    box.appendChild(el('h3', '', ['All cases']));
+    box.appendChild(countTable(d.total));
+    Object.keys(d.classes).sort().forEach(function (k) {
+      box.appendChild(el('h3', '', ['Fixture class: ' + k + ' (' + d.classes[k].cases + ' cases)']));
+      box.appendChild(countTable(d.classes[k].outputs));
+    });
+    return true;
+  }
+  function onCohortFile(ev) {
+    var f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    var box = document.getElementById('cohort');
+    if (f.size > MAX_BYTES) { box.replaceChildren(el('p', 'error', ['The file is too large for this viewer.'])); return; }
+    var reader = new FileReader();
+    reader.onerror = function () { box.replaceChildren(el('p', 'error', ['The file could not be read.'])); };
+    reader.onload = function () {
+      var data;
+      try { data = JSON.parse(String(reader.result)); } catch (e) { box.replaceChildren(el('p', 'error', ['The file is not valid JSON.'])); return; }
+      renderCohort(data);
+    };
+    reader.readAsText(f);
+  }
+
   document.getElementById('file').addEventListener('change', onFile);
-  window.ccisViewer = { render: render };
+  document.getElementById('cohort-file').addEventListener('change', onCohortFile);
+  window.ccisViewer = { render: render, renderCohort: renderCohort };
 }());
 </script>
 </body>

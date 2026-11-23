@@ -63,7 +63,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | DS3 | chunk-DS3-demo-run-record.md | Run record builder: content-addressed id, snapshot, versions, demo-parameter note | DONE | 2026-11-23 | 1 module, 1 test file | ccis-demo-record.js, 13 tests (187+1 todo pass); 32 fixtures give valid, byte-identical records; 3 breakage checks seen failing. D-056 to D-058. Next: DS4. |
 | DS4 | chunk-DS4-demo-cli.md | `ccis-cli.js run` (envelope in, run record out, no network) | DONE | 2026-11-23 | 1 CLI, 1 test file | ccis-cli.js, npm run demo, 9 tests (196+1 todo pass); exit 0/2 rules; 3 breakage checks seen failing. D-059 to D-061. EMR DM3 can call it. Next: DS5 after EMR DM1 to DM3. |
 | DS5 | chunk-DS5-demo-viewer.md | Static result viewer with banners (CSP-safe) | DONE | 2026-11-23 | 1 page, 1 test file | ccis-viewer.html (hash CSP, no innerHTML), 10 jsdom tests (206+1 todo pass); 3 breakage checks seen failing. jsdom devDep. D-062 to D-064. Next: DS6 (EMR DM1 to DM3 first). |
-| DS6 | chunk-DS6-demo-staged-cohort.md | Staged cohort view (batch of real runner over fixtures) + second-package card | TODO | | 1 script, 1 page edit, 1 test | Labelled staged, not the cohort engine. |
+| DS6 | chunk-DS6-demo-staged-cohort.md | Staged cohort view (batch of real runner over fixtures) + second-package card | DONE | 2026-11-23 | 1 script, 1 page edit, 1 test | scripts/demo-batch.js, cohort-demo.json (32 cases, counts only), viewer section, 7 tests. npm test NOT run (owner's request); counts checked by hand. D-065 to D-067. Next: DS7. |
 | DS7 | chunk-DS7-demo-hardening.md | EMR-export end-to-end test, README "Run the demo", limitations | TODO | | 1 test, 1 fixture pair, README | Needs EMR DM1. |
 | 1.6 | (written when reached) | Invalid examples, one per validator layer; FHIR-Mode example | LOCKED |  |  | Stage 2. Unlocks after 1.5a. |
 | 2.1 to 2.4 | (written when reached) | Validator and compiler | LOCKED |  |  | Stage 2. |
@@ -75,6 +75,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 ## ITEMS ONLY YOU CAN DO
 - Finding F-6 (`ccis/fixtures/snake/README.md`): a not-collected expected item gives overall `complete`. Approve a 0.1.2 fix as a new row (not blocking DS2b).
 - Confirm the omission rule D-050 (conflicting inputs: count, overall status and window are left out).
+- Run `npm test` once on your machine for DS6 (it was not run here at your request); if it fails, say "redo DS6".
 - Review `docs/DEMO-SLICE.md` and `docs/ROADMAP-COORDINATION.md` (rows DS0 and DS-X are drafts).
 - Answer findings F-4 and F-5 (`ccis/fixtures/snake/README.md`): by amending the dossier or by accepting the 0.1.0 tree behaviour. Two deferred fixture cases wait on them.
 - Confirm D-042: `convert` on a duration parameter is read as "express in the target unit" (identity when already minutes). Phase 2 must define it.

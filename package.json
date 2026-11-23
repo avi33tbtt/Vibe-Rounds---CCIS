@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "node --test",
-    "build": "node scripts/build-validators.js"
+    "build": "node scripts/build-validators.js",
+    "demo": "node ccis-cli.js"
   },
   "devDependencies": {
     "ajv": "8.18.0"

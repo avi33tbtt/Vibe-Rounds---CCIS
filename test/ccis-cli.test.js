@@ -135,9 +135,9 @@ test('main returns the exit code and reports through io', () => {
   assert.match(lines[0], /--envelope is required/);
 });
 
-test('npm script: package.json has a demo entry and no new dependencies', () => {
+test('npm script: package.json has a demo entry and no runtime dependencies', () => {
   const pkg = read(new URL('package.json', root));
   assert.equal(pkg.scripts.demo, 'node ccis-cli.js');
-  assert.deepEqual(Object.keys(pkg.devDependencies), ['ajv']);
+  assert.deepEqual(Object.keys(pkg.devDependencies).sort(), ['ajv', 'jsdom']);
   assert.equal(pkg.dependencies, undefined);
 });

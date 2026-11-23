@@ -12,6 +12,7 @@
     "demo": "node ccis-cli.js"
   },
   "devDependencies": {
-    "ajv": "8.18.0"
+    "ajv": "8.18.0",
+    "jsdom": "31.0.1"
   }
 }

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-N4R6df1GMl5DxHLA3JurCFgpC1QZr8NF1i03z9ZXmrA='; style-src 'sha256-etTWmghHfF1rP9GRtKb4TTI/jUC0nKg0hUyEQkt1Bvk='; img-src 'none'; connect-src 'none'; font-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCIS demo result viewer</title>
+<!-- DEMO RUNNER: replaced by rows 2.x and 3.x. Prototype. Synthetic data only. Not for clinical use. -->
+<style>
+:root { --bg:#fbfbfa; --fg:#1d1d1b; --muted:#5d5d58; --card:#fff; --line:#d6d5cf; --warn-bg:#fff4d6; --warn-fg:#5c4200; --bad-bg:#fde4e1; --bad-fg:#7a1a10; --ok-bg:#e1f2e4; --ok-fg:#15501f; --info-bg:#e3ecf8; --info-fg:#17396b; --grey-bg:#ececE8; --grey-fg:#3b3b37; --viol-bg:#ece3f6; --viol-fg:#43236b; }
+@media (prefers-color-scheme: dark) { :root { --bg:#161615; --fg:#ecebe6; --muted:#a3a29b; --card:#1f1f1d; --line:#3a3a36; --warn-bg:#3d3000; --warn-fg:#ffe08a; --bad-bg:#47140f; --bad-fg:#ffb4aa; --ok-bg:#12361a; --ok-fg:#a6e3b2; --info-bg:#14284a; --info-fg:#b4cdf5; --grey-bg:#2c2c29; --grey-fg:#d4d3cc; --viol-bg:#2f1d49; --viol-fg:#d9c3f5; } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
+main { max-width:60rem; margin:0 auto; padding:1rem; }
+h1 { font-size:1.4rem; margin:.5rem 0; } h2 { font-size:1.1rem; margin:1.5rem 0 .5rem; } h3 { font-size:1rem; margin:0 0 .25rem; }
+.banner { margin:0; padding:.6rem 1rem; font-weight:600; }
+.banner-proto { background:var(--warn-bg); color:var(--warn-fg); }
+.banner-demo { background:var(--viol-bg); color:var(--viol-fg); }
+.banner-failed { background:var(--bad-bg); color:var(--bad-fg); }
+.card { background:var(--card); border:1px solid var(--line); border-radius:6px; padding:.75rem 1rem; margin:.5rem 0; }
+.badge { display:inline-block; padding:.1rem .6rem; border-radius:1rem; font-size:.9rem; font-weight:600; border:1px solid currentColor; }
+.s-value { background:var(--ok-bg); color:var(--ok-fg); } .s-needs { background:var(--warn-bg); color:var(--warn-fg); }
+.s-indet { background:var(--grey-bg); color:var(--grey-fg); border-style:dashed; } .s-na { background:var(--info-bg); color:var(--info-fg); }
+.s-conflict { background:var(--bad-bg); color:var(--bad-fg); } .s-off { background:var(--viol-bg); color:var(--viol-fg); border-style:dotted; }
+.s-unknown { background:var(--grey-bg); color:var(--grey-fg); }
+.muted { color:var(--muted); } .none { color:var(--muted); font-style:italic; margin:.2rem 0; }
+dl { display:grid; grid-template-columns:max-content 1fr; gap:.2rem 1rem; margin:0; } dt { color:var(--muted); } dd { margin:0; overflow-wrap:anywhere; }
+.scroll { overflow-x:auto; } table { border-collapse:collapse; width:100%; } th, td { border:1px solid var(--line); padding:.25rem .5rem; text-align:left; vertical-align:top; }
+ul { margin:.2rem 0; padding-left:1.4rem; } .error { background:var(--bad-bg); color:var(--bad-fg); padding:.6rem 1rem; border-radius:6px; }
+</style>
+</head>
+<body>
+<p class="banner banner-proto" role="note">Synthetic data, prototype, not for clinical use.</p>
+<div id="banners"></div>
+<main>
+<h1>CCIS demo result viewer</h1>
+<p class="muted">Open a run record (.json) written by <code>ccis-cli.js</code>. The file is read on this device only; this page makes no network requests.</p>
+<p><label for="file">Run record file </label><input type="file" id="file" accept=".json,application/json"></p>
+<div id="out" aria-live="polite"></div>
+</main>
+<script>
+(function () {
+  'use strict';
+  var MAX = 2000;
+  var MAX_BYTES = 5000000;
+  var STATE_TEXT = {
+    'needs-data': 'Needs data (not computed)',
+    'indeterminate': 'Indeterminate (cannot say)',
+    'not-applicable': 'Not applicable',
+    'conflict': 'Conflict (records disagree)',
+    'parameter-not-enabled': 'Parameter not enabled'
+  };
+  var STATE_CLASS = { 'needs-data': 's-needs', 'indeterminate': 's-indet', 'not-applicable': 's-na', 'conflict': 's-conflict', 'parameter-not-enabled': 's-off' };
+
+  // The one escaper. Every piece of text on the page comes through here and becomes a text node.
+  function txt(v) {
+    var s = typeof v === 'string' ? v : JSON.stringify(v);
+    if (typeof s !== 'string') s = '';
+    if (s.length > MAX) s = s.slice(0, MAX) + '\u2026';
+    return document.createTextNode(s);
+  }
+  function el(tag, cls, kids) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    (kids || []).forEach(function (k) {
+      if (k === null || k === undefined) return;
+      e.appendChild(typeof k === 'object' && k.nodeType ? k : txt(k));
+    });
+    return e;
+  }
+  var isObj = function (x) { return x !== null && typeof x === 'object' && !Array.isArray(x); };
+  var isArr = Array.isArray;
+  var has = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+
+  function isRecord(r) {
+    return isObj(r) && typeof r.id === 'string' && (r.status === 'completed' || r.status === 'failed') &&
+      isObj(r.package) && isObj(r.standard) && isObj(r.engine) && isObj(r.operatorSet) && isObj(r.evaluationTime) &&
+      isObj(r.snapshot) && isArr(r.snapshot.observations) && isArr(r.snapshot.events) && isArr(r.parameters) &&
+      isObj(r.importReport) && isObj(r.importReport.counts) && isArr(r.results) && isArr(r.warnings) && isArr(r.limitations);
+  }
+
+  function badge(state) {
+    var known = has(STATE_CLASS, state);
+    return el('span', 'badge ' + (known ? STATE_CLASS[state] : 's-unknown'), [known ? STATE_TEXT[state] : state]);
+  }
+  function list(items) {
+    if (!isArr(items) || items.length === 0) return el('p', 'none', ['None']);
+    return el('ul', '', items.map(function (i) { return el('li', '', [i]); }));
+  }
+  function facts(pairs) {
+    var dl = el('dl');
+    pairs.forEach(function (p) { dl.appendChild(el('dt', '', [p[0]])); dl.appendChild(el('dd', '', [p[1]])); });
+    return dl;
+  }
+  function section(title, node) { return el('section', '', [el('h2', '', [title]), node]); }
+
+  function valueNode(r) {
+    if (has(r, 'state')) return el('p', '', [badge(r.state)]);
+    var v = r.value;
+    if (r.kind === 'table' && isObj(v) && isArr(v.columns) && isArr(v.rows)) {
+      var head = el('tr', '', v.columns.map(function (c) { return el('th', '', [c]); }));
+      var rows = v.rows.map(function (row) { return el('tr', '', (isArr(row) ? row : []).map(function (c) { return el('td', '', [String(c)]); })); });
+      return el('div', 'scroll', [el('table', '', [el('thead', '', [head]), el('tbody', '', rows)])]);
+    }
+    if (isObj(v) && has(v, 'amount')) return el('p', '', [el('span', 'badge s-value', ['Value']), ' ', String(v.amount) + ' ' + String(v.unit)]);
+    if (isObj(v) && isObj(v.time)) return el('p', '', [el('span', 'badge s-value', ['Value']), ' ', String(v.time.value) + ' (zone: ' + String(v.time.zone) + ')']);
+    if (isObj(v) && typeof v.label === 'string') {
+      var known = has(STATE_CLASS, v.label);
+      return el('p', '', [known ? badge(v.label) : el('span', 'badge s-value', ['Value']), known ? '' : ' ', known ? null : v.label]);
+    }
+    return el('p', '', [el('span', 'badge s-unknown', ['Unrecognised value']), ' ', v]);
+  }
+
+  function resultCard(r) {
+    var source = r['x-analytic'] || r['x-node'] || '';
+    var kids = [el('h3', '', [String(r.outputId)]), el('p', 'muted', [String(r.kind) + (source ? ' \u00b7 ' + source : '')]), valueNode(r)];
+    if (isArr(r.dependsOnParameters) && r.dependsOnParameters.length) kids.push(el('p', '', ['Needs parameters: ' + r.dependsOnParameters.join(', ')]));
+    kids.push(el('h4', '', ['Missing-data notes']), list(r.missingDataNotes), el('h4', '', ['Warnings']), list(r.warnings), el('h4', '', ['Limitations']), list(r.limitations));
+    return el('div', 'card', kids);
+  }
+
+  function paramRow(p) {
+    var on = p.enabled === true;
+    var value = '';
+    if (on) value = (isArr(p.value) ? p.value.join(', ') : String(p.value)) + (p.units ? ' ' + p.units : '');
+    return el('tr', '', [
+      el('td', '', [String(p.id)]),
+      el('td', '', [el('span', 'badge ' + (on ? 's-value' : 's-off'), [on ? 'Enabled' : 'Disabled'])]),
+      el('td', '', [on ? value : '\u2014']),
+      el('td', '', [on ? String(p.suppliedBy) : '\u2014']),
+      el('td', '', [p['x-testOnly'] === true ? 'Test-only placeholder' : ''])
+    ]);
+  }
+
+  function render(rec) {
+    var out = document.getElementById('out');
+    var banners = document.getElementById('banners');
+    out.replaceChildren();
+    banners.replaceChildren();
+    if (!isRecord(rec)) {
+      out.appendChild(el('p', 'error', ['This file is not a CCIS run record this viewer can read.']));
+      return false;
+    }
+    if (isObj(rec['x-demo'])) banners.appendChild(el('p', 'banner banner-demo', ['Demo placeholders, not clinical values.']));
+    if (rec.status === 'failed') banners.appendChild(el('p', 'banner banner-failed', ['This run failed. There are no results.']));
+
+    var snap = rec.snapshot;
+    var eie = snap.observations.concat(snap.events).filter(function (x) { return isObj(x) && x.status === 'entered-in-error'; }).length;
+    var c = rec.importReport.counts;
+    out.appendChild(section('Run', facts([
+      ['Run id', rec.id],
+      ['Status', rec.status],
+      ['Package', String(rec.package.id) + ' ' + String(rec.package.version)],
+      ['Standard', String(rec.standard.version)],
+      ['Engine', String(rec.engine.version)],
+      ['Operator set', String(rec.operatorSet.name) + ' ' + String(rec.operatorSet.version)],
+      ['Output contract', String(rec.outputContractVersion)],
+      ['Evaluation time', String(rec.evaluationTime.value) + ' (zone: ' + String(rec.evaluationTime.zone) + ')'],
+      ['Corrects', has(rec, 'corrects') ? String(rec.corrects) : 'Nothing (not a correction)']
+    ])));
+    if (rec.status === 'failed' && isObj(rec.failure)) {
+      out.appendChild(section('Failure', facts([['Rule', String(rec.failure.rule)], ['Message', String(rec.failure.message)]])));
+    }
+    out.appendChild(section('Results (' + rec.results.length + ')', rec.results.length ? el('div', '', rec.results.filter(isObj).map(resultCard)) : el('p', 'none', ['No results.'])));
+    var table = el('div', 'scroll', [el('table', '', [
+      el('thead', '', [el('tr', '', ['Parameter', 'State', 'Value', 'Supplied by', 'Note'].map(function (h) { return el('th', '', [h]); }))]),
+      el('tbody', '', rec.parameters.filter(isObj).map(paramRow))
+    ])]);
+    out.appendChild(section('Parameters', rec.parameters.length ? table : el('p', 'none', ['None declared.'])));
+    out.appendChild(section('Input snapshot (counts only)', facts([
+      ['Observations', String(snap.observations.length)],
+      ['Events', String(snap.events.length)],
+      ['Entered in error', String(eie)]
+    ])));
+    out.appendChild(section('Import report', facts([
+      ['Outcome', String(rec.importReport.outcome)],
+      ['Accepted', String(c.accepted)], ['Rejected', String(c.rejected)], ['Unmapped', String(c.unmapped)], ['Ambiguous', String(c.ambiguous)],
+      ['Refusal reason', typeof rec.importReport.refusalReason === 'string' ? rec.importReport.refusalReason : 'None']
+    ])));
+    out.appendChild(section('Run warnings', list(rec.warnings)));
+    out.appendChild(section('Run limitations', list(rec.limitations)));
+    return true;
+  }
+
+  function onFile(ev) {
+    var f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    var out = document.getElementById('out');
+    if (f.size > MAX_BYTES) { out.replaceChildren(el('p', 'error', ['The file is too large for this viewer.'])); return; }
+    var reader = new FileReader();
+    reader.onerror = function () { out.replaceChildren(el('p', 'error', ['The file could not be read.'])); };
+    reader.onload = function () {
+      var data;
+      try { data = JSON.parse(String(reader.result)); } catch (e) { out.replaceChildren(el('p', 'error', ['The file is not valid JSON.'])); return; }
+      render(data);
+    };
+    reader.readAsText(f);
+  }
+
+  document.getElementById('file').addEventListener('change', onFile);
+  window.ccisViewer = { render: render };
+}());
+</script>
+</body>
+</html>

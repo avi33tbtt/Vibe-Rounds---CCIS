@@ -63,9 +63,35 @@ The hand calculation was made from the dossier. Where the expression trees in `c
 
 ## Not built
 
+_Update (row 1.5b): the three items below are now built. See "Resolved in 0.1.1" further down. The text is kept as written in 1.5a._
+
 - **A parameter given in hours** (unit-conversion). Parameter units are minutes only (D-034) and no versioned conversion is declared. It needs a new artefact version (row 1.5b), so the case is listed under `deferred` in `index.json`.
 - **Estimated bite time with the target enabled**, because of F-1 (also `deferred`).
 - The certainty choice `needs-data` is not exercised.
+
+## Resolved in 0.1.1 (row 1.5b)
+
+New versions 0.1.1 of the two analytics (`ccis/examples/snake/snake-interval.analytics.0.1.1.json` and `snake-completeness.analytics.0.1.1.json`) agree with the dossier on the points below. The 0.1.0 files and the 23 cases above are unchanged and still apply to 0.1.0 (no executor yet, row 3.4, so nothing re-runs them against 0.1.1). Nine new cases apply to 0.1.1; their expected files say so in `x-analyticVersion`. Total: 32 cases.
+
+- **F-1 resolved.** The comparison now honours the certainty choice and F7 exactly as the interval does, and declares `indeterminate`. An estimated bite time with the target enabled gives the result, `needs-data` or `parameter-not-enabled` (naming the choice) according to the choice; an absent or unknown F7 gives `indeterminate`.
+- **F-2 resolved.** The read-time window gives `needs-data` unless F3 is documented as present. F3 explicitly not performed stays `not-applicable`.
+- **F-3 resolved in part.** The per-item table (`itemStates`) declares and gives `conflict` when an item's record conflicts. The count, the overall status and the read-time window on a conflicting record are still not specified: `conflicting-04` writes no value for them (`notSpecifiedOutputs`).
+- **Hours.** Both analytics declare the conversion `hoursToMinutes` 0.1.0 (hours to minutes, linear, factor 60, a definition of units and not a clinical value). The two duration parameters list `min` and `h`, and the trees reach the factor only through `convert`. Two cases give a duration in whole hours as a test-only placeholder; the allowed range is read in minutes after the declared conversion.
+- **Certainty choice `needs-data`** is now exercised (`estimated-05`).
+
+**Still open:** F-4 (not-applicable or not-enabled when F7 says not given and the target is disabled) and F-5 (overall status when an expected F3 is explicitly not performed). The 0.1.1 trees keep the 0.1.0 behaviour for both. They are owner questions: answer them by amending the dossier or by accepting the tree behaviour in a later row. Two cases wait for the answers and are listed under `deferred` in `index.json`.
+
+| Case | Class | What it tests |
+|------|-------|---------------|
+| `unit-conversion-03-target-in-hours` | unit-conversion | Target given as 2 h; 90 min is within 120 min only through the declared conversion. |
+| `unit-conversion-04-window-in-hours` | unit-conversion | Window given as 1 h; a read time 20 min after the start is in time only through the declared conversion. |
+| `estimated-04-target-accept` | estimated | Estimated bite time, target enabled, choice accept: result given, estimate visible on both outputs. |
+| `estimated-05-target-needs-data` | estimated | Same, choice needs-data: interval and comparison both needs-data. |
+| `estimated-06-target-choice-not-enabled` | estimated | Same, choice not enabled: both name the choice as not enabled. |
+| `missing-09-no-antivenom-status-target-enabled` | missing | F7 absent with the target enabled: interval and comparison both indeterminate. |
+| `missing-10-antivenom-status-unknown` | missing | F7 unknown with the target enabled: both indeterminate. |
+| `missing-11-no-clotting-status-window-enabled` | missing | F3 absent with the window enabled: needs-data, no in-time statement. |
+| `conflicting-04-two-status-records-conflict` | conflicting | Two F3 records disagree: the per-item table reports `conflict`. |
 
 ## What is not proved
 

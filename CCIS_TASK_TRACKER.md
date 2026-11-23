@@ -54,7 +54,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 1.4a | chunk-1.4a-schemas-validation-run.md | Schemas: validation record, run result, run record (split from 1.4 for size) | DONE | 2026-11-23 | 3 schemas, up to 16 fixtures | 3 schemas, 16 fixtures, 81 tests pass; 3 breakage checks seen failing. D-029 to D-031. Batch (G-03) and integrity (G-05) still open. Next: 1.5 chunk file. |
 | 1.5 | chunk-1.5-reference-artefacts.md | Valid snake reference artefacts: element, binding, pathway, 2 nodes, 2 analytics (chunk file first) | DONE | 2026-11-23 | 7 artefacts, 1 test | 7 artefacts, README, 13 tests (94 pass); 3 breakage checks seen failing. D-032 to D-034 (no value-set members; P6 unused). Next: 1.5a chunk file. |
 | 1.5a | chunk-1.5a-synthetic-fixtures.md | Synthetic fixtures (six classes) with hand-calculated expected results (split from 1.5 for size) | DONE | 2026-11-23 | ~20 cases, 1 test | 23 cases, 11 tests (105 pass); 3 breakage checks seen failing. Findings F-1 to F-5 (trees vs dossier); hours case deferred. D-035 to D-037. Next: 1.5b chunk file. |
-| 1.5b | chunk-1.5b-analytics-corrections.md | Analytics 0.1.1: comparison honours certainty, F7 and F3; declared hour-to-minute conversion; the deferred cases (chunk file first) | TODO | 2026-11-23 | 2 artefact versions, ~10 cases, 1 test | Added by 1.5a findings F-1 to F-5 (see ccis/fixtures/snake/README.md). Chunk file written 2026-11-23; awaiting owner approval. Next "do next" builds it. May split to 1.5c. |
+| 1.5b | chunk-1.5b-analytics-corrections.md | Analytics 0.1.1: comparison honours certainty, F7 and F3; declared hour-to-minute conversion; the deferred cases (chunk file first) | DONE | 2026-11-23 | 2 artefact versions, ~10 cases, 1 test | 2 analytics 0.1.1, 9 cases (32 total), 10 new tests (115 pass); 3 breakage checks seen failing. F-1, F-2, F-3 (part) fixed; F-4, F-5 open. D-041 to D-043. Next: DS1 (EMR B5a, B5b come first). |
 | DS0 | chunk-DS0-demo-slice-scope.md | Demo slice scope contract + roadmap coordination map (docs only) | DONE | 2026-11-23 | 2 markdown files | docs/DEMO-SLICE.md, docs/ROADMAP-COORDINATION.md. Owner reviews. |
 | DS1 | chunk-DS1-demo-loader.md | Demo loader: validate artefacts and envelope, import report, refuse bad input | TODO | | 1 module, 1 test file | Needs 1.5b. |
 | DS2a | chunk-DS2a-demo-executor.md | Demo executor: whitelist interpreter for the two analytics, fixtures as oracle | TODO | | 1 module, 1 test file | Split if over ~300 lines. |
@@ -73,6 +73,8 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 
 ## ITEMS ONLY YOU CAN DO
 - Review `docs/DEMO-SLICE.md` and `docs/ROADMAP-COORDINATION.md` (rows DS0 and DS-X are drafts).
+- Answer findings F-4 and F-5 (`ccis/fixtures/snake/README.md`): by amending the dossier or by accepting the 0.1.0 tree behaviour. Two deferred fixture cases wait on them.
+- Confirm D-042: `convert` on a duration parameter is read as "express in the target unit" (identity when already minutes). Phase 2 must define it.
 - Decide whether test-only placeholder parameter values may be shown in the demo (labelled), or the demo should show only "not enabled" states.
 - Review and approve gate R0.
 - Say "start stage 2" when ready for schemas and formal contracts.

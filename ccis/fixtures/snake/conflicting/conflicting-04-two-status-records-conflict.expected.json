@@ -1,0 +1,117 @@
+{
+  "case": "conflicting-04-two-status-records-conflict",
+  "class": "conflicting",
+  "tests": "Two records disagree about the clotting test status. The per-item table reports a conflict and gives no states.",
+  "x-analyticVersion": "0.1.1",
+  "parameters": {
+    "targetIntervalDuration": {
+      "value": {
+        "amount": 120,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "acceptedCertainty": {
+      "value": "accept",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "edgeRule": {
+      "value": "inside",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "expectedItems": {
+      "value": [
+        "clottingTestStatus",
+        "clottingTestStartTime",
+        "clottingResultReadTime",
+        "clottingResult"
+      ],
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "readTimeWindow": {
+      "value": {
+        "amount": 30,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    }
+  },
+  "evaluationTime": "2026-11-20T12:00:00Z",
+  "results": [
+    {
+      "outputId": "interval",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "amount": 90,
+        "unit": "min"
+      }
+    },
+    {
+      "outputId": "comparison",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "label": "within-target"
+      }
+    },
+    {
+      "outputId": "itemStates",
+      "kind": "table",
+      "warnings": [
+        "Two records disagree about the clotting test status."
+      ],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "conflict"
+    }
+  ],
+  "workings": [
+    "route: node 1 has an outcome for two conflicting records, to the gap report (dossier section 3, Indeterminate: \"or two records conflict\").",
+    "interval and comparison do not use F3: 90 min, within-target.",
+    "itemStates: two records for F3 contradict each other, so a conflict is reported and the per-item table is not produced (dossier section 6, Conflicting class: a reported conflict and no computed value).",
+    "count, overall status and read-time window: neither the dossier nor the 0.1.1 trees give a result when a record conflicts, so no value is written for them (finding F-3, remainder)."
+  ],
+  "pathwayRoute": [
+    {
+      "stage": "presentation"
+    },
+    {
+      "stage": "clotting-documentation",
+      "node": "clotting-test-documented",
+      "outcome": "records-conflict"
+    },
+    {
+      "stage": "gap-report"
+    }
+  ],
+  "noValueOutputs": [
+    "itemStates"
+  ],
+  "notSpecified": [
+    "expectedDocumentedCount, overallStatus, readTimeInWindow: no result is defined for a conflicting record (finding F-3, remainder)"
+  ],
+  "notSpecifiedOutputs": [
+    "expectedDocumentedCount",
+    "overallStatus",
+    "readTimeInWindow"
+  ]
+}

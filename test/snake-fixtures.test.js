@@ -14,7 +14,13 @@ const element = exa('snake-envenomation.element.json');
 const pathway = exa('snake-documentation.pathway.json');
 const A = exa('snake-interval.analytics.json');
 const B = exa('snake-completeness.analytics.json');
-const analytics = { [A.manifest.id]: A, [B.manifest.id]: B };
+// Row 1.5b: new cases apply to analytics 0.1.1 and say so in `x-analyticVersion`. Cases without it apply to 0.1.0.
+const A1 = exa('snake-interval.analytics.0.1.1.json');
+const B1 = exa('snake-completeness.analytics.0.1.1.json');
+const pkgs = { '0.1.0': { A, B }, '0.1.1': { A: A1, B: B1 } };
+const verOf = (c) => c.expected['x-analyticVersion'] ?? '0.1.0';
+const pk = (c) => pkgs[verOf(c)];
+const UNIT_MIN = { min: 1, h: 60 }; // plain arithmetic for the independent recomputation; not read from the artefacts
 const EL = element.manifest.id;
 
 const classDirs = readdirSync(fx).filter((d) => statSync(new URL(d, fx)).isDirectory()).sort();
@@ -63,6 +69,11 @@ test('index: every case has both files and every file is in the index', () => {
   assert.deepEqual(onDisk.sort(), [...listed].sort());
   for (const c of index.cases) assert.ok(c.tests && c.tests.length > 10, c.case);
   assert.ok(index.deferred.length >= 2 && index.deferred.every((d) => d.reason), 'deferred cases carry a reason');
+  // row 1.5b built the two cases deferred in 1.5a; F-4 and F-5 cases stay deferred
+  const names = index.deferred.map((d) => d.case);
+  for (const built of ['unit-conversion-hours-parameter', 'estimated-target-enabled']) assert.equal(names.includes(built), false, `${built} is built now`);
+  assert.ok(names.includes('antivenom-not-given-target-disabled') && names.includes('clotting-not-performed-expected-items-enabled'));
+  for (const d of index.deferred) assert.equal(cases.some((c) => c.case === d.case), false, `${d.case} is deferred and also built`);
 });
 
 test('index: all six classes are present', () => {
@@ -113,6 +124,10 @@ test('expected files: shape, results validate against the run-result schema, out
     assert.match(e.evaluationTime, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/);
     assert.ok(Array.isArray(e.workings) && e.workings.length > 0 && e.workings.every((w) => w.length > 20), c.case);
     assert.ok(Array.isArray(e.noValueOutputs) && Array.isArray(e.notSpecified));
+    const ver = verOf(c); const { A: AA, B: BB } = pk(c);
+    assert.ok(pkgs[ver], `${c.case}: unknown analytic version ${ver}`);
+    assert.equal(AA.manifest.version, ver); assert.equal(BB.manifest.version, ver);
+    const analytics = { [AA.manifest.id]: AA, [BB.manifest.id]: BB };
     const seen = new Set();
     for (const r of e.results) {
       assert.equal(runResult(r), true, `${c.case} ${r.outputId} ${JSON.stringify(runResult.errors)}`);
@@ -129,8 +144,21 @@ test('expected files: shape, results validate against the run-result schema, out
       else if (out.kind === 'value') assert.equal(r.value.unit, out.unit);
       else assert.deepEqual(r.value.columns, out.columns.map((x) => x.key));
       for (const p of r.dependsOnParameters || []) assert.ok(pkg.parameters.some((x) => x.id === p), `${c.case} parameter ${p}`);
+      if (r.state === 'parameter-not-enabled') {
+        // the result names the parameters it needed, and every one of them is disabled in this case
+        assert.ok(r.dependsOnParameters && r.dependsOnParameters.length > 0, `${c.case} ${r.outputId}: names what is not enabled`);
+        for (const p of r.dependsOnParameters) assert.equal(e.parameters !== 'none' && p in e.parameters, false, `${c.case} ${r.outputId}: ${p} is enabled`);
+      }
     }
-    const want = e.notSpecified.length ? A.outputs.length : A.outputs.length + B.outputs.length;
+    const unspecified = e.notSpecifiedOutputs ?? [];
+    if (ver === '0.1.0') assert.equal('notSpecifiedOutputs' in e, false, `${c.case}: 0.1.0 cases are as built in 1.5a`);
+    else {
+      assert.equal(unspecified.length > 0, e.notSpecified.length > 0, `${c.case}: notSpecified and notSpecifiedOutputs go together`);
+      for (const id of unspecified) { assert.ok(BB.outputs.some((o) => o.id === id), `${c.case} ${id}`); assert.equal(e.results.some((r) => r.outputId === id), false, `${c.case}: no value written for ${id}`); }
+    }
+    const want = ver === '0.1.0'
+      ? (e.notSpecified.length ? AA.outputs.length : AA.outputs.length + BB.outputs.length)
+      : AA.outputs.length + BB.outputs.length - unspecified.length;
     assert.equal(e.results.length, want, `${c.case}: one result per output`);
     for (const id of e.noValueOutputs) {
       const r = e.results.find((x) => x.outputId === id);
@@ -146,9 +174,17 @@ test('placeholders: only in expected files, every one marked test-only, valid fo
     for (const [id, v] of Object.entries(p)) {
       assert.equal(v.testOnly, true, `${c.case} ${id}`);
       assert.equal(v.note, 'test-only placeholder, not a clinical value');
-      const decl = [A, B].flatMap((x) => x.parameters).find((x) => x.id === id);
-      assert.ok(decl, `${c.case} undeclared parameter ${id}`);
-      if (decl.kind === 'duration') { assert.ok(decl.units.includes(v.value.unit)); assert.ok(v.value.amount >= decl.allowedRange.min && v.value.amount <= decl.allowedRange.max); }
+      const owner = [pk(c).A, pk(c).B].find((x) => x.parameters.some((y) => y.id === id));
+      assert.ok(owner, `${c.case} undeclared parameter ${id}`);
+      const decl = owner.parameters.find((y) => y.id === id);
+      if (decl.kind === 'duration') {
+        assert.ok(decl.units.includes(v.value.unit), `${c.case} ${id}: unit ${v.value.unit} not declared`);
+        // the allowed range is in minutes; a value in another unit is converted through the package's own declared conversion
+        const k = v.value.unit === 'min' ? { factor: 1 } : (owner.conversions ?? []).find((x) => x.from === v.value.unit && x.to === 'min');
+        assert.ok(k, `${c.case} ${id}: no declared conversion from ${v.value.unit} to min`);
+        const inMin = v.value.amount * k.factor;
+        assert.ok(inMin >= decl.allowedRange.min && inMin <= decl.allowedRange.max, `${c.case} ${id} range`);
+      }
       if (decl.kind === 'choice') assert.ok(decl.allowedChoices.includes(v.value));
       if (decl.kind === 'set') assert.ok(v.value.every((m) => decl.allowedMembers.includes(m)));
     }
@@ -187,29 +223,62 @@ test('independent recomputation: intervals, windows, comparisons from the envelo
     else want = { value: { amount: minutes(bite, start), unit: 'min' } };
     same(a.interval, want);
     // comparison (dossier 4.1 and 5)
-    if (target === undefined || edge === undefined) want = { state: 'parameter-not-enabled' };
-    else if (f7 === 'explicitly-negative') want = { state: 'not-applicable' };
-    else if (bite === null || start === null) want = { state: 'needs-data' };
-    else if (start < bite) want = { state: 'conflict' };
-    else { const d = minutes(bite, start); const within = edge === 'inside' ? d <= target.amount : d < target.amount; want = { value: { label: within ? 'within-target' : 'outside-target' } }; }
+    if (verOf(c) === '0.1.0') {
+      if (target === undefined || edge === undefined) want = { state: 'parameter-not-enabled' };
+      else if (f7 === 'explicitly-negative') want = { state: 'not-applicable' };
+      else if (bite === null || start === null) want = { state: 'needs-data' };
+      else if (start < bite) want = { state: 'conflict' };
+      else { const d = minutes(bite, start); const within = edge === 'inside' ? d <= target.amount : d < target.amount; want = { value: { label: within ? 'within-target' : 'outside-target' } }; }
+    } else {
+      // 0.1.1 (finding F-1): the comparison needs F1 with its certainty, F7 and F8, exactly as the interval does (dossier 4.1 and 5, P2)
+      const tmin = target === undefined ? undefined : target.amount * UNIT_MIN[target.unit];
+      if (target === undefined || edge === undefined) want = { state: 'parameter-not-enabled' };
+      else if (f7 === 'explicitly-negative') want = { state: 'not-applicable' };
+      else if (f7 !== 'present') want = { state: 'indeterminate' };
+      else if (bite === null || start === null || !cert) want = { state: 'needs-data' };
+      else if (start < bite) want = { state: 'conflict' };
+      else if (cert === 'estimated' && accepted === undefined) want = { state: 'parameter-not-enabled' };
+      else if (cert === 'estimated' && accepted === 'needs-data') want = { state: 'needs-data' };
+      else { const d = minutes(bite, start); const within = edge === 'inside' ? d <= tmin : d < tmin; want = { value: { label: within ? 'within-target' : 'outside-target' } }; }
+    }
     same(a.comparison, want);
     if (Object.keys(b).length === 0) continue;
     // read-time window (dossier 5, P4 and P5)
     const f3 = stateOf(env, 'clottingTestStatus'); const t0 = instant(obsOf(env, 'clottingTestStartTime')[0]); const t1 = instant(obsOf(env, 'clottingResultReadTime')[0]);
     const win = pv(exp, 'readTimeWindow');
-    if (f3 === 'explicitly-negative') want = { state: 'not-applicable' };
-    else if (win === undefined || edge === undefined) want = { state: 'parameter-not-enabled' };
-    else if (t0 === null || t1 === null) want = { state: 'needs-data' };
-    else if (t1 < t0) want = { state: 'conflict' };
-    else { const d = minutes(t0, t1); const inn = edge === 'inside' ? d <= win.amount : d < win.amount; want = { value: { label: inn ? 'in-time' : 'not-in-time' } }; }
+    if (!b.readTimeInWindow) { assert.ok((exp.notSpecifiedOutputs ?? []).includes('readTimeInWindow'), `${c.case}: no window result and not listed as unspecified`); continue; }
+    if (verOf(c) === '0.1.0') {
+      if (f3 === 'explicitly-negative') want = { state: 'not-applicable' };
+      else if (win === undefined || edge === undefined) want = { state: 'parameter-not-enabled' };
+      else if (t0 === null || t1 === null) want = { state: 'needs-data' };
+      else if (t1 < t0) want = { state: 'conflict' };
+      else { const d = minutes(t0, t1); const inn = edge === 'inside' ? d <= win.amount : d < win.amount; want = { value: { label: inn ? 'in-time' : 'not-in-time' } }; }
+    } else {
+      // 0.1.1 (finding F-2): F4 is only meaningful when F3 says performed (dossier 2, F4), so F3 must be documented as present
+      const wmin = win === undefined ? undefined : win.amount * UNIT_MIN[win.unit];
+      if (f3 === 'explicitly-negative') want = { state: 'not-applicable' };
+      else if (win === undefined || edge === undefined) want = { state: 'parameter-not-enabled' };
+      else if (f3 !== 'present') want = { state: 'needs-data' };
+      else if (t0 === null || t1 === null) want = { state: 'needs-data' };
+      else if (t1 < t0) want = { state: 'conflict' };
+      else { const d = minutes(t0, t1); const inn = edge === 'inside' ? d <= wmin : d < wmin; want = { value: { label: inn ? 'in-time' : 'not-in-time' } }; }
+    }
     same(b.readTimeInWindow, want);
   }
 });
 
 test('independent recomputation: item states, count and overall status from what the envelope records', () => {
   const items = ['clottingTestStatus', 'clottingTestStartTime', 'clottingResultReadTime', 'clottingResult'];
-  for (const c of cases.filter((x) => !x.expected.notSpecified.length)) {
+  for (const c of cases) {
     const env = c.envelope; const exp = c.expected; const b = byOut(exp, B.manifest.id);
+    if (!b.itemStates) { assert.ok(exp.notSpecified.length, `${c.case}: no item states and not listed as unspecified`); continue; }
+    if (items.some((k) => stateOf(env, k) === 'conflicting')) {
+      // finding F-3 (0.1.1): a conflicting item gives the declared conflict state and no table
+      assert.equal(verOf(c), '0.1.1', `${c.case}: a conflict result needs the 0.1.1 analytic`);
+      same(b.itemStates, { state: 'conflict' });
+      continue;
+    }
+    if (exp.notSpecified.length) continue;
     const per = items.map((k) => { const s = stateOf(env, k); return s === 'present' ? 'documented' : s === 'absent' ? 'not-documented' : s; });
     assert.deepEqual(b.itemStates.value.rows, [per], c.case);
     const set = pv(exp, 'expectedItems');
@@ -265,9 +334,12 @@ test('pathway routes: valid against the pathway and equal to the route worked ou
 test('behaviour rules: unknown never becomes false or normal; missing, conflicting and not-applicable give no value; estimates stay visible', () => {
   for (const c of cases.filter((x) => ['missing', 'conflicting', 'out-of-scope'].includes(x.class))) {
     const e = c.expected; const b = byOut(e, B.manifest.id);
-    const changed = e.noValueOutputs.length > 0 || JSON.stringify(e.pathwayRoute) !== FULL_ROUTE || (b.itemStates && b.itemStates.value.rows[0].includes('not-documented'));
+    const changed = e.noValueOutputs.length > 0 || JSON.stringify(e.pathwayRoute) !== FULL_ROUTE || (b.itemStates && b.itemStates.value && b.itemStates.value.rows[0].includes('not-documented'));
     assert.ok(changed, `${c.case} must differ from a normal result`);
     for (const r of e.results) if (['needs-data', 'indeterminate', 'conflict', 'not-applicable'].includes(r.state)) assert.equal('value' in r, false);
+  }
+  for (const c of cases.filter((x) => verOf(x) === '0.1.1' && x.class === 'conflicting')) {
+    assert.equal(byOut(c.expected, B1.manifest.id).itemStates.state, 'conflict', `${c.case}: the per-item table reports a conflict`);
   }
   for (const c of cases.filter((x) => x.class === 'missing')) {
     for (const r of c.expected.results) if (r.state === 'needs-data' || r.state === 'indeterminate') assert.ok(r.missingDataNotes.length > 0, `${c.case} ${r.outputId} says what is missing`);
@@ -279,11 +351,74 @@ test('behaviour rules: unknown never becomes false or normal; missing, conflicti
     const r = byOut(c.expected, A.manifest.id).interval;
     assert.ok(r.warnings.some((w) => /estimated/i.test(w)), `${c.case}: the estimate stays visible`);
   }
-  assert.equal(cases.filter((x) => codeOf(x.envelope, 'biteTimeCertainty') === 'estimated').length, 3);
+  assert.equal(cases.filter((x) => codeOf(x.envelope, 'biteTimeCertainty') === 'estimated' && verOf(x) === '0.1.0').length, 3);
+  assert.equal(cases.filter((x) => codeOf(x.envelope, 'biteTimeCertainty') === 'estimated' && verOf(x) === '0.1.1').length, 3);
   const edgeIn = byOut(cases.find((x) => x.case === 'boundary-01-edge-inside').expected, A.manifest.id).comparison;
   const edgeOut = byOut(cases.find((x) => x.case === 'boundary-02-edge-outside').expected, A.manifest.id).comparison;
   assert.notDeepEqual(edgeIn.value, edgeOut.value, 'the edge rule changes the boundary result');
   const n1 = byOut(cases.find((x) => x.case === 'normal-01-all-enabled').expected, A.manifest.id);
   const u1 = byOut(cases.find((x) => x.case === 'unit-conversion-01-mixed-offsets').expected, A.manifest.id);
   assert.deepEqual(u1.interval.value, n1.interval.value, 'different offsets, same instants, same interval');
+});
+
+// ---- row 1.5b: the cases built for analytics 0.1.1 ----
+const byName = (n) => cases.find((x) => x.case === n);
+const out = (n, an, id) => byOut(byName(n).expected, an)[id];
+
+test('versions: the 23 cases of row 1.5a still apply to 0.1.0 and are untouched; the nine new cases apply to 0.1.1', () => {
+  const old = cases.filter((c) => verOf(c) === '0.1.0'); const added = cases.filter((c) => verOf(c) === '0.1.1');
+  assert.equal(old.length, 23); assert.equal(added.length, 9);
+  for (const c of old) assert.equal('x-analyticVersion' in c.expected, false, c.case);
+  assert.deepEqual(added.map((c) => c.case).sort(), [
+    'conflicting-04-two-status-records-conflict', 'estimated-04-target-accept', 'estimated-05-target-needs-data',
+    'estimated-06-target-choice-not-enabled', 'missing-09-no-antivenom-status-target-enabled', 'missing-10-antivenom-status-unknown',
+    'missing-11-no-clotting-status-window-enabled', 'unit-conversion-03-target-in-hours', 'unit-conversion-04-window-in-hours',
+  ]);
+  for (const c of added) assert.equal(c.expected['x-analyticVersion'], '0.1.1');
+});
+
+test('0.1.1 hours cases: the hours value is compared only after the declared conversion, and the answer differs from the unconverted one', () => {
+  const t = byName('unit-conversion-03-target-in-hours').expected; const w = byName('unit-conversion-04-window-in-hours').expected;
+  assert.deepEqual(t.parameters.targetIntervalDuration.value, { amount: 2, unit: 'h' });
+  assert.deepEqual(w.parameters.readTimeWindow.value, { amount: 1, unit: 'h' });
+  assert.equal(A1.conversions[0].factor * 2, 120); assert.equal(B1.conversions[0].factor * 1, 60);
+  const normal = byName('normal-01-all-enabled');
+  // same record as normal-01; interval 90 and read time 20 min after start
+  assert.deepEqual(byName('unit-conversion-03-target-in-hours').envelope.observations, normal.envelope.observations);
+  assert.deepEqual(byName('unit-conversion-04-window-in-hours').envelope.observations, normal.envelope.observations);
+  same(out('unit-conversion-03-target-in-hours', A.manifest.id, 'comparison'), { value: { label: 'within-target' } }); // 90 <= 120
+  same(out('unit-conversion-04-window-in-hours', B.manifest.id, 'readTimeInWindow'), { value: { label: 'in-time' } }); // 20 <= 60
+  // had the bare numbers been compared (2 against 90, 1 against 20) both answers would flip
+  assert.ok(minutes(0, 90 * 60000) > 2 && minutes(0, 20 * 60000) > 1);
+});
+
+test('0.1.1 estimated cases: with the target enabled the comparison honours the certainty choice (finding F-1)', () => {
+  const A_ = A.manifest.id;
+  same(out('estimated-04-target-accept', A_, 'comparison'), { value: { label: 'within-target' } });
+  same(out('estimated-05-target-needs-data', A_, 'comparison'), { state: 'needs-data' });
+  same(out('estimated-06-target-choice-not-enabled', A_, 'comparison'), { state: 'parameter-not-enabled' });
+  assert.deepEqual(out('estimated-06-target-choice-not-enabled', A_, 'comparison').dependsOnParameters, ['acceptedCertainty']);
+  assert.deepEqual(out('estimated-06-target-choice-not-enabled', A_, 'interval').dependsOnParameters, ['acceptedCertainty']);
+  for (const n of ['estimated-04-target-accept', 'estimated-05-target-needs-data', 'estimated-06-target-choice-not-enabled']) {
+    const cmp = out(n, A_, 'comparison'); assert.ok(cmp.warnings.some((x) => /estimated/i.test(x)), `${n}: the estimate stays visible on the comparison`);
+  }
+  // all three certainty choices are now exercised: accept (01, 04), flag-only (02), needs-data (05), not enabled (03, 06)
+  const est = cases.filter((c) => codeOf(c.envelope, 'biteTimeCertainty') === 'estimated');
+  const choices = new Set(est.map((c) => pv(c.expected, 'acceptedCertainty')));
+  for (const k of ['accept', 'flag-only', 'needs-data', undefined]) assert.ok(choices.has(k), `certainty choice ${k === undefined ? 'not enabled' : k} is exercised`);
+});
+
+test('0.1.1 missing cases: F7 absent or unknown with the target enabled is indeterminate for both outputs; F3 absent with the window enabled is needs-data (findings F-1, F-2)', () => {
+  const A_ = A.manifest.id; const B_ = B.manifest.id;
+  for (const n of ['missing-09-no-antivenom-status-target-enabled', 'missing-10-antivenom-status-unknown']) {
+    assert.ok(byName(n).expected.parameters.targetIntervalDuration && byName(n).expected.parameters.edgeRule, `${n}: target and edge rule are enabled`);
+    same(out(n, A_, 'interval'), { state: 'indeterminate' }); same(out(n, A_, 'comparison'), { state: 'indeterminate' });
+  }
+  assert.equal(stateOf(byName('missing-09-no-antivenom-status-target-enabled').envelope, 'antivenomStatus'), 'absent');
+  assert.equal(stateOf(byName('missing-10-antivenom-status-unknown').envelope, 'antivenomStatus'), 'unknown');
+  const m11 = 'missing-11-no-clotting-status-window-enabled';
+  assert.equal(stateOf(byName(m11).envelope, 'clottingTestStatus'), 'absent');
+  assert.ok(byName(m11).expected.parameters.readTimeWindow && byName(m11).expected.parameters.edgeRule, 'window and edge rule are enabled');
+  assert.equal(stateOf(byName(m11).envelope, 'clottingTestStartTime'), 'present'); assert.equal(stateOf(byName(m11).envelope, 'clottingResultReadTime'), 'present');
+  same(out(m11, B_, 'readTimeInWindow'), { state: 'needs-data' });
 });

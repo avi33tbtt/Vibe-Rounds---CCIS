@@ -12,6 +12,7 @@ Source: `docs/USE-CASE-SNAKE.md` sections 1 to 5. All artefacts are `status: dra
 | `snake-node-clotting.node.json`, `snake-node-antivenom.node.json` | The two decision nodes as standalone files. A test keeps them identical to the copies inside the pathway. Each has explicit indeterminate and missing-data outcomes and a next step on every outcome. |
 | `snake-interval.analytics.json` | Analytic A: bite-to-anti-snake-venom interval and an optional comparison that stays `parameter-not-enabled` until a target and an edge rule are enabled. |
 | `snake-completeness.analytics.json` | Analytic B: per-item documentation states, a count and overall status against expected items (once supplied), and a read-time window (once supplied). Measures the record, not care. |
+| `snake-interval.analytics.0.1.1.json`, `snake-completeness.analytics.0.1.1.json` | Versions 0.1.1 of the two analytics (row 1.5b): the comparison honours the certainty choice and F7 (F-1), the read-time window needs F3 documented as present (F-2), the per-item table gives `conflict` (F-3, in part), and the declared conversion `hoursToMinutes` 0.1.0 lets a duration parameter be given in hours. Same ids, status `draft`. The 0.1.0 files are unchanged and stay published. The findings are in `ccis/fixtures/snake/README.md`. |
 
 ## Modelling choices to know about
 
@@ -23,5 +24,5 @@ Source: `docs/USE-CASE-SNAKE.md` sections 1 to 5. All artefacts are `status: dra
 ## Left to later rows
 
 - Operator arity and types, including what `select` and `count` mean over a parameter-supplied set; unit consistency; reachability; that every `needs` key and ref resolves in a real validator (Phase 2). This row's test checks the references only for these artefacts.
-- Unit conversion (a duration parameter in hours) is not declared. Parameter units are minutes only. Row 1.5a decides whether the unit-conversion fixture class needs a new version.
+- Unit conversion (a duration parameter in hours) is not declared. Parameter units are minutes only. Row 1.5a decides whether the unit-conversion fixture class needs a new version. (Done in row 1.5b: declared in the 0.1.1 files; the 0.1.0 files stay minutes only.)
 - Results, synthetic cases and hand-calculated expected values: row 1.5a, then row 3.4. Invalid examples: row 1.6.

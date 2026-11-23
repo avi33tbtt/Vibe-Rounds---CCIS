@@ -1,0 +1,154 @@
+{
+  "case": "unit-conversion-03-target-in-hours",
+  "class": "unit-conversion",
+  "tests": "Target interval given in whole hours (test-only placeholder). Compared with the interval only through the declared hours-to-minutes conversion.",
+  "x-analyticVersion": "0.1.1",
+  "parameters": {
+    "targetIntervalDuration": {
+      "value": {
+        "amount": 2,
+        "unit": "h"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "acceptedCertainty": {
+      "value": "accept",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "edgeRule": {
+      "value": "inside",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    }
+  },
+  "evaluationTime": "2026-11-20T12:00:00Z",
+  "results": [
+    {
+      "outputId": "interval",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "amount": 90,
+        "unit": "min"
+      }
+    },
+    {
+      "outputId": "comparison",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "label": "within-target"
+      }
+    },
+    {
+      "outputId": "itemStates",
+      "kind": "table",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "columns": [
+          "clottingTestStatus",
+          "clottingTestStartTime",
+          "clottingResultReadTime",
+          "clottingResult"
+        ],
+        "rows": [
+          [
+            "documented",
+            "documented",
+            "documented",
+            "documented"
+          ]
+        ]
+      }
+    },
+    {
+      "outputId": "expectedDocumentedCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "expectedItems"
+      ]
+    },
+    {
+      "outputId": "overallStatus",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "expectedItems"
+      ]
+    },
+    {
+      "outputId": "readTimeInWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "readTimeWindow"
+      ]
+    }
+  ],
+  "workings": [
+    "interval: 09:30 minus 08:00 = 90 min (dossier 4.1). Certainty exact, so no estimate warning.",
+    "comparison: the target is given as 2 h. The declared conversion hoursToMinutes 0.1.0 (linear, factor 60) turns 2 h into 120 min (dossier 4.1, time units; CCIS-REQ-042 and 043). Edge rule inside: 90 is less than 120, so within-target. Without the conversion the number 2 would be set against 90 and give outside-target, which is what this case guards against.",
+    "itemStates: F3 to F6 all have a record, so each is documented (dossier 4.2). count and overall status: expected items not enabled, so parameter-not-enabled. readTimeInWindow: window not enabled, so parameter-not-enabled.",
+    "route: node 1 documented with result, node 2 given with time documented, end (dossier section 3)."
+  ],
+  "pathwayRoute": [
+    {
+      "stage": "presentation"
+    },
+    {
+      "stage": "clotting-documentation",
+      "node": "clotting-test-documented",
+      "outcome": "result-documented"
+    },
+    {
+      "stage": "antivenom-documentation",
+      "node": "antivenom-documented",
+      "outcome": "given-time-documented"
+    },
+    {
+      "end": true
+    }
+  ],
+  "noValueOutputs": [
+    "expectedDocumentedCount",
+    "overallStatus",
+    "readTimeInWindow"
+  ],
+  "notSpecified": []
+}

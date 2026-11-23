@@ -1,0 +1,156 @@
+{
+  "case": "estimated-06-target-choice-not-enabled",
+  "class": "estimated",
+  "tests": "Estimated bite time, target enabled, certainty choice not enabled. Both outputs say the choice is not enabled.",
+  "x-analyticVersion": "0.1.1",
+  "parameters": {
+    "targetIntervalDuration": {
+      "value": {
+        "amount": 120,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "edgeRule": {
+      "value": "inside",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    }
+  },
+  "evaluationTime": "2026-11-20T12:00:00Z",
+  "results": [
+    {
+      "outputId": "interval",
+      "kind": "value",
+      "warnings": [
+        "Bite time is estimated."
+      ],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "acceptedCertainty"
+      ]
+    },
+    {
+      "outputId": "comparison",
+      "kind": "classification",
+      "warnings": [
+        "Bite time is estimated."
+      ],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "acceptedCertainty"
+      ]
+    },
+    {
+      "outputId": "itemStates",
+      "kind": "table",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "columns": [
+          "clottingTestStatus",
+          "clottingTestStartTime",
+          "clottingResultReadTime",
+          "clottingResult"
+        ],
+        "rows": [
+          [
+            "documented",
+            "documented",
+            "documented",
+            "documented"
+          ]
+        ]
+      }
+    },
+    {
+      "outputId": "expectedDocumentedCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "expectedItems"
+      ]
+    },
+    {
+      "outputId": "overallStatus",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "expectedItems"
+      ]
+    },
+    {
+      "outputId": "readTimeInWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "readTimeWindow"
+      ]
+    }
+  ],
+  "workings": [
+    "interval: the bite time is an estimate and no local choice says how to treat it, so the interval is not produced (dossier 5, P2; CCIS-REQ-072).",
+    "comparison: the target and edge rule are enabled, but the comparison would rest on the estimated bite time and the choice is not enabled, so parameter-not-enabled, naming the choice (dossier 5: a computation that depends on a disabled parameter reports it).",
+    "itemStates: F3 to F6 all documented (dossier 4.2). count and overall status: expected items not enabled, so parameter-not-enabled. readTimeInWindow: window not enabled, so parameter-not-enabled.",
+    "route: node 1 documented with result, node 2 given with time documented, end (dossier section 3)."
+  ],
+  "pathwayRoute": [
+    {
+      "stage": "presentation"
+    },
+    {
+      "stage": "clotting-documentation",
+      "node": "clotting-test-documented",
+      "outcome": "result-documented"
+    },
+    {
+      "stage": "antivenom-documentation",
+      "node": "antivenom-documented",
+      "outcome": "given-time-documented"
+    },
+    {
+      "end": true
+    }
+  ],
+  "noValueOutputs": [
+    "interval",
+    "comparison",
+    "expectedDocumentedCount",
+    "overallStatus",
+    "readTimeInWindow"
+  ],
+  "notSpecified": []
+}

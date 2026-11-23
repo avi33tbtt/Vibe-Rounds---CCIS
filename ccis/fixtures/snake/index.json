@@ -115,18 +115,63 @@
       "case": "estimated-03-choice-not-enabled",
       "class": "estimated",
       "tests": "Estimated bite time, certainty choice not enabled."
+    },
+    {
+      "case": "unit-conversion-03-target-in-hours",
+      "class": "unit-conversion",
+      "tests": "Target interval given in whole hours (test-only placeholder). Compared with the interval only through the declared hours-to-minutes conversion."
+    },
+    {
+      "case": "unit-conversion-04-window-in-hours",
+      "class": "unit-conversion",
+      "tests": "Read-time window given in whole hours (test-only placeholder). Compared with the read time only through the declared hours-to-minutes conversion."
+    },
+    {
+      "case": "estimated-04-target-accept",
+      "class": "estimated",
+      "tests": "Estimated bite time, target enabled, certainty choice accept. The result is given and the estimate stays visible on both outputs."
+    },
+    {
+      "case": "estimated-05-target-needs-data",
+      "class": "estimated",
+      "tests": "Estimated bite time, target enabled, certainty choice needs-data. Neither the interval nor the comparison is produced."
+    },
+    {
+      "case": "estimated-06-target-choice-not-enabled",
+      "class": "estimated",
+      "tests": "Estimated bite time, target enabled, certainty choice not enabled. Both outputs say the choice is not enabled."
+    },
+    {
+      "case": "missing-09-no-antivenom-status-target-enabled",
+      "class": "missing",
+      "tests": "Anti-snake-venom status removed (F7) with the target enabled; start time still present. Interval and comparison are both indeterminate."
+    },
+    {
+      "case": "missing-10-antivenom-status-unknown",
+      "class": "missing",
+      "tests": "Anti-snake-venom status recorded as unknown (F7), no start time recorded, target enabled. Interval and comparison are both indeterminate."
+    },
+    {
+      "case": "missing-11-no-clotting-status-window-enabled",
+      "class": "missing",
+      "tests": "Clotting test status removed (F3) with the read-time window enabled; F4 to F6 still recorded. No in-time statement is made."
+    },
+    {
+      "case": "conflicting-04-two-status-records-conflict",
+      "class": "conflicting",
+      "tests": "Two records disagree about the clotting test status. The per-item table reports a conflict and gives no states."
     }
   ],
   "deferred": [
     {
-      "case": "unit-conversion-hours-parameter",
-      "class": "unit-conversion",
-      "reason": "Parameter units are minutes only (D-034). A parameter given in hours needs a declared, versioned conversion in a new artefact version (row 1.5b)."
+      "case": "antivenom-not-given-target-disabled",
+      "class": "out-of-scope",
+      "reason": "The dossier does not say whether not-applicable or parameter-not-enabled wins when F7 says not given and the target is disabled (finding F-4). Needs an owner answer."
     },
     {
-      "case": "estimated-target-enabled",
-      "class": "estimated",
-      "reason": "The comparison tree ignores the certainty choice (finding F-1). Built after the artefact is corrected in a new version (row 1.5b)."
+      "case": "clotting-not-performed-expected-items-enabled",
+      "class": "out-of-scope",
+      "reason": "The dossier (4.2) does not give the overall status when an expected F3 is explicitly not performed (finding F-5). Needs an owner answer."
     }
   ]
 }

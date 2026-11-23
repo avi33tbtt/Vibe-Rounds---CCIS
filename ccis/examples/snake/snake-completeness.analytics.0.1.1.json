@@ -1,0 +1,1399 @@
+{
+  "manifest": {
+    "id": "snake.clotting-documentation-completeness",
+    "name": "Clotting-test documentation completeness",
+    "type": "analytics-package",
+    "version": "0.1.1",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft",
+    "references": [
+      {
+        "id": "snake.envenomation-timing",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "question": "For this case, which parts of the clotting-test documentation are present, and which are not?",
+  "intendedUsers": [
+    "Local reviewers of care processes"
+  ],
+  "population": "People presenting with a suspected snake bite. Narrowing is for the local clinician to declare.",
+  "limitations": {
+    "statement": "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done.",
+    "items": [
+      "The record cannot tell not done from done but not written down.",
+      "No item counts as expected until a local clinician enables the expected-items set."
+    ]
+  },
+  "context": [
+    {
+      "ref": {
+        "id": "snake.envenomation-timing",
+        "type": "contextual-element",
+        "range": "^0.1.0"
+      },
+      "fields": [
+        "clottingTestStatus",
+        "clottingTestStartTime",
+        "clottingResultReadTime",
+        "clottingResult"
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "key": "clottingTestStatus",
+      "element": "snake.envenomation-timing",
+      "field": "clottingTestStatus",
+      "type": "code",
+      "onMissing": "needs-data"
+    },
+    {
+      "key": "clottingTestStartTime",
+      "element": "snake.envenomation-timing",
+      "field": "clottingTestStartTime",
+      "type": "datetime",
+      "onMissing": "needs-data"
+    },
+    {
+      "key": "clottingResultReadTime",
+      "element": "snake.envenomation-timing",
+      "field": "clottingResultReadTime",
+      "type": "datetime",
+      "onMissing": "needs-data"
+    },
+    {
+      "key": "clottingResult",
+      "element": "snake.envenomation-timing",
+      "field": "clottingResult",
+      "type": "code",
+      "onMissing": "needs-data"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "expectedItems",
+      "label": "Expected clotting-test documentation items",
+      "kind": "set",
+      "allowedMembers": [
+        "clottingTestStatus",
+        "clottingTestStartTime",
+        "clottingResultReadTime",
+        "clottingResult"
+      ],
+      "enabledByDefault": false,
+      "suppliedBy": "Local clinician (role, not yet named)"
+    },
+    {
+      "id": "readTimeWindow",
+      "label": "Window for the result read time",
+      "kind": "duration",
+      "units": [
+        "min",
+        "h"
+      ],
+      "allowedRange": {
+        "min": 0,
+        "max": 525600
+      },
+      "enabledByDefault": false,
+      "suppliedBy": "Local clinician (role, not yet named)",
+      "note": "The allowed range is a technical bound of the format. It is not a clinical value and not a suggestion."
+    },
+    {
+      "id": "edgeRule",
+      "label": "Edge rule for boundaries",
+      "kind": "choice",
+      "allowedChoices": [
+        "inside",
+        "outside"
+      ],
+      "enabledByDefault": false,
+      "suppliedBy": "Local clinician (role, not yet named)"
+    },
+    {
+      "id": "populationScope",
+      "label": "Population scope",
+      "kind": "criteria",
+      "enabledByDefault": false,
+      "suppliedBy": "Local clinician (role, not yet named)",
+      "note": "No narrowing is assumed. Applying criteria is not expressible in the expression tree (see ccis/examples/snake/README.md)."
+    }
+  ],
+  "operatorSet": {
+    "name": "ccis-core-ops",
+    "version": "0.1.0"
+  },
+  "computation": [
+    {
+      "output": "itemStates",
+      "expr": {
+        "op": "if",
+        "args": [
+          {
+            "op": "or",
+            "args": [
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "op": "state-of",
+                    "args": [
+                      {
+                        "ref": "input",
+                        "id": "clottingTestStatus"
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "conflicting"
+                  }
+                ]
+              },
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "op": "state-of",
+                    "args": [
+                      {
+                        "ref": "input",
+                        "id": "clottingTestStartTime"
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "conflicting"
+                  }
+                ]
+              },
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "op": "state-of",
+                    "args": [
+                      {
+                        "ref": "input",
+                        "id": "clottingResultReadTime"
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "conflicting"
+                  }
+                ]
+              },
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "op": "state-of",
+                    "args": [
+                      {
+                        "ref": "input",
+                        "id": "clottingResult"
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "conflicting"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "literal": "conflict"
+          },
+          {
+            "op": "select",
+            "args": [
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "op": "state-of",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "clottingTestStatus"
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "explicitly-negative"
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "explicitly-negative"
+                  },
+                  {
+                    "op": "if",
+                    "args": [
+                      {
+                        "op": "is-present",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "clottingTestStatus"
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "documented"
+                      },
+                      {
+                        "op": "if",
+                        "args": [
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingTestStatus"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "unknown"
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "unknown"
+                          },
+                          {
+                            "literal": "not-documented"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "op": "state-of",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "clottingTestStatus"
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "explicitly-negative"
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "not-applicable"
+                  },
+                  {
+                    "op": "if",
+                    "args": [
+                      {
+                        "op": "is-present",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "clottingTestStartTime"
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "documented"
+                      },
+                      {
+                        "op": "if",
+                        "args": [
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingTestStartTime"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "unknown"
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "unknown"
+                          },
+                          {
+                            "literal": "not-documented"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "op": "state-of",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "clottingTestStatus"
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "explicitly-negative"
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "not-applicable"
+                  },
+                  {
+                    "op": "if",
+                    "args": [
+                      {
+                        "op": "is-present",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "clottingResultReadTime"
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "documented"
+                      },
+                      {
+                        "op": "if",
+                        "args": [
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingResultReadTime"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "unknown"
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "unknown"
+                          },
+                          {
+                            "literal": "not-documented"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "op": "state-of",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "clottingTestStatus"
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "explicitly-negative"
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "not-applicable"
+                  },
+                  {
+                    "op": "if",
+                    "args": [
+                      {
+                        "op": "is-present",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "clottingResult"
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "documented"
+                      },
+                      {
+                        "op": "if",
+                        "args": [
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingResult"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "unknown"
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "unknown"
+                          },
+                          {
+                            "literal": "not-documented"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "output": "expectedDocumentedCount",
+      "expr": {
+        "op": "if",
+        "args": [
+          {
+            "op": "not",
+            "args": [
+              {
+                "op": "is-present",
+                "args": [
+                  {
+                    "ref": "parameter",
+                    "id": "expectedItems"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "literal": "parameter-not-enabled"
+          },
+          {
+            "op": "count",
+            "args": [
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "select",
+                    "args": [
+                      {
+                        "ref": "parameter",
+                        "id": "expectedItems"
+                      },
+                      {
+                        "literal": "clottingTestStatus"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "is-present",
+                    "args": [
+                      {
+                        "ref": "input",
+                        "id": "clottingTestStatus"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "select",
+                    "args": [
+                      {
+                        "ref": "parameter",
+                        "id": "expectedItems"
+                      },
+                      {
+                        "literal": "clottingTestStartTime"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "is-present",
+                    "args": [
+                      {
+                        "ref": "input",
+                        "id": "clottingTestStartTime"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "select",
+                    "args": [
+                      {
+                        "ref": "parameter",
+                        "id": "expectedItems"
+                      },
+                      {
+                        "literal": "clottingResultReadTime"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "is-present",
+                    "args": [
+                      {
+                        "ref": "input",
+                        "id": "clottingResultReadTime"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "select",
+                    "args": [
+                      {
+                        "ref": "parameter",
+                        "id": "expectedItems"
+                      },
+                      {
+                        "literal": "clottingResult"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "is-present",
+                    "args": [
+                      {
+                        "ref": "input",
+                        "id": "clottingResult"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "output": "overallStatus",
+      "expr": {
+        "op": "if",
+        "args": [
+          {
+            "op": "not",
+            "args": [
+              {
+                "op": "is-present",
+                "args": [
+                  {
+                    "ref": "parameter",
+                    "id": "expectedItems"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "literal": "parameter-not-enabled"
+          },
+          {
+            "op": "if",
+            "args": [
+              {
+                "op": "or",
+                "args": [
+                  {
+                    "op": "and",
+                    "args": [
+                      {
+                        "op": "select",
+                        "args": [
+                          {
+                            "ref": "parameter",
+                            "id": "expectedItems"
+                          },
+                          {
+                            "literal": "clottingTestStatus"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "eq",
+                        "args": [
+                          {
+                            "op": "state-of",
+                            "args": [
+                              {
+                                "ref": "input",
+                                "id": "clottingTestStatus"
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "absent"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "and",
+                    "args": [
+                      {
+                        "op": "select",
+                        "args": [
+                          {
+                            "ref": "parameter",
+                            "id": "expectedItems"
+                          },
+                          {
+                            "literal": "clottingTestStartTime"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "eq",
+                        "args": [
+                          {
+                            "op": "state-of",
+                            "args": [
+                              {
+                                "ref": "input",
+                                "id": "clottingTestStartTime"
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "absent"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "not",
+                        "args": [
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingTestStatus"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "explicitly-negative"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "and",
+                    "args": [
+                      {
+                        "op": "select",
+                        "args": [
+                          {
+                            "ref": "parameter",
+                            "id": "expectedItems"
+                          },
+                          {
+                            "literal": "clottingResultReadTime"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "eq",
+                        "args": [
+                          {
+                            "op": "state-of",
+                            "args": [
+                              {
+                                "ref": "input",
+                                "id": "clottingResultReadTime"
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "absent"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "not",
+                        "args": [
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingTestStatus"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "explicitly-negative"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "and",
+                    "args": [
+                      {
+                        "op": "select",
+                        "args": [
+                          {
+                            "ref": "parameter",
+                            "id": "expectedItems"
+                          },
+                          {
+                            "literal": "clottingResult"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "eq",
+                        "args": [
+                          {
+                            "op": "state-of",
+                            "args": [
+                              {
+                                "ref": "input",
+                                "id": "clottingResult"
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "absent"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "not",
+                        "args": [
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingTestStatus"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "explicitly-negative"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "literal": "incomplete"
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "or",
+                    "args": [
+                      {
+                        "op": "and",
+                        "args": [
+                          {
+                            "op": "select",
+                            "args": [
+                              {
+                                "ref": "parameter",
+                                "id": "expectedItems"
+                              },
+                              {
+                                "literal": "clottingTestStatus"
+                              }
+                            ]
+                          },
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingTestStatus"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "unknown"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "op": "and",
+                        "args": [
+                          {
+                            "op": "select",
+                            "args": [
+                              {
+                                "ref": "parameter",
+                                "id": "expectedItems"
+                              },
+                              {
+                                "literal": "clottingTestStartTime"
+                              }
+                            ]
+                          },
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingTestStartTime"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "unknown"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "op": "and",
+                        "args": [
+                          {
+                            "op": "select",
+                            "args": [
+                              {
+                                "ref": "parameter",
+                                "id": "expectedItems"
+                              },
+                              {
+                                "literal": "clottingResultReadTime"
+                              }
+                            ]
+                          },
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingResultReadTime"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "unknown"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "op": "and",
+                        "args": [
+                          {
+                            "op": "select",
+                            "args": [
+                              {
+                                "ref": "parameter",
+                                "id": "expectedItems"
+                              },
+                              {
+                                "literal": "clottingResult"
+                              }
+                            ]
+                          },
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "state-of",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingResult"
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "unknown"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "indeterminate"
+                  },
+                  {
+                    "literal": "complete"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "output": "readTimeInWindow",
+      "expr": {
+        "op": "if",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "op": "state-of",
+                "args": [
+                  {
+                    "ref": "input",
+                    "id": "clottingTestStatus"
+                  }
+                ]
+              },
+              {
+                "literal": "explicitly-negative"
+              }
+            ]
+          },
+          {
+            "literal": "not-applicable"
+          },
+          {
+            "op": "if",
+            "args": [
+              {
+                "op": "or",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "is-present",
+                        "args": [
+                          {
+                            "ref": "parameter",
+                            "id": "readTimeWindow"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "is-present",
+                        "args": [
+                          {
+                            "ref": "parameter",
+                            "id": "edgeRule"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "literal": "parameter-not-enabled"
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "is-present",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "clottingTestStatus"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "needs-data"
+                  },
+                  {
+                    "op": "if",
+                    "args": [
+                      {
+                        "op": "or",
+                        "args": [
+                          {
+                            "op": "not",
+                            "args": [
+                              {
+                                "op": "is-present",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingTestStartTime"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "op": "not",
+                            "args": [
+                              {
+                                "op": "is-present",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "clottingResultReadTime"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "needs-data"
+                      },
+                      {
+                        "op": "if",
+                        "args": [
+                          {
+                            "op": "lt",
+                            "args": [
+                              {
+                                "ref": "input",
+                                "id": "clottingResultReadTime"
+                              },
+                              {
+                                "ref": "input",
+                                "id": "clottingTestStartTime"
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "conflict"
+                          },
+                          {
+                            "op": "if",
+                            "args": [
+                              {
+                                "op": "eq",
+                                "args": [
+                                  {
+                                    "ref": "parameter",
+                                    "id": "edgeRule"
+                                  },
+                                  {
+                                    "literal": "inside"
+                                  }
+                                ]
+                              },
+                              {
+                                "op": "if",
+                                "args": [
+                                  {
+                                    "op": "le",
+                                    "args": [
+                                      {
+                                        "op": "time-diff",
+                                        "args": [
+                                          {
+                                            "ref": "input",
+                                            "id": "clottingTestStartTime"
+                                          },
+                                          {
+                                            "ref": "input",
+                                            "id": "clottingResultReadTime"
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "op": "convert",
+                                        "args": [
+                                          {
+                                            "ref": "parameter",
+                                            "id": "readTimeWindow"
+                                          },
+                                          {
+                                            "ref": "conversion",
+                                            "id": "hoursToMinutes"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "literal": "in-time"
+                                  },
+                                  {
+                                    "literal": "not-in-time"
+                                  }
+                                ]
+                              },
+                              {
+                                "op": "if",
+                                "args": [
+                                  {
+                                    "op": "lt",
+                                    "args": [
+                                      {
+                                        "op": "time-diff",
+                                        "args": [
+                                          {
+                                            "ref": "input",
+                                            "id": "clottingTestStartTime"
+                                          },
+                                          {
+                                            "ref": "input",
+                                            "id": "clottingResultReadTime"
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "op": "convert",
+                                        "args": [
+                                          {
+                                            "ref": "parameter",
+                                            "id": "readTimeWindow"
+                                          },
+                                          {
+                                            "ref": "conversion",
+                                            "id": "hoursToMinutes"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "literal": "in-time"
+                                  },
+                                  {
+                                    "literal": "not-in-time"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "itemStates",
+      "kind": "table",
+      "columns": [
+        {
+          "key": "clottingTestStatus",
+          "label": "Test status"
+        },
+        {
+          "key": "clottingTestStartTime",
+          "label": "Test start time"
+        },
+        {
+          "key": "clottingResultReadTime",
+          "label": "Result read time"
+        },
+        {
+          "key": "clottingResult",
+          "label": "Result"
+        }
+      ],
+      "states": [
+        "needs-data",
+        "conflict"
+      ],
+      "carries": [
+        "warnings",
+        "limitations",
+        "missingDataNotes"
+      ]
+    },
+    {
+      "id": "expectedDocumentedCount",
+      "kind": "value",
+      "valueType": "integer",
+      "unit": "1",
+      "states": [
+        "parameter-not-enabled"
+      ],
+      "carries": [
+        "warnings",
+        "limitations",
+        "missingDataNotes"
+      ]
+    },
+    {
+      "id": "overallStatus",
+      "kind": "classification",
+      "labels": [
+        "complete",
+        "incomplete",
+        "indeterminate"
+      ],
+      "states": [
+        "parameter-not-enabled"
+      ],
+      "carries": [
+        "warnings",
+        "limitations",
+        "missingDataNotes"
+      ]
+    },
+    {
+      "id": "readTimeInWindow",
+      "kind": "classification",
+      "labels": [
+        "in-time",
+        "not-in-time"
+      ],
+      "states": [
+        "needs-data",
+        "not-applicable",
+        "conflict",
+        "parameter-not-enabled"
+      ],
+      "carries": [
+        "warnings",
+        "limitations",
+        "missingDataNotes"
+      ]
+    }
+  ],
+  "interpretation": {
+    "meaning": "Per item, whether the clotting-test documentation is documented, not documented (nothing recorded), explicitly recorded as not performed, unknown or not applicable, with a count against the expected items once a local clinician supplies them. This describes the record only. Not documented never means not done.",
+    "prohibited": [
+      "Do not read not documented as the test not having been done.",
+      "Do not read any output as a statement about the quality of care.",
+      "Do not use any output as a recommendation, alert or order."
+    ]
+  },
+  "executionProfile": {
+    "maxSteps": 1000,
+    "maxDepth": 24,
+    "maxOutputBytes": 65536
+  },
+  "evidence": {
+    "statement": "No evidence is claimed. None has been reviewed.",
+    "sources": []
+  },
+  "provenance": {
+    "origin": "Drafted for demonstration from docs/USE-CASE-SNAKE.md",
+    "basis": "Analytic B of the use-case dossier. Demonstration only. No clinical review has taken place and no clinician owner is named. Version 0.1.1 corrects findings F-2 (the read-time window needs the test status documented as present) and F-3 in part (the per-item table declares and gives conflict) and declares the hours-to-minutes conversion for the window (row 1.5b). The 0.1.0 file is unchanged. The changes have had no clinical review."
+  },
+  "conversions": [
+    {
+      "id": "hoursToMinutes",
+      "version": "0.1.0",
+      "from": "h",
+      "to": "min",
+      "kind": "linear",
+      "factor": 60,
+      "x-note": "A definition of units (one hour is sixty minutes). It is not a clinical value and not a suggestion. Used only through the convert operator."
+    }
+  ]
+}

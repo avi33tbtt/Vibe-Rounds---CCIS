@@ -28,6 +28,10 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 
 ---
 
+**Added 2026-11-23 (demo slice and roadmap coordination).** Rows DS0 to DS7 build a small, clearly labelled demo runner so the EMR and CCIS can be shown end to end (scope: `docs/DEMO-SLICE.md`). They use the `ccis-demo-` file prefix and are replaced by rows 2.x and 3.x, which stay `LOCKED`. The fixtures remain the regression oracle. Global build order across both repos: CCIS 1.5b -> EMR B5a, B5b -> DS1 to DS4 -> EMR DM1, DM2a, DM2b, DM3 -> DS5 to DS7 -> EMR DM4. Roadmap coordination: `docs/ROADMAP-COORDINATION.md`.
+
+---
+
 ## STATUS LEGEND
 `TODO` | `IN PROGRESS` | `DONE` | `BLOCKED` | `SKIPPED` | `SPLIT` | `LOCKED` (not startable yet)
 
@@ -51,14 +55,25 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 1.5 | chunk-1.5-reference-artefacts.md | Valid snake reference artefacts: element, binding, pathway, 2 nodes, 2 analytics (chunk file first) | DONE | 2026-11-23 | 7 artefacts, 1 test | 7 artefacts, README, 13 tests (94 pass); 3 breakage checks seen failing. D-032 to D-034 (no value-set members; P6 unused). Next: 1.5a chunk file. |
 | 1.5a | chunk-1.5a-synthetic-fixtures.md | Synthetic fixtures (six classes) with hand-calculated expected results (split from 1.5 for size) | DONE | 2026-11-23 | ~20 cases, 1 test | 23 cases, 11 tests (105 pass); 3 breakage checks seen failing. Findings F-1 to F-5 (trees vs dossier); hours case deferred. D-035 to D-037. Next: 1.5b chunk file. |
 | 1.5b | chunk-1.5b-analytics-corrections.md | Analytics 0.1.1: comparison honours certainty, F7 and F3; declared hour-to-minute conversion; the deferred cases (chunk file first) | TODO | 2026-11-23 | 2 artefact versions, ~10 cases, 1 test | Added by 1.5a findings F-1 to F-5 (see ccis/fixtures/snake/README.md). Chunk file written 2026-11-23; awaiting owner approval. Next "do next" builds it. May split to 1.5c. |
+| DS0 | chunk-DS0-demo-slice-scope.md | Demo slice scope contract + roadmap coordination map (docs only) | DONE | 2026-11-23 | 2 markdown files | docs/DEMO-SLICE.md, docs/ROADMAP-COORDINATION.md. Owner reviews. |
+| DS1 | chunk-DS1-demo-loader.md | Demo loader: validate artefacts and envelope, import report, refuse bad input | TODO | | 1 module, 1 test file | Needs 1.5b. |
+| DS2a | chunk-DS2a-demo-executor.md | Demo executor: whitelist interpreter for the two analytics, fixtures as oracle | TODO | | 1 module, 1 test file | Split if over ~300 lines. |
+| DS2b | chunk-DS2b-demo-pathway.md | Two-node pathway evaluation with explicit indeterminate and missing-data branches | TODO | | 1 module, 1 test file | |
+| DS3 | chunk-DS3-demo-run-record.md | Run record builder: content-addressed id, snapshot, versions, demo-parameter note | TODO | | 1 module, 1 test file | |
+| DS4 | chunk-DS4-demo-cli.md | `ccis-cli.js run` (envelope in, run record out, no network) | TODO | | 1 CLI, 1 test file | EMR DM3 needs this. |
+| DS5 | chunk-DS5-demo-viewer.md | Static result viewer with banners (CSP-safe) | TODO | | 1 page, 1 test file | |
+| DS6 | chunk-DS6-demo-staged-cohort.md | Staged cohort view (batch of real runner over fixtures) + second-package card | TODO | | 1 script, 1 page edit, 1 test | Labelled staged, not the cohort engine. |
+| DS7 | chunk-DS7-demo-hardening.md | EMR-export end-to-end test, README "Run the demo", limitations | TODO | | 1 test, 1 fixture pair, README | Needs EMR DM1. |
 | 1.6 | (written when reached) | Invalid examples, one per validator layer; FHIR-Mode example | LOCKED |  |  | Stage 2. Unlocks after 1.5a. |
 | 2.1 to 2.4 | (written when reached) | Validator and compiler | LOCKED |  |  | Stage 2. |
-| 3.1 to 3.11 | (written when reached) | Importer, compatibility, executor, run records, local marketplace, CLI, browser app, hardening, slice, CCIS 0.1.0 | LOCKED |  |  | Stage 2. 3.11 ends with the user's limitations review. |
+| 3.1 to 3.11 | (written when reached) | Importer, compatibility, executor, run records, local marketplace, CLI, browser app, hardening, slice, CCIS 0.1.0 | LOCKED |  |  | Stage 2. Replaces the demo runner (DS1 to DS5); keep `ccis-cli.js` interface and fixtures. 3.11 ends with the user's limitations review. |
 | 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | After 0.1.0. |
 | 5.1 to 5.7 | (written when reached) | Templates, decision graphs, research-to-package, cohorts, access model | LOCKED |  |  | After Phase 4. 5.7 needs the D-002 server decision. |
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 ## ITEMS ONLY YOU CAN DO
+- Review `docs/DEMO-SLICE.md` and `docs/ROADMAP-COORDINATION.md` (rows DS0 and DS-X are drafts).
+- Decide whether test-only placeholder parameter values may be shown in the demo (labelled), or the demo should show only "not enabled" states.
 - Review and approve gate R0.
 - Say "start stage 2" when ready for schemas and formal contracts.
 - Name a clinician owner for the snake-envenomation parameters.

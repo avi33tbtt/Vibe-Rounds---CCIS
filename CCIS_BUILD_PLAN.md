@@ -307,3 +307,13 @@ Nothing is built in the EMR from this plan except the exporter, later. Recommend
 | Browser storage loss of run records | Run records are exportable files; the UI prompts to export |
 | "Validated" misread as clinically safe | Separate assurance fields; UI shows scope; prototype banner everywhere |
 | Free-tier session limits | Small chunks, size guards, just-in-time chunk files |
+
+## 13. Demo track (added 2026-11-23)
+
+A small demo runner (rows DS0 to DS7) shows the EMR and CCIS working end to end before the full Phase 2 and 3 runtime exists. Scope and rules: `docs/DEMO-SLICE.md`. Decisions D-038 to D-040. The demo uses the committed validators, the snake reference artefacts (after 1.5b) and the fixtures as the oracle. It is replaced, not extended, by rows 2.x and 3.x. EMR-side rows (B5a, B5b, DM1 to DM4) and the full EMR roadmap (R0 to R8) are tracked in the EMR repo; coordination map: `docs/ROADMAP-COORDINATION.md`.
+
+| Risk | Handling |
+|---|---|
+| Demo runner hardens into the standard by accident | `ccis-demo-` prefix, header comment, replacement noted on rows 3.x |
+| Placeholder parameters mistaken for clinical values | Disabled by default; `--demo-parameters` flag; banner on every view |
+| Staged cohort view mistaken for the cohort engine | Persistent "staged" label (D-040) |

@@ -1,0 +1,166 @@
+{
+  "case": "missing-06-no-read-time",
+  "class": "missing",
+  "tests": "Result read time removed (F5).",
+  "parameters": {
+    "targetIntervalDuration": {
+      "value": {
+        "amount": 120,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "acceptedCertainty": {
+      "value": "accept",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "edgeRule": {
+      "value": "inside",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "expectedItems": {
+      "value": [
+        "clottingTestStatus",
+        "clottingTestStartTime",
+        "clottingResultReadTime",
+        "clottingResult"
+      ],
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "readTimeWindow": {
+      "value": {
+        "amount": 30,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    }
+  },
+  "evaluationTime": "2026-11-20T12:00:00Z",
+  "results": [
+    {
+      "outputId": "interval",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "amount": 90,
+        "unit": "min"
+      }
+    },
+    {
+      "outputId": "comparison",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "label": "within-target"
+      }
+    },
+    {
+      "outputId": "itemStates",
+      "kind": "table",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "columns": [
+          "clottingTestStatus",
+          "clottingTestStartTime",
+          "clottingResultReadTime",
+          "clottingResult"
+        ],
+        "rows": [
+          [
+            "documented",
+            "documented",
+            "not-documented",
+            "documented"
+          ]
+        ]
+      }
+    },
+    {
+      "outputId": "expectedDocumentedCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "amount": 3,
+        "unit": "1"
+      }
+    },
+    {
+      "outputId": "overallStatus",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "label": "incomplete"
+      }
+    },
+    {
+      "outputId": "readTimeInWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [
+        "Result read time is not documented."
+      ],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "needs-data"
+    }
+  ],
+  "workings": [
+    "itemStates: F5 has nothing recorded = not documented. count 3 of 4 expected; overall incomplete (dossier 4.2).",
+    "readTimeInWindow: needs the read time; missing, so needs-data (dossier 5, P4).",
+    "route: node 1 documented without read time is flagged and goes on to stage 3; node 2 given with time; end (dossier section 3)."
+  ],
+  "pathwayRoute": [
+    {
+      "stage": "presentation"
+    },
+    {
+      "stage": "clotting-documentation",
+      "node": "clotting-test-documented",
+      "outcome": "result-without-read-time"
+    },
+    {
+      "stage": "antivenom-documentation",
+      "node": "antivenom-documented",
+      "outcome": "given-time-documented"
+    },
+    {
+      "end": true
+    }
+  ],
+  "noValueOutputs": [
+    "readTimeInWindow"
+  ],
+  "notSpecified": []
+}

@@ -1,0 +1,155 @@
+{
+  "case": "missing-05-no-clotting-status",
+  "class": "missing",
+  "tests": "Clotting test status removed (F3). Read-time window not enabled (finding F-2).",
+  "parameters": {
+    "targetIntervalDuration": {
+      "value": {
+        "amount": 120,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "acceptedCertainty": {
+      "value": "accept",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "edgeRule": {
+      "value": "inside",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "expectedItems": {
+      "value": [
+        "clottingTestStatus",
+        "clottingTestStartTime",
+        "clottingResultReadTime",
+        "clottingResult"
+      ],
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    }
+  },
+  "evaluationTime": "2026-11-20T12:00:00Z",
+  "results": [
+    {
+      "outputId": "interval",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "amount": 90,
+        "unit": "min"
+      }
+    },
+    {
+      "outputId": "comparison",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "label": "within-target"
+      }
+    },
+    {
+      "outputId": "itemStates",
+      "kind": "table",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "columns": [
+          "clottingTestStatus",
+          "clottingTestStartTime",
+          "clottingResultReadTime",
+          "clottingResult"
+        ],
+        "rows": [
+          [
+            "not-documented",
+            "documented",
+            "documented",
+            "documented"
+          ]
+        ]
+      }
+    },
+    {
+      "outputId": "expectedDocumentedCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "amount": 3,
+        "unit": "1"
+      }
+    },
+    {
+      "outputId": "overallStatus",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "label": "incomplete"
+      }
+    },
+    {
+      "outputId": "readTimeInWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "readTimeWindow"
+      ]
+    }
+  ],
+  "workings": [
+    "itemStates: F3 has no record = not documented (nothing recorded); F4, F5, F6 have records = documented (dossier 4.2).",
+    "count: expected four, documented three = 3. overall: an expected item has nothing recorded = incomplete (dossier 4.2).",
+    "readTimeInWindow: window left disabled on purpose (finding F-2), so parameter-not-enabled.",
+    "route: node 1 no record goes to the gap report; the route ends there."
+  ],
+  "pathwayRoute": [
+    {
+      "stage": "presentation"
+    },
+    {
+      "stage": "clotting-documentation",
+      "node": "clotting-test-documented",
+      "outcome": "nothing-recorded"
+    },
+    {
+      "stage": "gap-report"
+    }
+  ],
+  "noValueOutputs": [
+    "readTimeInWindow"
+  ],
+  "notSpecified": []
+}

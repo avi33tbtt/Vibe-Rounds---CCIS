@@ -1,0 +1,158 @@
+{
+  "case": "out-of-scope-02-clotting-not-performed",
+  "class": "out-of-scope",
+  "tests": "Clotting test explicitly not performed; F4 to F6 not applicable. Expected-items set not enabled (finding F-5).",
+  "parameters": {
+    "targetIntervalDuration": {
+      "value": {
+        "amount": 120,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "acceptedCertainty": {
+      "value": "accept",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "edgeRule": {
+      "value": "inside",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "readTimeWindow": {
+      "value": {
+        "amount": 30,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    }
+  },
+  "evaluationTime": "2026-11-20T12:00:00Z",
+  "results": [
+    {
+      "outputId": "interval",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "amount": 90,
+        "unit": "min"
+      }
+    },
+    {
+      "outputId": "comparison",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "label": "within-target"
+      }
+    },
+    {
+      "outputId": "itemStates",
+      "kind": "table",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "columns": [
+          "clottingTestStatus",
+          "clottingTestStartTime",
+          "clottingResultReadTime",
+          "clottingResult"
+        ],
+        "rows": [
+          [
+            "explicitly-negative",
+            "not-applicable",
+            "not-applicable",
+            "not-applicable"
+          ]
+        ]
+      }
+    },
+    {
+      "outputId": "expectedDocumentedCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "expectedItems"
+      ]
+    },
+    {
+      "outputId": "overallStatus",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "expectedItems"
+      ]
+    },
+    {
+      "outputId": "readTimeInWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "not-applicable"
+    }
+  ],
+  "workings": [
+    "itemStates: F3 explicitly recorded as not performed; F4 to F6 are not applicable and are not counted as missing (dossier 4.2, Not applicable items).",
+    "readTimeInWindow: no test was performed, so not-applicable, not needs-data.",
+    "count and overall: no expected-items set enabled (the dossier does not say what overall status means when an expected F3 is explicitly not performed: finding F-5).",
+    "route: node 1 documented as not performed, on to stage 3 (dossier section 3)."
+  ],
+  "pathwayRoute": [
+    {
+      "stage": "presentation"
+    },
+    {
+      "stage": "clotting-documentation",
+      "node": "clotting-test-documented",
+      "outcome": "documented-not-performed"
+    },
+    {
+      "stage": "antivenom-documentation",
+      "node": "antivenom-documented",
+      "outcome": "given-time-documented"
+    },
+    {
+      "end": true
+    }
+  ],
+  "noValueOutputs": [
+    "expectedDocumentedCount",
+    "overallStatus",
+    "readTimeInWindow"
+  ],
+  "notSpecified": []
+}

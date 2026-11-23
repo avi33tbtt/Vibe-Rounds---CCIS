@@ -1,0 +1,165 @@
+{
+  "case": "missing-04-no-antivenom-start-time",
+  "class": "missing",
+  "tests": "Administration start time removed (F8), status given.",
+  "parameters": {
+    "targetIntervalDuration": {
+      "value": {
+        "amount": 120,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "acceptedCertainty": {
+      "value": "accept",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "edgeRule": {
+      "value": "inside",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "expectedItems": {
+      "value": [
+        "clottingTestStatus",
+        "clottingTestStartTime",
+        "clottingResultReadTime",
+        "clottingResult"
+      ],
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "readTimeWindow": {
+      "value": {
+        "amount": 30,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    }
+  },
+  "evaluationTime": "2026-11-20T12:00:00Z",
+  "results": [
+    {
+      "outputId": "interval",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [
+        "Anti-snake-venom start time is not documented."
+      ],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "state": "needs-data"
+    },
+    {
+      "outputId": "comparison",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [
+        "Anti-snake-venom start time is not documented."
+      ],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "state": "needs-data"
+    },
+    {
+      "outputId": "itemStates",
+      "kind": "table",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "columns": [
+          "clottingTestStatus",
+          "clottingTestStartTime",
+          "clottingResultReadTime",
+          "clottingResult"
+        ],
+        "rows": [
+          [
+            "documented",
+            "documented",
+            "documented",
+            "documented"
+          ]
+        ]
+      }
+    },
+    {
+      "outputId": "expectedDocumentedCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "amount": 4,
+        "unit": "1"
+      }
+    },
+    {
+      "outputId": "overallStatus",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "label": "complete"
+      }
+    },
+    {
+      "outputId": "readTimeInWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "label": "in-time"
+      }
+    }
+  ],
+  "workings": [
+    "interval and comparison: F8 missing, so needs-data, never zero (dossier 4.1).",
+    "route: node 2 outcome Given, time not documented goes to the gap report (dossier section 3)."
+  ],
+  "pathwayRoute": [
+    {
+      "stage": "presentation"
+    },
+    {
+      "stage": "clotting-documentation",
+      "node": "clotting-test-documented",
+      "outcome": "result-documented"
+    },
+    {
+      "stage": "antivenom-documentation",
+      "node": "antivenom-documented",
+      "outcome": "given-time-not-documented"
+    },
+    {
+      "stage": "gap-report"
+    }
+  ],
+  "noValueOutputs": [
+    "interval",
+    "comparison"
+  ],
+  "notSpecified": []
+}

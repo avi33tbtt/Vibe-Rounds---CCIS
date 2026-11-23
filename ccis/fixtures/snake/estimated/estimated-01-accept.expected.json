@@ -1,0 +1,144 @@
+{
+  "case": "estimated-01-accept",
+  "class": "estimated",
+  "tests": "Estimated bite time, certainty choice accept. Target not enabled (finding F-1).",
+  "parameters": {
+    "acceptedCertainty": {
+      "value": "accept",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    }
+  },
+  "evaluationTime": "2026-11-20T12:00:00Z",
+  "results": [
+    {
+      "outputId": "interval",
+      "kind": "value",
+      "warnings": [
+        "Bite time is estimated."
+      ],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "amount": 90,
+        "unit": "min"
+      }
+    },
+    {
+      "outputId": "comparison",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "targetIntervalDuration",
+        "edgeRule"
+      ]
+    },
+    {
+      "outputId": "itemStates",
+      "kind": "table",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "columns": [
+          "clottingTestStatus",
+          "clottingTestStartTime",
+          "clottingResultReadTime",
+          "clottingResult"
+        ],
+        "rows": [
+          [
+            "documented",
+            "documented",
+            "documented",
+            "documented"
+          ]
+        ]
+      }
+    },
+    {
+      "outputId": "expectedDocumentedCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "expectedItems"
+      ]
+    },
+    {
+      "outputId": "overallStatus",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "expectedItems"
+      ]
+    },
+    {
+      "outputId": "readTimeInWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "readTimeWindow",
+        "edgeRule"
+      ]
+    }
+  ],
+  "workings": [
+    "interval: 90 min. The estimate is accepted and the result carries the estimate with it, so the warning stays visible (dossier 2, F1: \"Estimated must stay visible\").",
+    "comparison: no target enabled."
+  ],
+  "pathwayRoute": [
+    {
+      "stage": "presentation"
+    },
+    {
+      "stage": "clotting-documentation",
+      "node": "clotting-test-documented",
+      "outcome": "result-documented"
+    },
+    {
+      "stage": "antivenom-documentation",
+      "node": "antivenom-documented",
+      "outcome": "given-time-documented"
+    },
+    {
+      "end": true
+    }
+  ],
+  "noValueOutputs": [
+    "comparison",
+    "expectedDocumentedCount",
+    "overallStatus",
+    "readTimeInWindow"
+  ],
+  "notSpecified": []
+}

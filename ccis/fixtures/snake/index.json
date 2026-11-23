@@ -1,0 +1,132 @@
+{
+  "note": "Synthetic cases only. Parameter values in the expected files are test-only placeholders, not clinical values.",
+  "cases": [
+    {
+      "case": "normal-01-all-enabled",
+      "class": "normal",
+      "tests": "Complete consistent record, every placeholder parameter enabled."
+    },
+    {
+      "case": "normal-02-nothing-enabled",
+      "class": "normal",
+      "tests": "Same complete record, no parameter enabled. Values that need no parameter are still given; the rest say not enabled."
+    },
+    {
+      "case": "boundary-01-edge-inside",
+      "class": "boundary",
+      "tests": "Interval exactly equals the target and read time exactly on the window limit; edge rule inside."
+    },
+    {
+      "case": "boundary-02-edge-outside",
+      "class": "boundary",
+      "tests": "Same record as boundary-01; edge rule outside. Results differ from boundary-01."
+    },
+    {
+      "case": "boundary-03-one-minute-inside",
+      "class": "boundary",
+      "tests": "One minute inside each limit with edge rule outside: the rule does not change a clearly inside value."
+    },
+    {
+      "case": "missing-01-no-bite-time",
+      "class": "missing",
+      "tests": "Bite time removed (F1). Never zero."
+    },
+    {
+      "case": "missing-02-no-certainty",
+      "class": "missing",
+      "tests": "Certainty of the bite time removed (F1 certainty). Target not enabled (see README finding F-1)."
+    },
+    {
+      "case": "missing-03-no-antivenom-status",
+      "class": "missing",
+      "tests": "Anti-snake-venom status removed (F7); start time still present. Target not enabled (finding F-1)."
+    },
+    {
+      "case": "missing-04-no-antivenom-start-time",
+      "class": "missing",
+      "tests": "Administration start time removed (F8), status given."
+    },
+    {
+      "case": "missing-05-no-clotting-status",
+      "class": "missing",
+      "tests": "Clotting test status removed (F3). Read-time window not enabled (finding F-2)."
+    },
+    {
+      "case": "missing-06-no-read-time",
+      "class": "missing",
+      "tests": "Result read time removed (F5)."
+    },
+    {
+      "case": "missing-07-no-result",
+      "class": "missing",
+      "tests": "Clotting result removed (F6); read time still present."
+    },
+    {
+      "case": "missing-08-clotting-status-unknown",
+      "class": "missing",
+      "tests": "Clotting test status unknown (F3) and F4 to F6 not recorded; only F3 expected."
+    },
+    {
+      "case": "conflicting-01-antivenom-before-bite",
+      "class": "conflicting",
+      "tests": "Administration start (07:30) earlier than the bite (08:00)."
+    },
+    {
+      "case": "conflicting-02-read-before-start",
+      "class": "conflicting",
+      "tests": "Result read time (08:50) earlier than test start (09:00)."
+    },
+    {
+      "case": "conflicting-03-two-status-records",
+      "class": "conflicting",
+      "tests": "Two records disagree about the clotting test status: performed, and explicitly not performed."
+    },
+    {
+      "case": "out-of-scope-01-antivenom-not-given",
+      "class": "out-of-scope",
+      "tests": "Anti-snake-venom explicitly not given; start time not applicable."
+    },
+    {
+      "case": "out-of-scope-02-clotting-not-performed",
+      "class": "out-of-scope",
+      "tests": "Clotting test explicitly not performed; F4 to F6 not applicable. Expected-items set not enabled (finding F-5)."
+    },
+    {
+      "case": "unit-conversion-01-mixed-offsets",
+      "class": "unit-conversion",
+      "tests": "The instants of normal-01 written with offsets +05:45 and -05:00. Same results as normal-01."
+    },
+    {
+      "case": "unit-conversion-02-local-midnight",
+      "class": "unit-conversion",
+      "tests": "Bite at local 23:30 (+05:45) and administration given in another offset."
+    },
+    {
+      "case": "estimated-01-accept",
+      "class": "estimated",
+      "tests": "Estimated bite time, certainty choice accept. Target not enabled (finding F-1)."
+    },
+    {
+      "case": "estimated-02-flag-only",
+      "class": "estimated",
+      "tests": "Estimated bite time, certainty choice flag-only."
+    },
+    {
+      "case": "estimated-03-choice-not-enabled",
+      "class": "estimated",
+      "tests": "Estimated bite time, certainty choice not enabled."
+    }
+  ],
+  "deferred": [
+    {
+      "case": "unit-conversion-hours-parameter",
+      "class": "unit-conversion",
+      "reason": "Parameter units are minutes only (D-034). A parameter given in hours needs a declared, versioned conversion in a new artefact version (row 1.5b)."
+    },
+    {
+      "case": "estimated-target-enabled",
+      "class": "estimated",
+      "reason": "The comparison tree ignores the certainty choice (finding F-1). Built after the artefact is corrected in a new version (row 1.5b)."
+    }
+  ]
+}

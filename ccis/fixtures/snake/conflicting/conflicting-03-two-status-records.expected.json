@@ -1,0 +1,95 @@
+{
+  "case": "conflicting-03-two-status-records",
+  "class": "conflicting",
+  "tests": "Two records disagree about the clotting test status: performed, and explicitly not performed.",
+  "parameters": {
+    "targetIntervalDuration": {
+      "value": {
+        "amount": 120,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "acceptedCertainty": {
+      "value": "accept",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "edgeRule": {
+      "value": "inside",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "expectedItems": {
+      "value": [
+        "clottingTestStatus",
+        "clottingTestStartTime",
+        "clottingResultReadTime",
+        "clottingResult"
+      ],
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "readTimeWindow": {
+      "value": {
+        "amount": 30,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    }
+  },
+  "evaluationTime": "2026-11-20T12:00:00Z",
+  "results": [
+    {
+      "outputId": "interval",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "amount": 90,
+        "unit": "min"
+      }
+    },
+    {
+      "outputId": "comparison",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "value": {
+        "label": "within-target"
+      }
+    }
+  ],
+  "workings": [
+    "route: node 1 has an outcome for two conflicting records, to the gap report (dossier section 3, Indeterminate: \"or two records conflict\").",
+    "interval and comparison do not use F3: 90 min, within-target.",
+    "completeness: neither the dossier (4.2) nor the tree gives a per-item state for a conflicting record, so no expected value is written (README finding F-3)."
+  ],
+  "pathwayRoute": [
+    {
+      "stage": "presentation"
+    },
+    {
+      "stage": "clotting-documentation",
+      "node": "clotting-test-documented",
+      "outcome": "records-conflict"
+    },
+    {
+      "stage": "gap-report"
+    }
+  ],
+  "noValueOutputs": [],
+  "notSpecified": [
+    "completeness outputs (itemStates, expectedDocumentedCount, overallStatus, readTimeInWindow): no per-item state for a conflicting record is defined"
+  ]
+}

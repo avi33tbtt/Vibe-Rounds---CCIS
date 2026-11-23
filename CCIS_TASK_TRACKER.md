@@ -58,7 +58,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | DS0 | chunk-DS0-demo-slice-scope.md | Demo slice scope contract + roadmap coordination map (docs only) | DONE | 2026-11-23 | 2 markdown files | docs/DEMO-SLICE.md, docs/ROADMAP-COORDINATION.md. Owner reviews. |
 | DS1 | chunk-DS1-demo-loader.md | Demo loader: validate artefacts and envelope, import report, refuse bad input | DONE | 2026-11-23 | 1 module, 1 test file | ccis-demo-loader.js, 13 tests (128 pass); 3 breakage checks seen failing. All 32 fixtures load. D-044 to D-046. Next: DS2a.
 | DS2a | chunk-DS2a-demo-executor.md | Demo executor: whitelist interpreter and the interval analytic (completeness split to DS2a-2) | DONE | 2026-11-23 | 1 module, 1 test file | ccis-demo-exec.js, 17 tests (144+1 pass); all 32 cases equal expected on 0.1.1; 3 breakage checks seen failing. Split: completeness to DS2a-2. D-047 to D-049. |
-| DS2a-2 | chunk-DS2a-2-demo-executor-completeness.md | Demo executor part 2: select, count, table results; completeness analytic (4 outputs), fixtures as oracle (chunk file first) | TODO | | 1 module edit, 1 test file | Split from DS2a for size (D-049). Chunk file written 2026-11-23; approve it, then 'do next' builds it. |
+| DS2a-2 | chunk-DS2a-2-demo-executor-completeness.md | Demo executor part 2: select, count, table results; completeness analytic (4 outputs), fixtures as oracle (chunk file first) | DONE | 2026-11-23 | 1 module edit, 1 test file | All 32 cases equal expected, both analytics; 160 tests, 3 breakage checks seen failing. F-6 found (not-collected reads complete). D-050 to D-052. |
 | DS2b | chunk-DS2b-demo-pathway.md | Two-node pathway evaluation with explicit indeterminate and missing-data branches | TODO | | 1 module, 1 test file | |
 | DS3 | chunk-DS3-demo-run-record.md | Run record builder: content-addressed id, snapshot, versions, demo-parameter note | TODO | | 1 module, 1 test file | |
 | DS4 | chunk-DS4-demo-cli.md | `ccis-cli.js run` (envelope in, run record out, no network) | TODO | | 1 CLI, 1 test file | EMR DM3 needs this. |
@@ -73,6 +73,8 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 ## ITEMS ONLY YOU CAN DO
+- Finding F-6 (`ccis/fixtures/snake/README.md`): a not-collected expected item gives overall `complete`. Approve a 0.1.2 fix as a new row (not blocking DS2b).
+- Confirm the omission rule D-050 (conflicting inputs: count, overall status and window are left out).
 - Review `docs/DEMO-SLICE.md` and `docs/ROADMAP-COORDINATION.md` (rows DS0 and DS-X are drafts).
 - Answer findings F-4 and F-5 (`ccis/fixtures/snake/README.md`): by amending the dossier or by accepting the 0.1.0 tree behaviour. Two deferred fixture cases wait on them.
 - Confirm D-042: `convert` on a duration parameter is read as "express in the target unit" (identity when already minutes). Phase 2 must define it.

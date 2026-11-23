@@ -1,15 +1,16 @@
 // DEMO RUNNER: replaced by rows 2.x and 3.x.
 // Prototype. Synthetic data only. Not for clinical use.
 //
-// Demo executor (row DS2a, interval half). Pure: no clock read, randomness, network, file access, eval or
+// Demo executor (rows DS2a and DS2a-2). Pure: no clock read, randomness, network, file access, eval or
 // dynamic import. A whitelist interpreter over the declarative expression trees of a package.
 //
 //   evaluateAnalytic(analytic, envelope, parameters, evaluationTime)
 //     -> { ok: true, results: [run results] } | { ok: false, refusal: 'fixed sentence' }
 //
-// - Whitelist: and, or, not, is-present, state-of, eq, lt, le, time-diff, convert, if. Anything else, or any
-//   tree using a name the package does not declare, refuses the WHOLE analytic before anything is evaluated.
-//   Row DS2a-2 adds select and count (the completeness analytic) and tables.
+// - Whitelist: and, or, not, is-present, state-of, eq, lt, le, time-diff, convert, if, select, count. Anything
+//   else, or any tree using a name the package does not declare, refuses the WHOLE analytic before anything runs.
+//   select with a set parameter first is membership (true or false); otherwise it builds one table row.
+//   count counts true arguments; an unknown argument makes the count unknown, never a number.
 // - Three-valued: an unreadable or non-present input gives "unknown" (null) in a comparison, never false. An
 //   unknown condition does not pick a branch. An unknown result is `indeterminate` if the output declares it,
 //   else the analytic is refused. Unknown never becomes a value.
@@ -17,15 +18,23 @@
 //   More than one record for a field is `conflicting` (demo rule D-047). Entered-in-error records are ignored.
 // - Disabled parameters give state `parameter-not-enabled` with `dependsOnParameters`.
 // - Every result validates against run-result.schema.json (a defect throws). Refusals never echo input content.
-// - Warning and missing-data wording comes from a table in this file, because the package format has no place
-//   for it (D-047). The demo runs the two snake analytics only.
+// - Warning and missing-data wording comes from tables in this file, because the package format has no place
+//   for it (D-047). The demo runs the two snake analytics only (interval, completeness).
+// - Omission rule (D-050): when an input of the completeness analytic is `conflicting`, the outputs that neither
+//   the dossier nor the trees define are left out of `results` and listed in `omitted`. Never filled with a value.
 
 import { analytics as vAnalytics, contextEnvelope as vEnvelope, runResult as vResult } from './ccis/validators/ccis-validators.js';
 
-const SUPPORTED = { and: [1, Infinity], or: [1, Infinity], not: [1, 1], 'is-present': [1, 1], 'state-of': [1, 1], eq: [2, 2], lt: [2, 2], le: [2, 2], 'time-diff': [2, 2], convert: [2, 2], if: [3, 3] };
+const SUPPORTED = { and: [1, Infinity], or: [1, Infinity], not: [1, 1], 'is-present': [1, 1], 'state-of': [1, 1], eq: [2, 2], lt: [2, 2], le: [2, 2], 'time-diff': [2, 2], convert: [2, 2], if: [3, 3], select: [1, Infinity], count: [1, Infinity] };
 const BASE_UNIT = 'min';
 const MAX_DEPTH = 64;
 const INTERVAL_ID = 'snake.bite-to-antivenom-interval';
+const COMPLETENESS_ID = 'snake.clotting-documentation-completeness';
+// Labelled demo table (finding F-3, remainder): outputs with no defined result when an input conflicts.
+// `itemStates` is also left out when the analytic version does not declare `conflict` for it (0.1.0).
+const OMIT_ON_CONFLICT = { [COMPLETENESS_ID]: ['expectedDocumentedCount', 'overallStatus', 'readTimeInWindow'] };
+const LABEL2 = { clottingTestStatus: 'Clotting test status', clottingTestStartTime: 'Test start time', clottingResultReadTime: 'Result read time', clottingResult: 'Clotting result' };
+const NOUN2 = { clottingTestStatus: 'clotting test status', clottingTestStartTime: 'test start time', clottingResultReadTime: 'result read time', clottingResult: 'clotting result' };
 const ESTIMATED = 'biteTimeCertainty=estimated';
 const LABEL = { biteTime: 'Bite time', biteTimeCertainty: 'Certainty of the bite time', antivenomStatus: 'Anti-snake-venom administration status', antivenomStartTime: 'Anti-snake-venom start time' };
 
@@ -59,12 +68,15 @@ function prescan(analytic) {
   const inputs = new Set(analytic.inputs.map((i) => i.key));
   const params = new Set(analytic.parameters.map((p) => p.id));
   const convs = new Set((analytic.conversions ?? []).map((c) => c.id));
-  const walk = (e, depth) => {
+  const kindOf = new Map(analytic.parameters.map((p) => [p.id, p]));
+  const isSet = (a) => 'ref' in a && a.ref === 'parameter' && kindOf.get(a.id)?.kind === 'set';
+  const walk = (e, depth, out, parent) => {
     if (depth > MAX_DEPTH) refuse('analytic refused: expression too deep');
     if ('literal' in e) return;
     if ('ref' in e) {
       const known = { input: inputs, parameter: params, conversion: convs }[e.ref];
       if (!known.has(e.id)) refuse('analytic refused: the expression names something the package does not declare');
+      if (isSet(e) && parent !== 'select' && parent !== 'is-present') refuse('analytic refused: a set parameter is used outside select and is-present');
       return;
     }
     const arity = Object.hasOwn(SUPPORTED, e.op) ? SUPPORTED[e.op] : null;
@@ -74,13 +86,18 @@ function prescan(analytic) {
     if ((e.op === 'is-present' && !('ref' in first && first.ref !== 'conversion')) || (e.op === 'state-of' && !('ref' in first && first.ref === 'input'))) refuse('analytic refused: is-present and state-of need a reference');
     if (e.op === 'convert' && !('ref' in second && second.ref === 'conversion')) refuse('analytic refused: convert needs a declared conversion');
     e.args.forEach((a, i) => { if (!(e.op === 'convert' && i === 1) && 'ref' in a && a.ref === 'conversion') refuse('analytic refused: a conversion is used outside convert'); });
-    e.args.forEach((a) => walk(a, depth + 1));
+    if (e.op === 'select') {
+      if (isSet(first)) {
+        if (e.args.length !== 2 || !('literal' in second) || typeof second.literal !== 'string' || !kindOf.get(first.id).allowedMembers.includes(second.literal)) refuse('analytic refused: a membership test needs a set parameter and one member it declares');
+      } else if (e.args.some(isSet) || out.kind !== 'table' || e.args.length !== out.columns.length) refuse('analytic refused: a table row does not match the output columns');
+    }
+    e.args.forEach((a) => walk(a, depth + 1, out, e.op));
   };
   const byOutput = new Map();
   for (const c of analytic.computation) { if (byOutput.has(c.output)) refuse('analytic refused: an output has two computations'); byOutput.set(c.output, c.expr); }
   const outs = new Set(analytic.outputs.map((o) => o.id));
   if (byOutput.size !== outs.size || [...byOutput.keys()].some((k) => !outs.has(k))) refuse('analytic refused: outputs and computations do not match');
-  for (const e of byOutput.values()) walk(e, 0);
+  for (const [id, e] of byOutput) walk(e, 0, analytic.outputs.find((o) => o.id === id), null);
   return byOutput;
 }
 
@@ -121,6 +138,9 @@ function readParams(analytic, supplied) {
       const mins = toBase(analytic, v);
       if (mins === null || mins < p.allowedRange.min || mins > p.allowedRange.max) refuse('parameters refused: a duration is outside the technical bound');
       map.set(p.id, { value: { amount: v.amount, unit: v.unit } });
+    } else if (p.kind === 'set') {
+      if (!Array.isArray(v) || v.length === 0 || new Set(v).size !== v.length || v.some((m) => typeof m !== 'string' || !p.allowedMembers.includes(m))) refuse('parameters refused: a set is empty, has a duplicate or has a member the package does not allow');
+      map.set(p.id, { value: [...v] });
     } else refuse('parameters refused: this kind of parameter is not supported by the demo executor');
   }
   return map;
@@ -139,16 +159,35 @@ function evaluate(e, ctx) {
     }
     const p = ctx.params.get(e.id);
     if (!p) return null;
+    if (Array.isArray(p.value)) refuse('analytic refused: a set parameter is used as a value');
     return typeof p.value === 'string' ? p.value : { q: p.value.amount, unit: p.value.unit };
   }
   const a = e.args;
   switch (e.op) {
     case 'is-present':
-      if (a[0].ref === 'input') return ctx.inputs.get(a[0].id).state === 'present';
+      if (a[0].ref === 'input') {
+        const st = ctx.inputs.get(a[0].id).state;
+        if (st !== 'present') ctx.trace.notPresent.set(a[0].id, st);
+        return st === 'present';
+      }
       if (ctx.params.has(a[0].id)) return true;
       ctx.trace.disabled.add(a[0].id);
       return false;
     case 'state-of': return ctx.inputs.get(a[0].id).state;
+    case 'select': {
+      if ('ref' in a[0] && a[0].ref === 'parameter') { // membership
+        const p = ctx.params.get(a[0].id);
+        if (!p) { ctx.trace.disabled.add(a[0].id); return null; }
+        return p.value.includes(a[1].literal);
+      }
+      const cells = a.map((v) => evaluate(v, ctx)); // one table row
+      if (cells.some((c) => c !== null && typeof c !== 'string')) refuse('analytic refused: a table cell is not a state');
+      return cells.includes(null) ? null : { row: cells };
+    }
+    case 'count': {
+      const xs = a.map((x) => bool(evaluate(x, ctx)));
+      return xs.includes(null) ? null : { q: xs.filter((x) => x === true).length, unit: '1' };
+    }
     case 'not': { const x = bool(evaluate(a[0], ctx)); return x === null ? null : !x; }
     case 'and': { const xs = a.map((x) => bool(evaluate(x, ctx))); return xs.includes(false) ? false : xs.includes(null) ? null : true; }
     case 'or': { const xs = a.map((x) => bool(evaluate(x, ctx))); return xs.includes(true) ? true : xs.includes(null) ? null : false; }
@@ -192,7 +231,7 @@ const inputNote = (key, state) => {
   return state === 'absent' ? `${LABEL[key]} is not documented.` : `${LABEL[key]} is recorded as ${state}.`;
 };
 
-function describe(state, value, ctx) {
+function describeInterval(state, value, ctx) {
   const estimated = ctx.trace.eqTrue.has(ESTIMATED);
   const choice = ctx.params.get('acceptedCertainty')?.value;
   const warnings = [];
@@ -211,18 +250,44 @@ function describe(state, value, ctx) {
   return { warnings, missing };
 }
 
+const startRead = ['clottingTestStartTime', 'clottingResultReadTime'];
+const listNotes = (keys, ctx) => {
+  const notes = [];
+  const absent = keys.filter((k) => ctx.trace.notPresent.get(k) === 'absent');
+  if (absent.length === 1) notes.push(`${LABEL2[absent[0]]} is not documented.`);
+  else if (absent.length > 1) notes.push(`${[LABEL2[absent[0]], ...absent.slice(1).map((k) => NOUN2[k])].join(' and ')} are not documented.`);
+  for (const k of keys) { const st = ctx.trace.notPresent.get(k); if (st && st !== 'absent') notes.push(`${LABEL2[k]} is recorded as ${st}.`); }
+  return notes;
+};
+
+function describeCompleteness(out, state, ctx) {
+  const warnings = [];
+  let missing = [];
+  if (out.id === 'itemStates' && state === 'conflict') {
+    for (const [k, i] of ctx.inputs) if (i.state === 'conflicting') warnings.push(`Two records disagree about the ${NOUN2[k]}.`);
+  }
+  if (out.id === 'readTimeInWindow' && state === 'conflict') warnings.push('Result read time is earlier than the test start time.');
+  if (out.id === 'readTimeInWindow' && state === 'needs-data') {
+    const st = ctx.trace.notPresent.get('clottingTestStatus');
+    if (st) missing = [`Clotting test status is ${st === 'absent' ? 'not documented' : `recorded as ${st}`}, so the test start time cannot be read as the start of a performed test.`];
+    else missing = listNotes(startRead, ctx);
+  }
+  return { warnings, missing };
+}
+
 function result(analytic, out, expr, ctx) {
-  ctx.trace = { disabled: new Set(), eqTrue: new Set() };
+  ctx.trace = { disabled: new Set(), eqTrue: new Set(), notPresent: new Map() };
   const r = evaluate(expr, ctx);
   let state;
   let value;
   if (r === null) state = 'indeterminate';
   else if (typeof r === 'string' && out.states.includes(r)) state = r;
   else if (typeof r === 'string' && out.kind === 'classification' && out.labels.includes(r)) value = { label: r };
-  else if (isObj(r) && r.q !== undefined && out.kind === 'value' && r.unit === out.unit) value = { amount: r.q, unit: r.unit };
+  else if (isObj(r) && r.q !== undefined && out.kind === 'value' && r.unit === out.unit && (out.valueType !== 'integer' || Number.isInteger(r.q))) value = { amount: r.q, unit: r.unit };
+  else if (isObj(r) && Array.isArray(r.row) && out.kind === 'table' && r.row.length === out.columns.length) value = { columns: out.columns.map((c) => c.key), rows: [r.row] };
   else refuse('analytic refused: a result is not one the output declares');
   if (state && !out.states.includes(state)) refuse('analytic refused: a result is a state the output does not declare');
-  const { warnings, missing } = describe(state, value, ctx);
+  const { warnings, missing } = analytic.manifest.id === COMPLETENESS_ID ? describeCompleteness(out, state, ctx) : describeInterval(state, value, ctx);
   const res = { outputId: out.id, kind: out.kind, warnings, limitations: [analytic.limitations.statement], missingDataNotes: missing, 'x-analytic': analytic.manifest.id };
   if (state) res.state = state; else res.value = value;
   if (state === 'parameter-not-enabled') {
@@ -239,13 +304,17 @@ export function evaluateAnalytic(analytic, envelope, parameters, evaluationTime)
     if (!isObj(envelope) || vEnvelope(envelope) !== true) refuse('envelope refused: does not conform to the context envelope schema');
     if (typeof evaluationTime !== 'string' || instant({ value: evaluationTime, zone: 'stated' }) === null) refuse('evaluation time refused: needs an explicit offset');
     const trees = prescan(analytic);
-    if (analytic.manifest.id !== INTERVAL_ID) refuse('analytic refused: the demo executor has wording for the snake interval analytic only so far');
+    if (analytic.manifest.id !== INTERVAL_ID && analytic.manifest.id !== COMPLETENESS_ID) refuse('analytic refused: the demo executor has wording for the two snake analytics only');
     const ctx = {
       inputs: readInputs(analytic, envelope),
       params: readParams(analytic, parameters),
       conversions: new Map((analytic.conversions ?? []).map((c) => [c.id, c])),
     };
-    return { ok: true, results: analytic.outputs.map((o) => result(analytic, o, trees.get(o.id), ctx)) };
+    const conflicting = [...ctx.inputs.values()].some((i) => i.state === 'conflicting');
+    const gone = new Set(conflicting ? OMIT_ON_CONFLICT[analytic.manifest.id] ?? [] : []);
+    if (gone.size > 0 && !analytic.outputs.find((o) => o.id === 'itemStates')?.states.includes('conflict')) gone.add('itemStates');
+    const kept = analytic.outputs.filter((o) => !gone.has(o.id));
+    return { ok: true, results: kept.map((o) => result(analytic, o, trees.get(o.id), ctx)), omitted: analytic.outputs.filter((o) => gone.has(o.id)).map((o) => o.id) };
   } catch (err) {
     if (err instanceof Refusal) return { ok: false, refusal: err.message };
     if (err instanceof RangeError) return { ok: false, refusal: 'analytic refused: expression too deep' };

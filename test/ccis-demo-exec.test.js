@@ -150,10 +150,8 @@ test('hours: a duration in hours is compared only after the declared conversion,
   refused(run(normal(), { ...ALL, targetIntervalDuration: { value: { amount: 525601, unit: 'min' } } }), 'outside the technical bound');
 });
 
-test('whitelist: the completeness analytic and any operator outside the subset refuse the whole analytic', () => {
-  refused(run(normal(), 'none', B1), 'operator not supported by the demo executor');
-  refused(run(normal(), 'none', exa('snake-completeness.analytics.json')), 'operator not supported by the demo executor');
-  for (const op of ['ne', 'gt', 'ge', 'add', 'sub', 'count', 'select']) {
+test('whitelist: any operator outside the subset refuses the whole analytic (select and count: see the completeness tests)', () => {
+  for (const op of ['ne', 'gt', 'ge', 'add', 'sub']) {
     const a = clone(A1); a.computation[0].expr = { op, args: [{ literal: 'x' }] };
     refused(run(normal(), 'none', a), 'operator not supported');
   }

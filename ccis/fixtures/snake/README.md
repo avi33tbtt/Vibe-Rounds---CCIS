@@ -61,6 +61,8 @@ The hand calculation was made from the dossier. Where the expression trees in `c
 - **F-4. Which wins: not-applicable or not-enabled.** If F7 says not given and the target is disabled, the dossier does not say whether the comparison is not-applicable or parameter-not-enabled. The tree says parameter-not-enabled. `out-of-scope-01` enables the target.
 - **F-5. Overall status when an expected F3 is explicitly not performed.** The tree gives complete with a count of 0. The dossier (4.2) does not cover it. `out-of-scope-02` leaves the expected-items set disabled, and the test refuses a case that depends on this.
 
+- **F-6. Not-collected expected item reads as complete (found in row DS2a-2).** In the completeness trees (0.1.0 and 0.1.1) an expected item recorded as not-collected is not counted, but the overall status has no branch for it and gives `complete`. It should be `indeterminate`, as for unknown. Needs a new version (0.1.2). No case depends on it; a todo test in `test/ccis-demo-exec-completeness.test.js` keeps it visible.
+
 ## Not built
 
 _Update (row 1.5b): the three items below are now built. See "Resolved in 0.1.1" further down. The text is kept as written in 1.5a._

@@ -1,0 +1,178 @@
+{
+  "id": "clotting-test-documented",
+  "question": "Is the clotting test documented as performed, and is its result documented?",
+  "inputs": [
+    {
+      "key": "clottingTestStatus",
+      "element": "snake.envenomation-timing",
+      "field": "clottingTestStatus"
+    },
+    {
+      "key": "readTime",
+      "element": "snake.envenomation-timing",
+      "field": "clottingResultReadTime"
+    },
+    {
+      "key": "result",
+      "element": "snake.envenomation-timing",
+      "field": "clottingResult"
+    }
+  ],
+  "preconditions": [
+    "Tests the record only. Present means a record exists. It says nothing about the value."
+  ],
+  "outcomes": [
+    {
+      "id": "result-documented",
+      "kind": "answer",
+      "when": [
+        {
+          "input": "clottingTestStatus",
+          "is": "present"
+        },
+        {
+          "input": "readTime",
+          "is": "present"
+        },
+        {
+          "input": "result",
+          "is": "present"
+        }
+      ],
+      "next": {
+        "stage": "antivenom-documentation"
+      }
+    },
+    {
+      "id": "result-without-read-time",
+      "kind": "missing-data",
+      "when": [
+        {
+          "input": "clottingTestStatus",
+          "is": "present"
+        },
+        {
+          "input": "readTime",
+          "is": "absent"
+        },
+        {
+          "input": "result",
+          "is": "present"
+        }
+      ],
+      "next": {
+        "stage": "antivenom-documentation"
+      },
+      "note": "Flagged: no read time is documented"
+    },
+    {
+      "id": "read-time-without-result",
+      "kind": "missing-data",
+      "when": [
+        {
+          "input": "clottingTestStatus",
+          "is": "present"
+        },
+        {
+          "input": "readTime",
+          "is": "present"
+        },
+        {
+          "input": "result",
+          "is": "absent"
+        }
+      ],
+      "next": {
+        "stage": "antivenom-documentation"
+      },
+      "note": "Flagged: no result is documented"
+    },
+    {
+      "id": "no-result-no-read-time",
+      "kind": "missing-data",
+      "when": [
+        {
+          "input": "clottingTestStatus",
+          "is": "present"
+        },
+        {
+          "input": "readTime",
+          "is": "absent"
+        },
+        {
+          "input": "result",
+          "is": "absent"
+        }
+      ],
+      "next": {
+        "stage": "antivenom-documentation"
+      },
+      "note": "Flagged: neither result nor read time is documented"
+    },
+    {
+      "id": "documented-not-performed",
+      "kind": "answer",
+      "when": [
+        {
+          "input": "clottingTestStatus",
+          "is": "explicitly-negative"
+        }
+      ],
+      "next": {
+        "stage": "antivenom-documentation"
+      }
+    },
+    {
+      "id": "records-conflict",
+      "kind": "conflicting",
+      "when": [
+        {
+          "input": "clottingTestStatus",
+          "is": "conflicting"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "nothing-recorded",
+      "kind": "indeterminate",
+      "when": [
+        {
+          "input": "clottingTestStatus",
+          "is": "absent"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "status-unknown",
+      "kind": "indeterminate",
+      "when": [
+        {
+          "input": "clottingTestStatus",
+          "is": "unknown"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "status-not-collected",
+      "kind": "indeterminate",
+      "when": [
+        {
+          "input": "clottingTestStatus",
+          "is": "not-collected"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    }
+  ]
+}

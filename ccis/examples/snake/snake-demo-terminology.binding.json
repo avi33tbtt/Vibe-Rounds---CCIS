@@ -1,0 +1,16 @@
+{
+  "codeSystem": {
+    "id": "ccis-demo",
+    "version": "0.1.0"
+  },
+  "valueSet": {
+    "id": "ccis-demo.clotting-test-status",
+    "version": "0.1.0"
+  },
+  "code": "clotting-test-status",
+  "display": "Clotting test status (demonstration)",
+  "mapping": {
+    "status": "mapped",
+    "note": "Demonstration code in a local demonstration code system. Unverified. Not a real terminology code."
+  }
+}

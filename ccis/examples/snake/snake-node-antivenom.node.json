@@ -1,0 +1,137 @@
+{
+  "id": "antivenom-documented",
+  "question": "Is anti-snake-venom administration documented, with its time?",
+  "inputs": [
+    {
+      "key": "antivenomStatus",
+      "element": "snake.envenomation-timing",
+      "field": "antivenomStatus"
+    },
+    {
+      "key": "startTime",
+      "element": "snake.envenomation-timing",
+      "field": "antivenomStartTime"
+    }
+  ],
+  "preconditions": [
+    "Tests the record only. Present means a record exists. It says nothing about the value."
+  ],
+  "outcomes": [
+    {
+      "id": "given-time-documented",
+      "kind": "answer",
+      "when": [
+        {
+          "input": "antivenomStatus",
+          "is": "present"
+        },
+        {
+          "input": "startTime",
+          "is": "present"
+        }
+      ],
+      "next": {
+        "end": true
+      }
+    },
+    {
+      "id": "given-time-not-documented",
+      "kind": "missing-data",
+      "when": [
+        {
+          "input": "antivenomStatus",
+          "is": "present"
+        },
+        {
+          "input": "startTime",
+          "is": "absent"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "given-time-unknown",
+      "kind": "indeterminate",
+      "when": [
+        {
+          "input": "antivenomStatus",
+          "is": "present"
+        },
+        {
+          "input": "startTime",
+          "is": "unknown"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "documented-not-given",
+      "kind": "answer",
+      "when": [
+        {
+          "input": "antivenomStatus",
+          "is": "explicitly-negative"
+        }
+      ],
+      "next": {
+        "end": true
+      }
+    },
+    {
+      "id": "records-conflict",
+      "kind": "conflicting",
+      "when": [
+        {
+          "input": "antivenomStatus",
+          "is": "conflicting"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "nothing-recorded",
+      "kind": "indeterminate",
+      "when": [
+        {
+          "input": "antivenomStatus",
+          "is": "absent"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "status-unknown",
+      "kind": "indeterminate",
+      "when": [
+        {
+          "input": "antivenomStatus",
+          "is": "unknown"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    },
+    {
+      "id": "status-not-collected",
+      "kind": "indeterminate",
+      "when": [
+        {
+          "input": "antivenomStatus",
+          "is": "not-collected"
+        }
+      ],
+      "next": {
+        "stage": "gap-report"
+      }
+    }
+  ]
+}

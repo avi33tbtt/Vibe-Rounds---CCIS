@@ -1,0 +1,474 @@
+{
+  "manifest": {
+    "id": "snake.documentation-path",
+    "name": "Snake envenomation: documentation path",
+    "type": "pathway",
+    "version": "0.1.0",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft",
+    "references": [
+      {
+        "id": "snake.envenomation-timing",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      {
+        "id": "snake.bite-to-antivenom-interval",
+        "type": "analytics-package",
+        "version": "0.1.0"
+      },
+      {
+        "id": "snake.clotting-documentation-completeness",
+        "type": "analytics-package",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "scope": "Documentation of timing and completeness for a suspected snake bite. Describes information needed only.",
+  "intendedUse": "Descriptive process review. It does not authorise, direct or recommend any treatment, order or action.",
+  "exclusions": [
+    "Diagnosis, severity grading and treatment choice.",
+    "Any product, quantity or amount of anything given."
+  ],
+  "elements": [
+    {
+      "id": "snake.envenomation-timing",
+      "type": "contextual-element",
+      "range": "^0.1.0"
+    }
+  ],
+  "stages": [
+    {
+      "id": "presentation",
+      "label": "Presentation",
+      "kind": "information",
+      "entry": [
+        "A suspected snake bite has presented."
+      ],
+      "exit": [
+        "Bite time and arrival time are documented, or their absence is known."
+      ],
+      "needs": [
+        "biteTime",
+        "biteTimeCertainty",
+        "arrivalTime"
+      ]
+    },
+    {
+      "id": "clotting-documentation",
+      "label": "Clotting-test documentation",
+      "kind": "information",
+      "entry": [
+        "Presentation information has been reviewed."
+      ],
+      "exit": [
+        "The clotting test status is documented, or its absence is known."
+      ],
+      "needs": [
+        "clottingTestStatus",
+        "clottingTestStartTime",
+        "clottingResultReadTime",
+        "clottingResult"
+      ]
+    },
+    {
+      "id": "antivenom-documentation",
+      "label": "Anti-snake-venom documentation",
+      "kind": "information",
+      "entry": [
+        "Clotting-test documentation has been reviewed."
+      ],
+      "exit": [
+        "The administration status is documented, or its absence is known."
+      ],
+      "needs": [
+        "antivenomStatus",
+        "antivenomStartTime",
+        "antivenomNotGivenReason"
+      ]
+    },
+    {
+      "id": "gap-report",
+      "label": "Gap report",
+      "kind": "report",
+      "entry": [
+        "The record cannot answer a documentation question."
+      ],
+      "exit": [
+        "The gap has been reported."
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "clotting-test-documented",
+      "question": "Is the clotting test documented as performed, and is its result documented?",
+      "inputs": [
+        {
+          "key": "clottingTestStatus",
+          "element": "snake.envenomation-timing",
+          "field": "clottingTestStatus"
+        },
+        {
+          "key": "readTime",
+          "element": "snake.envenomation-timing",
+          "field": "clottingResultReadTime"
+        },
+        {
+          "key": "result",
+          "element": "snake.envenomation-timing",
+          "field": "clottingResult"
+        }
+      ],
+      "preconditions": [
+        "Tests the record only. Present means a record exists. It says nothing about the value."
+      ],
+      "outcomes": [
+        {
+          "id": "result-documented",
+          "kind": "answer",
+          "when": [
+            {
+              "input": "clottingTestStatus",
+              "is": "present"
+            },
+            {
+              "input": "readTime",
+              "is": "present"
+            },
+            {
+              "input": "result",
+              "is": "present"
+            }
+          ],
+          "next": {
+            "stage": "antivenom-documentation"
+          }
+        },
+        {
+          "id": "result-without-read-time",
+          "kind": "missing-data",
+          "when": [
+            {
+              "input": "clottingTestStatus",
+              "is": "present"
+            },
+            {
+              "input": "readTime",
+              "is": "absent"
+            },
+            {
+              "input": "result",
+              "is": "present"
+            }
+          ],
+          "next": {
+            "stage": "antivenom-documentation"
+          },
+          "note": "Flagged: no read time is documented"
+        },
+        {
+          "id": "read-time-without-result",
+          "kind": "missing-data",
+          "when": [
+            {
+              "input": "clottingTestStatus",
+              "is": "present"
+            },
+            {
+              "input": "readTime",
+              "is": "present"
+            },
+            {
+              "input": "result",
+              "is": "absent"
+            }
+          ],
+          "next": {
+            "stage": "antivenom-documentation"
+          },
+          "note": "Flagged: no result is documented"
+        },
+        {
+          "id": "no-result-no-read-time",
+          "kind": "missing-data",
+          "when": [
+            {
+              "input": "clottingTestStatus",
+              "is": "present"
+            },
+            {
+              "input": "readTime",
+              "is": "absent"
+            },
+            {
+              "input": "result",
+              "is": "absent"
+            }
+          ],
+          "next": {
+            "stage": "antivenom-documentation"
+          },
+          "note": "Flagged: neither result nor read time is documented"
+        },
+        {
+          "id": "documented-not-performed",
+          "kind": "answer",
+          "when": [
+            {
+              "input": "clottingTestStatus",
+              "is": "explicitly-negative"
+            }
+          ],
+          "next": {
+            "stage": "antivenom-documentation"
+          }
+        },
+        {
+          "id": "records-conflict",
+          "kind": "conflicting",
+          "when": [
+            {
+              "input": "clottingTestStatus",
+              "is": "conflicting"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "nothing-recorded",
+          "kind": "indeterminate",
+          "when": [
+            {
+              "input": "clottingTestStatus",
+              "is": "absent"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "status-unknown",
+          "kind": "indeterminate",
+          "when": [
+            {
+              "input": "clottingTestStatus",
+              "is": "unknown"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "status-not-collected",
+          "kind": "indeterminate",
+          "when": [
+            {
+              "input": "clottingTestStatus",
+              "is": "not-collected"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        }
+      ]
+    },
+    {
+      "id": "antivenom-documented",
+      "question": "Is anti-snake-venom administration documented, with its time?",
+      "inputs": [
+        {
+          "key": "antivenomStatus",
+          "element": "snake.envenomation-timing",
+          "field": "antivenomStatus"
+        },
+        {
+          "key": "startTime",
+          "element": "snake.envenomation-timing",
+          "field": "antivenomStartTime"
+        }
+      ],
+      "preconditions": [
+        "Tests the record only. Present means a record exists. It says nothing about the value."
+      ],
+      "outcomes": [
+        {
+          "id": "given-time-documented",
+          "kind": "answer",
+          "when": [
+            {
+              "input": "antivenomStatus",
+              "is": "present"
+            },
+            {
+              "input": "startTime",
+              "is": "present"
+            }
+          ],
+          "next": {
+            "end": true
+          }
+        },
+        {
+          "id": "given-time-not-documented",
+          "kind": "missing-data",
+          "when": [
+            {
+              "input": "antivenomStatus",
+              "is": "present"
+            },
+            {
+              "input": "startTime",
+              "is": "absent"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "given-time-unknown",
+          "kind": "indeterminate",
+          "when": [
+            {
+              "input": "antivenomStatus",
+              "is": "present"
+            },
+            {
+              "input": "startTime",
+              "is": "unknown"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "documented-not-given",
+          "kind": "answer",
+          "when": [
+            {
+              "input": "antivenomStatus",
+              "is": "explicitly-negative"
+            }
+          ],
+          "next": {
+            "end": true
+          }
+        },
+        {
+          "id": "records-conflict",
+          "kind": "conflicting",
+          "when": [
+            {
+              "input": "antivenomStatus",
+              "is": "conflicting"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "nothing-recorded",
+          "kind": "indeterminate",
+          "when": [
+            {
+              "input": "antivenomStatus",
+              "is": "absent"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "status-unknown",
+          "kind": "indeterminate",
+          "when": [
+            {
+              "input": "antivenomStatus",
+              "is": "unknown"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        },
+        {
+          "id": "status-not-collected",
+          "kind": "indeterminate",
+          "when": [
+            {
+              "input": "antivenomStatus",
+              "is": "not-collected"
+            }
+          ],
+          "next": {
+            "stage": "gap-report"
+          }
+        }
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "from": "presentation",
+      "to": "clotting-documentation"
+    },
+    {
+      "from": "clotting-documentation",
+      "to": "antivenom-documentation",
+      "via": "clotting-test-documented"
+    },
+    {
+      "from": "clotting-documentation",
+      "to": "gap-report",
+      "via": "clotting-test-documented"
+    },
+    {
+      "from": "antivenom-documentation",
+      "to": "gap-report",
+      "via": "antivenom-documented"
+    }
+  ],
+  "timing": [
+    {
+      "id": "bite-to-antivenom",
+      "description": "Interval from the bite to the start of administration. The number is supplied by a local clinician, never here.",
+      "between": {
+        "from": "presentation",
+        "to": "antivenom-documentation"
+      },
+      "parameter": "targetIntervalDuration"
+    }
+  ],
+  "analytics": [
+    {
+      "ref": {
+        "id": "snake.bite-to-antivenom-interval",
+        "type": "analytics-package",
+        "range": "^0.1.0"
+      },
+      "requirement": "optional"
+    },
+    {
+      "ref": {
+        "id": "snake.clotting-documentation-completeness",
+        "type": "analytics-package",
+        "range": "^0.1.0"
+      },
+      "requirement": "optional"
+    }
+  ]
+}

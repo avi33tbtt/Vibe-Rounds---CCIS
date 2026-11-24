@@ -132,7 +132,7 @@ test('page: the seams hold booleans and counts only, and no element has an on* a
   await pickMarket(w, picked());
   await pickEnvelope(w);
   choose(w, 1, PATH);
-  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'importState', 'resultsState', 'runState', 'selectorState', 'state']);
+  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'exportState', 'importState', 'resultsState', 'runState', 'selectorState', 'state']);
   const cs = w.ccisApp.catalogueState();
   assert.deepEqual(Object.keys(plain(cs)), ['shown', 'rows', 'needsData', 'incompatible', 'other']);
   assert.equal(typeof cs.shown, 'boolean');

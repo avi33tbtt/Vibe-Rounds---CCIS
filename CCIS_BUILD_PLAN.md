@@ -245,6 +245,7 @@ Phases follow Book Ch9 section 9 (0 to 6). IDs are `phase.number`. **"Chunk brie
 | 5.5 | Cohort definition, three-valued evaluator, manifest with reasons and counts, on a ~30-patient synthetic set |
 | 5.6 | Cohort analytics, aggregation, provenance; small-cell masking (default 5, clinical owner to confirm) |
 | 5.7 | Access model for population-level work: purpose, separate permissions, audit. **Needs a decision on whether a server is introduced (D-002).** |
+| 5.8 | Cohort Context Graph: aggregate, derived in-memory projection (cohort, condition, observation concept, pathway, analytic output, time window nodes; declared and co-occurrence edges, never causal) over the synthetic cohort, with a relationship-map UI, time-window navigation and provenance. Small-cell masking from 5.6. Brief: `plan-chunks/chunk-5.8-cohort-context-graph.md` |
 
 ### Phase 6: Interoperability, governance, integration  (last)
 

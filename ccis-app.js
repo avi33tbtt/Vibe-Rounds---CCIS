@@ -8,6 +8,7 @@ import { mountImportView } from './ccis-app-import-view.js';
 import { mountSelectorView } from './ccis-app-selector-view.js';
 import { mountCatalogueView } from './ccis-app-catalogue-view.js';
 import { mountRunView } from './ccis-app-run-view.js';
+import { mountResultsView } from './ccis-app-results-view.js';
 import { runForPage } from './ccis-app-run.js';
 import { compatibilityFor, catalogueModel } from './ccis-app-catalogue.js';
 
@@ -15,8 +16,10 @@ const app = { marketLoaded: false, entries: 0, runs: 0, refused: false };
 const imp = { imported: false, refused: false, accepted: 0, rejected: 0, unmapped: 0, ambiguous: 0 };
 const sel = { contextChosen: false, pathwayChosen: false, mismatch: false, ready: false };
 const cat = { shown: false, rows: 0, needsData: 0, incompatible: 0, other: 0 };
+const results = { shown: false, state: 'none', groups: 0, items: 0, trace: 0, missing: 0 };
 const run = { ready: false, selected: 0, ran: false, failed: false, results: 0, skipped: 0, refused: false };
 let market = null;
+let resultsView = null;
 let runView = null; // declared before any mount: the other views call back at mount
 let lastRecord = null; // in this closure only, for row 3.9a; never on window
 let lastSkipped = [];
@@ -28,6 +31,7 @@ const refreshRun = () => {
   if (!runView) return;
   lastRecord = null;
   lastSkipped = [];
+  resultsView?.reset();
   const result = compatibilityFor({ market, pathwayKey: selectorView?.selectedPathwayKey() ?? null, context: importView?.getContext() ?? null });
   const rows = result.ok === true
     ? catalogueModel(result.result).rows.filter((r) => r.kind === 'analytics-package').map((r) => ({ id: r.id, version: r.version, label: r.label, mayRun: r.mayRun }))
@@ -54,7 +58,15 @@ if (runRoot) {
     root: runRoot,
     onState: (s) => { for (const k of Object.keys(run)) run[k] = s[k]; },
     run: (a) => runForPage({ market, pathwayKey: selectorView?.selectedPathwayKey() ?? null, importResult: importView?.getResult() ?? null, supplied: {}, evaluationTime: a.evaluationTime, runNeedsData: a.runNeedsData, only: a.only }),
-    onRun: (record, skipped) => { lastRecord = record; lastSkipped = skipped; },
+    onRun: (record, skipped) => { lastRecord = record; lastSkipped = skipped; resultsView?.show({ ok: true, record, skipped }); },
+  });
+}
+const resultsRoot = document.getElementById('results');
+if (resultsRoot) {
+  resultsView = mountResultsView({
+    document,
+    root: resultsRoot,
+    onState: (s) => { for (const k of Object.keys(results)) results[k] = s[k]; },
   });
 }
 
@@ -120,5 +132,6 @@ window.ccisApp = {
   selectorState: () => ({ ...sel }),
   catalogueState: () => ({ ...cat }),
   runState: () => ({ ...run }),
+  resultsState: () => ({ ...results }),
   checksumOf,
 };

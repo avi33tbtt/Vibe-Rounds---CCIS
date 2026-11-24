@@ -59,7 +59,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 3.9.1a | chunk-3.9.1a-run-wiring.md | Browser app 2-iii: wire the run view into the page; import view gains `getResult()`; `runState()`; rebuild `index.html` | DONE | 2026-11-25 | 0 new modules, 1 test, 5 small edits | Run wired (#run); 37 tests pass in 5 files; 2 breakages seen failing (one substituted, D-172); index.html rebuilt (1.33 MB). Next: 3.9a chunk file. |
 | 3.9a | chunk-3.9a-results-model.md | Browser app 2b-i: pure results model (values with units, decision path, missingness, scope, limitations, provenance) | DONE | 2026-11-25 | 1 module, 1 test | ccis-app-results.js and test; 8 tests pass (new file only); 2 breakages seen failing. D-174. Next: 3.9a.1 chunk file. |
 | 3.9a.1 | chunk-3.9a.1-results-view.md | Browser app 2b-ii: results view (module and jsdom test only, not wired) | DONE | 2026-11-25 | 1 module, 1 test | ccis-app-results-view.js and test; 8 tests pass (new file only); 2 breakages seen failing. Next: 3.9a.2 chunk file. |
-| 3.9a.2 | chunk-3.9a.2-results-wiring.md | Browser app 2b-iii: wire the results view into the page (record kept in the closure), `resultsState()`, rebuild `index.html` | TODO |  | 0 new modules, 1 test, 4 small edits | Needs 3.9a.1. |
+| 3.9a.2 | chunk-3.9a.2-results-wiring.md | Browser app 2b-iii: wire the results view into the page (record kept in the closure), `resultsState()`, rebuild `index.html` | DONE | 2026-11-25 | 0 new modules, 1 test, 4 small edits | Results wired (#results); 45 tests pass in 6 files; 2 breakages seen failing; index.html rebuilt (1.34 MB). D-177. Next: 3.9b chunk file. |
 | 3.9b | (written when reached) | Browser app 2c-i: pure run record export and verification line (see F-11) | TODO |  | 1 module, 1 test | Needs 3.9a.2. |
 | 3.9b.1 | (written when reached) | Browser app 2c-ii: export button and wiring | TODO |  | 1 module, 1 test | Needs 3.9b. |
 | 3.10 | (written when reached) | Browser hardening 1: strict CSP, no inline handlers, bundle-wide forbidden-API scan | TODO |  | 1 script or test, 1 test | Needs 3.9b.1. |
@@ -70,6 +70,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 3.11a | (written when reached) | Freeze CCIS 0.1.0, limitations list. Ends with your review before Phase 4 | TODO |  | docs only | Needs 3.11.1. |
 | 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | After 0.1.0. |
 | 5.1 to 5.7 | (written when reached) | Templates, decision graphs, research-to-package, cohorts, access model | LOCKED |  |  | After Phase 4. 5.7 needs the D-002 server decision. |
+| 5.8 | chunk-5.8-cohort-context-graph.md | Cohort Context Graph and aggregate Cohort Explorer (synthetic ~30-subject cohort; derived in-memory projection; relationship-map UI). Source brief is over 5 KB: split into narrower chunk files (projection, fixture, map view, timeline, tests) when reached | LOCKED |  | split into 5+ rows when reached | Needs 5.5 and 5.6 (and 3.10 for UI). 5.7 before any shared or real use. Not 5.3 decision nodes. D-178. |
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 

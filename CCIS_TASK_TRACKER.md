@@ -51,7 +51,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 3.8c | chunk-3.8c-selector-model.md | Browser app 1c-i: pure context and pathway selector model | DONE | 2026-11-25 | 1 module, 1 test | ccis-app-selector.js and test; 7 tests pass (new file only); 2 breakages seen failing. Next: 3.8c.1 chunk file. |
 | 3.8c.1 | chunk-3.8c.1-selector-view.md | Browser app 1c-ii: selector view (module and jsdom test only, not wired) | DONE | 2026-11-25 | 1 module, 1 test | ccis-app-selector-view.js and test; 8 tests pass (new file only); 2 breakages seen failing. Next: 3.8c.2 chunk file. |
 | 3.8c.2 | chunk-3.8c.2-selector-wiring.md | Browser app 1c-iii: wire selector into `ccis-app.js`, template; import view passes applied versions; `selectorState()`; rebuild `index.html` | DONE | 2026-11-25 | 0 new modules, 1 test, 4 small edits | Selector wired; 28 tests pass in 4 files; 2 breakages seen failing; index.html rebuilt (1.2 MB). Next: 3.8d chunk file. |
-| 3.8d | chunk-3.8d-catalogue-model.md | Browser app 1d-i: pure catalogue model (explanations, Needs data, Incompatible) | TODO |  | 1 module, 1 test | Chunk file written 2026-11-25, awaiting approval. Next "do next" builds it. |
+| 3.8d | chunk-3.8d-catalogue-model.md | Browser app 1d-i: pure catalogue model (explanations, Needs data, Incompatible) | DONE | 2026-11-25 | 1 module, 1 test | ccis-app-catalogue.js and test; 8 tests pass (new file only); 2 breakages seen failing. Finding F-12 (see DECISIONS). Next: 3.8d.1 chunk file. |
 | 3.8d.1 | (written when reached) | Browser app 1d-ii: catalogue view and wiring | TODO |  | 1 module, 1 test | Needs 3.8d. Chunk file first. Must get the imported context to the page in memory only, never on `window`. |
 | 3.9 | (written when reached) | Browser app 2-i: in-page run adapter (planner and run through the seam, bundle check, no UI) | TODO |  | 1 module, 1 test | Needs 3.8d.1. |
 | 3.9.1 | (written when reached) | Browser app 2-ii: multi-select and run wiring (no results display) | TODO |  | 1 module, 1 test | Needs 3.9. |
@@ -73,7 +73,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)
 - Row 3.8 took the defaults (D-146): `esbuild` 0.28.2 pinned, pure SHA-256 in the bundle only, `index.html` committed with `--check` in CI. Say so if any should change. Run `npm ci` after you pull (new dependency).
 - Run the full `npm test` once on your machine. On a fresh clone at 3.8a it ran 664 tests: all pass except the two known F-6 TODO gaps.
-- Decide F-10, F-11 and D-112 (they affect rows 3.9 to 3.9b).
+- New F-12 (D-162): with no context the pathway row reads "Compatible with limitations" while its packages need data; the view must show the package rows. Decide F-10, F-11 and D-112 (they affect rows 3.9 to 3.9b).
 - Commit `market/` as it is (it holds `.gitattributes` with `* -text`).
 - Still open: clinician owner, D-002, F-4 to F-9, D-099, branch protection; before real data: safety, security, privacy, licence checks.
 

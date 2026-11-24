@@ -10,7 +10,8 @@
 // `resolve(ref)` is the pipeline's layer 3 resolver: { state: 'ok', doc } or another state. A rule that needs an
 // artefact that was not supplied is skipped quietly: layer 3 already reported it. Unknown is never guessed.
 //
-// Not in this row (split to 2.2b): checks on elements and bindings (binding on a non-code field, UCUM units).
+// Element and binding checks (row 2.2b): a binding on a field that is not a code field, and unit strings that are not UCUM.
+// UCUM is a small offline grammar check. What the grammar cannot decide is a warning that says "not checked", never a pass.
 // Cycles are a warning only: "bounded" is not defined until gap G-09 (row 5.3).
 
 const isObj = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
@@ -26,6 +27,9 @@ export const SEMANTIC_RULES = [
   { ruleId: 'CCIS-V4-006', layer: 4, severity: 'error', summary: 'A time-zone conversion names a zone that is not a known time zone.' },
   { ruleId: 'CCIS-V4-007', layer: 4, severity: 'warning', summary: 'A declared input or parameter is never used by any computation.' },
   { ruleId: 'CCIS-V4-008', layer: 4, severity: 'warning', summary: 'An output declares a non-value state that its computation cannot give.' },
+  { ruleId: 'CCIS-V4-009', layer: 4, severity: 'error', summary: 'A field carries a terminology binding but its type is not code.' },
+  { ruleId: 'CCIS-V4-010', layer: 4, severity: 'error', summary: 'A unit string is clearly not a valid UCUM unit.' },
+  { ruleId: 'CCIS-V4-011', layer: 4, severity: 'warning', summary: 'A unit string could not be decided offline (annotation or unit not in the small built-in table), so it was not checked.' },
   { ruleId: 'CCIS-V5-001', layer: 5, severity: 'error', summary: 'A transition, outcome or timing names a stage or node that does not exist.' },
   { ruleId: 'CCIS-V5-002', layer: 5, severity: 'error', summary: 'A stage cannot be reached from the first stage by any transition.' },
   { ruleId: 'CCIS-V5-003', layer: 5, severity: 'error', summary: 'An outcome tests an input that is not one of the node\'s inputs.' },
@@ -72,9 +76,129 @@ function resultLiterals(e, path, out = []) {
   return out;
 }
 
+
+// ---------------------------------------------------------------------------------------------
+// Layer 4: elements (row 2.2b): bindings and UCUM unit strings
+// ---------------------------------------------------------------------------------------------
+
+// Small built-in table (data, not a download). true = a metric unit that takes a prefix; false = it does not.
+const UCUM_UNITS = new Map([
+  ['m', true], ['g', true], ['s', true], ['L', true], ['l', true], ['mol', true], ['eq', true], ['U', true],
+  ['Pa', true], ['Hz', true], ['J', true], ['W', true], ['N', true],
+  ['min', false], ['h', false], ['d', false], ['wk', false], ['mo', false], ['a', false], ['%', false],
+]);
+const UCUM_PREFIXES = ['da', 'Y', 'Z', 'E', 'P', 'T', 'G', 'M', 'k', 'h', 'd', 'c', 'm', 'u', 'n', 'p', 'f', 'a', 'z', 'y'];
+
+// One unit atom (a symbol with an optional exponent). Returns { s: 'ok' | 'unknown' | 'error', why }.
+function ucumAtom(atom) {
+  if (/^\d+$/.test(atom)) return { s: 'ok' };
+  if (/^10[*^]-?\d+$/.test(atom)) return { s: 'ok' };
+  if (!/^[A-Za-z0-9_%[\]*^+\-']+$/.test(atom)) return { s: 'error', why: `"${atom}" has a character that UCUM does not allow` };
+  const m = /^(.*?[^\d+-])([+-]?\d+)?$/.exec(atom);
+  const base = m ? m[1] : atom;
+  if (UCUM_UNITS.has(base)) return { s: 'ok' };
+  for (const p of UCUM_PREFIXES) {
+    if (base.startsWith(p) && base.length > p.length && UCUM_UNITS.has(base.slice(p.length))) {
+      return UCUM_UNITS.get(base.slice(p.length)) ? { s: 'ok' } : { s: 'error', why: `the prefix "${p}" cannot go with the unit "${base.slice(p.length)}"` };
+    }
+  }
+  return { s: 'unknown', why: `the unit "${base}" is not in the built-in table` };
+}
+
+// The whole string. Structure errors are found first; an unknown atom or an annotation gives 'unknown', never 'ok'.
+function checkUcum(unit) {
+  if (typeof unit !== 'string') return { s: 'unknown', why: 'it is not text' };
+  if (unit === '') return { s: 'error', why: 'it is empty' };
+  let annotated = false;
+  let open = false;
+  let flat = '';
+  for (const ch of unit) {
+    if (ch === '{') { if (open) return { s: 'error', why: 'braces are nested' }; open = true; annotated = true; flat += '1'; } else if (ch === '}') { if (!open) return { s: 'error', why: 'a closing brace has no opening brace' }; open = false; } else if (!open) flat += ch;
+  }
+  if (open) return { s: 'error', why: 'a brace is not closed' };
+  if (/\s/.test(flat)) return { s: 'error', why: 'it has a space (UCUM has none)' };
+  let at = 0;
+  let worst = annotated ? { s: 'unknown', why: 'it has a brace annotation' } : { s: 'ok' };
+  const fail = (why) => ({ s: 'error', why });
+  const atoms = [];
+  let bad = null;
+  const factor = () => {
+    if (flat[at] === '(') {
+      at += 1;
+      const r = term(false);
+      if (r) return r;
+      if (flat[at] !== ')') return fail('a bracket is not closed');
+      at += 1;
+      return null;
+    }
+    let j = at;
+    while (j < flat.length && !'./()'.includes(flat[j])) j += 1;
+    if (j === at) return fail('an operator has nothing on one side');
+    atoms.push(flat.slice(at, j));
+    at = j;
+    return null;
+  };
+  const term = (top) => {
+    if (flat[at] === '/' && top) at += 1; // a single leading slash is allowed
+    let r = factor();
+    if (r) return r;
+    while (at < flat.length && (flat[at] === '.' || flat[at] === '/')) {
+      at += 1;
+      r = factor();
+      if (r) return r;
+    }
+    return null;
+  };
+  bad = term(true);
+  if (bad) return bad;
+  if (at < flat.length) return fail(flat[at] === ')' ? 'a closing bracket has no opening bracket' : 'it cannot be read');
+  for (const a of atoms) {
+    const r = ucumAtom(a);
+    if (r.s === 'error') return r;
+    if (r.s === 'unknown' && worst.s === 'ok') worst = r;
+  }
+  return worst;
+}
+
+function unitDiag(out, unit, path, what) {
+  const r = checkUcum(unit);
+  if (r.s === 'error') {
+    out.push(diag('error', 'CCIS-V4-010', path, `The unit "${unit}" of ${what} is not a valid UCUM unit: ${r.why}.`, 'Write the unit as a UCUM string. A count with no unit is "1".'));
+  } else if (r.s === 'unknown') {
+    out.push(diag('warning', 'CCIS-V4-011', path, `The unit "${unit}" of ${what} was not checked: ${r.why}.`, 'Check the unit by hand against UCUM. This validator checks only a small built-in set offline.'));
+  }
+}
+
+function fieldChecks(f, base, out) {
+  if (!isObj(f)) return;
+  if (f.binding !== undefined && f.type !== 'code') {
+    out.push(diag('error', 'CCIS-V4-009', `${base}/binding`,
+      `The field "${f.key}" has a terminology binding, but its type is ${LABEL[f.type] ?? String(f.type)}, not code.`,
+      'Remove the binding, or make the field a code field. A binding names a code, so it fits only a code field.'));
+  }
+  arr(f.units).forEach((u, j) => unitDiag(out, u, `${base}/units/${j}`, `the field "${f.key}"`));
+}
+
+function elementChecks(doc, out) {
+  arr(doc.fields).forEach((f, i) => fieldChecks(f, `/fields/${i}`, out));
+  arr(doc.modules).forEach((m, k) => isObj(m) && arr(m.fields).forEach((f, i) => fieldChecks(f, `/modules/${k}/fields/${i}`, out)));
+}
+
+function analyticsUnitChecks(doc, out) {
+  arr(doc.inputs).forEach((x, i) => isObj(x) && arr(x.units).forEach((u, j) => unitDiag(out, u, `/inputs/${i}/units/${j}`, `the input "${x.key}"`)));
+  arr(doc.parameters).forEach((x, i) => isObj(x) && arr(x.units).forEach((u, j) => unitDiag(out, u, `/parameters/${i}/units/${j}`, `the parameter "${x.id}"`)));
+  arr(doc.outputs).forEach((x, i) => { if (isObj(x) && x.unit !== undefined) unitDiag(out, x.unit, `/outputs/${i}/unit`, `the output "${x.id}"`); });
+  arr(doc.conversions).forEach((c, i) => {
+    if (!isObj(c) || c.kind === 'time-zone') return;
+    for (const end of ['from', 'to']) if (c[end] !== undefined) unitDiag(out, c[end], `/conversions/${i}/${end}`, `the conversion "${c.id}"`);
+  });
+}
+
 export function semanticLayer(doc, kind) {
   const out = [];
+  if (kind === 'contextual-element') { elementChecks(doc, out); return out; }
   if (kind !== 'analytics-package') return out;
+  analyticsUnitChecks(doc, out);
 
   const inputs = new Map();
   arr(doc.inputs).forEach((x, i) => isObj(x) && typeof x.key === 'string' && inputs.set(x.key, { ...x, at: i }));

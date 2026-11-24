@@ -46,10 +46,10 @@ node ccis-cli.js validate ccis/examples/invalid/5-graph-and-compatibility/transi
 | 1 Syntax | `V1-001`, `V1-002` | The text is a JSON object. |
 | 2 Structural | `V2-001` to `V2-006` | The committed schemas. |
 | 3 Reference integrity | `V3-001` to `V3-005` | Fields, keys and referenced artefacts exist. |
-| 4 Semantic (analytics) | `V4-001` to `V4-006` errors; `V4-007`, `V4-008` warnings | Operator argument types and counts; ids resolve; units and declared conversions; states an output declares; known time zones; unused inputs and parameters. |
+| 4 Semantic | `V4-001` to `V4-006`, `V4-009`, `V4-010` errors; `V4-007`, `V4-008`, `V4-011` warnings | Analytics: operator argument types and counts; ids resolve; units and declared conversions; states an output declares; known time zones; unused inputs and parameters. Elements: a binding only on a code field; unit strings are UCUM (a small offline grammar; what it cannot decide is a warning that says "not checked"). |
 | 5 Graph and compatibility | `V5-001` to `V5-006`, `V5-008` errors; `V5-007` warning | Stages and transitions exist and are reachable; outcomes test the node's inputs and cover its first input's six record states; timing parameters exist; every non-report stage has a way out; supported standard and operator-set versions. A cycle is a warning only. |
 
-- Known gaps: duplicate keys inside a JSON object are not detected; a leading byte order mark is a syntax error. **Not yet checked (row 2.2b):** a binding on a non-code field and UCUM unit strings. **Not checked:** whether a cycle is bounded (gap G-09, row 5.3); execution-profile feasibility and pin resolution (row 2.4); layers 6 to 8 (row 2.3). `criteria` parameters are never reported as unused, because their use lies outside the expression tree.
+- Known gaps: duplicate keys inside a JSON object are not detected; a leading byte order mark is a syntax error. **Not checked:** a full UCUM check (units outside the small built-in table and brace annotations give a warning only, CCIS-V4-011); whether a cycle is bounded (gap G-09, row 5.3); execution-profile feasibility and pin resolution (row 2.4); layers 6 to 8 (row 2.3). `criteria` parameters are never reported as unused, because their use lies outside the expression tree.
 
 ## What is staged
 

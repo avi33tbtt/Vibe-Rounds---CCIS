@@ -221,11 +221,12 @@ test('the catalogue lists every new rule id once, with the severity the rules gi
   const idList = RULES.map((x) => x.ruleId);
   assert.equal(new Set(idList).size, idList.length);
   const added = SEMANTIC_RULES.map((x) => x.ruleId);
-  assert.equal(added.length, 16);
+  assert.equal(added.length, 19); // 16 from row 2.2, 3 from row 2.2b
   for (const id of added) assert.equal(idList.filter((x) => x === id).length, 1, id);
   for (const x of SEMANTIC_RULES) assert.match(x.ruleId, new RegExp(`^CCIS-V${x.layer}-\\d{3}$`));
-  assert.deepEqual(SEMANTIC_RULES.filter((x) => x.severity === 'warning').map((x) => x.ruleId), ['CCIS-V4-007', 'CCIS-V4-008', 'CCIS-V5-007']);
+  assert.deepEqual(SEMANTIC_RULES.filter((x) => x.severity === 'warning').map((x) => x.ruleId), ['CCIS-V4-007', 'CCIS-V4-008', 'CCIS-V4-011', 'CCIS-V5-007']);
   // Every id in the catalogue has a handmade case above (or is covered by an example).
   const covered = new Set(cases.flatMap((c) => c[3]));
-  for (const id of added) assert.ok(covered.has(id), `no handmade case for ${id}`);
+  // V4-009 to V4-011 have their handmade cases in test/ccis-validator-element.test.js (row 2.2b).
+  for (const id of added.filter((x) => !['CCIS-V4-009', 'CCIS-V4-010', 'CCIS-V4-011'].includes(x))) assert.ok(covered.has(id), `no handmade case for ${id}`);
 });

@@ -72,7 +72,7 @@ test('in jsdom the stub runs, state is counts only, and bundled checksumOf equal
   const dom = new JSDOM(html, { runScripts: 'dangerously' });
   const w = dom.window;
   assert.match(w.document.getElementById('status').textContent, /^Ready\./);
-  assert.equal(JSON.stringify(w.ccisApp.state()), JSON.stringify({ marketLoaded: false, entries: 0, runs: 0 }));
+  assert.equal(JSON.stringify(w.ccisApp.state()), JSON.stringify({ marketLoaded: false, entries: 0, runs: 0, refused: false }));
   const files = marketFiles();
   assert.ok(files.length >= 7);
   for (const [rel, text] of files) assert.equal(w.ccisApp.checksumOf(text), checksumOf(text), rel);

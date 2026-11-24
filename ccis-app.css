@@ -4,3 +4,9 @@ body{margin:0;font:16px/1.5 system-ui,sans-serif;background:var(--bg);color:var(
 .banner{margin:0;padding:.6rem 1rem;font-weight:600;background:var(--warn-bg);color:var(--warn-fg)}
 main{padding:1rem;max-width:60rem;margin:0 auto}
 .muted{color:var(--muted)}
+h2{font-size:1.15rem}
+button,input{font:inherit}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:.3rem .5rem;border-bottom:1px solid var(--muted)}
+.refusal{border:2px solid var(--warn-fg);padding:.4rem 1rem;background:var(--warn-bg);color:var(--warn-fg)}

@@ -44,7 +44,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 |----|-----------|------|--------|------|------------|------------------|
 | 0.0 to 3.7 | `docs/TRACKER-ARCHIVE.md` | All completed rows (Phases 0 to 3.7, DS0 to DS7) | DONE | to 2026-11-24 |  | Moved to the archive. Latest: 3.7 CLI over the market. |
 | 3.8 | chunk-3.8-app-shell.md | Browser app 1: pure SHA-256 (build only), esbuild pipeline to one hashed inline script, `index.html` shell with banners, `--check` | DONE | 2026-11-24 | 2 new modules, 1 script, 3 small assets, 1 generated page, 2 tests | ccis-sha256.js, build-app.js, index.html (1.2 MB); 14 tests pass in 2 files; 3 breakage checks seen failing. Full npm test NOT run (owner). D-146. Next: 3.8a chunk file. |
-| 3.8a | (written when reached) | Browser app 1b: market folder loader (`loadMarket` through the seam), market view, refusal view | TODO |  | 2 modules, 1 test | Needs 3.8 (done). Chunk file first. |
+| 3.8a | chunk-3.8a-market-loader.md | Browser app 1b: market folder loader (`loadMarket` through the seam), market view, refusal view | DONE | 2026-11-24 | 2 modules, 1 test | ccis-app-market.js, ccis-app-market-view.js, test; 23 tests pass in 3 files; 3 breakages seen failing; full npm test: 1 stale test fixed (D-149). D-147 to D-149. Next: 3.8b chunk file. |
 | 3.8b | (written when reached) | Browser app 1c: envelope input, import report view (no values), Clear, no-storage scan | TODO |  | 1 module, 1 test | Needs 3.8a. Chunk file first. |
 | 3.8c | (written when reached) | Browser app 1d: context and pathway selector | TODO |  | 1 module, 1 test | Needs 3.8b. Chunk file first. |
 | 3.8d | (written when reached) | Browser app 1e: compatibility catalogue with explanations (including Needs data and Incompatible views) | TODO |  | 1 module, 1 test | Needs 3.8c. Chunk file first. |
@@ -62,7 +62,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)
 - Row 3.8 took the defaults (D-146): `esbuild` 0.28.2 pinned, pure SHA-256 in the bundle only, `index.html` committed with `--check` in CI. Say so if any should change. Run `npm ci` after you pull (new dependency).
-- Run the full `npm test` once on your machine (not run on a fresh clone for 3.4a to 3.7; last full run: 545 pass).
+- Run the full `npm test` once on your machine. On a fresh clone at 3.8a it ran 664 tests: all pass except the two known F-6 TODO gaps.
 - Decide F-10, F-11 and D-112 (they affect rows 3.9 to 3.9b).
 - Commit `market/` as it is (it holds `.gitattributes` with `* -text`).
 - Still open: clinician owner, D-002, F-4 to F-9, D-099, branch protection; before real data: safety, security, privacy, licence checks.

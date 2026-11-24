@@ -34,7 +34,7 @@ export function mountImportView({ document, root, getMarket, onState }) {
   root.append(el('h2', 'Import'), label, document.createTextNode(' '), clear, result);
 
   let ticket = 0;
-  const state = (o) => onState({ imported: false, refused: false, accepted: 0, rejected: 0, unmapped: 0, ambiguous: 0, message: NONE, ...o });
+  const state = (o) => onState({ imported: false, refused: false, accepted: 0, rejected: 0, unmapped: 0, ambiguous: 0, applied: [], message: NONE, ...o });
   const stop = (sentence, refused) => {
     result.replaceChildren(el('p', sentence, 'refusal'), el('p', S_NOTE, 'muted'));
     state({ refused, message: sentence });
@@ -65,7 +65,7 @@ export function mountImportView({ document, root, getMarket, onState }) {
       el('p', S_NOTE, 'muted'),
     ].filter(Boolean);
     result.replaceChildren(...parts);
-    state({ imported: true, accepted: c.accepted, rejected: c.rejected, unmapped: c.unmapped, ambiguous: c.ambiguous, message: `Envelope read: ${c.total} records. Nothing has been run.` });
+    state({ imported: true, applied: v.applied, accepted: c.accepted, rejected: c.rejected, unmapped: c.unmapped, ambiguous: c.ambiguous, message: `Envelope read: ${c.total} records. Nothing has been run.` });
   }
 
   input.addEventListener('change', async () => {

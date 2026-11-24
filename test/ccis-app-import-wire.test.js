@@ -88,7 +88,7 @@ test('page: state() keeps its four keys and neither seam holds a market string',
   await pickMarket(w, picked());
   await pickEnvelope(w);
   assert.deepEqual(Object.keys(w.ccisApp.state()), ['marketLoaded', 'entries', 'runs', 'refused']);
-  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['checksumOf', 'importState', 'state']);
+  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['checksumOf', 'importState', 'selectorState', 'state']);
   const shown = JSON.stringify([w.ccisApp.state(), w.ccisApp.importState()]);
   const secret = JSON.parse(readFileSync(new URL(`market/${firstArtefact()}`, ROOT), 'utf8'));
   const strings = JSON.stringify(secret).match(/"[^"]{16,}"/g) ?? [];

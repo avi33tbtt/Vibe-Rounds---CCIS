@@ -71,6 +71,17 @@ node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects
 - **The equivalence harness (`compareRoutes`) is proven here on three stand-ins for one route** (the committed text, an in-memory copy and a re-formatted copy). The code SDK (row 4.2), the form editor (4.4) and FHIR Mode (6.1) are not built; they plug into the same harness.
 - **Limits:** array order is significant, so two routes that list the same items in a different order give different bytes. A lone decision node or terminology binding has no manifest and is refused (C-008). One artefact is compiled at a time; a bundle of pinned artefacts and the check of a pin at use come with rows 3.x. No signing.
 
+### Import (row 3.1)
+
+`ccis-import.js` is the importer library: `importEnvelope(envelope, { held, supportedEnvelopeMajors, expectedChecksum })` turns one EMR export into a **canonical context** (`ccis-context/1`) and an **import report**. It reads no files and makes no network request. `held` is the list of artefact documents the app holds. The command-line `import` command comes with row 3.7.
+
+- **Four categories, one per record.** Every observation, event and applied reference is `accepted`, `rejected`, `unmapped` or `ambiguous`, and the counts add up to the record count. The context holds only the accepted records, unchanged and sorted by `id`, with a `sha256:` checksum. The report keeps the `ref`, a reason code and a category for the others, never their content.
+- **Rejected:** entered in error; source class, state or kind not permitted by the field; a unit the field does not permit; a correction of an id that is not in the envelope. **Unmapped:** the concept is not a field of an applied element.
+- **No unit conversion at import.** A unit that is not permitted is rejected, never converted or assumed. Conversion happens only in the executor, through a package's declared `convert`. No time, zone or value is ever filled in; unknown stays unknown, and the report notes `recorded-time-unknown` and `time-zone-unknown`.
+- **`ambiguous` is always 0 for the snake package.** Conflicting observations are kept and handled by the executor's omission rule (D-050). The report format allows `ambiguous`; the importer does not produce it yet.
+- **Whole-envelope refusal.** A file that is not an object, has an unsupported major version, fails the schema or carries an unrecognised member (identity and narrative have no member, so they arrive as one), applies an artefact version the app does not hold, uses a record id twice, or does not match `expectedChecksum` is refused with no records and no context. The reason never names the member or quotes the content.
+- All `x-` members are ignored and listed in `ignored` by JSON pointer. `ccis-demo-loader.js` is unchanged and still runs the demo until the switch in rows 3.7 and 3.11.
+
 ## What is staged
 
 Shown, but not the real thing. Each is labelled in the viewer.

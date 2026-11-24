@@ -123,6 +123,15 @@ node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects
 - **Rule trace.** One entry per node visited: the states found, the number and ids of the records (never values), every outcome considered in package order with each test and whether it passed, and the outcome taken. It is a separate member; the run-result schema is unchanged.
 - **Oracle.** The 33 routes (32 cases plus the EMR export) and the node results equal the demo walker's.
 
+### Run planner and run records (row 3.5)
+
+`ccis-run.js` plans a run, executes it and writes one immutable run record. It is pure (no file, clock, network, randomness or `eval`). `planRun` uses the 3.2 compatibility result to decide what may run; `executeRun` walks the pathway (3.4b) and runs each allowed analytic (3.4a); `verifyRecord`, `rerunFromRecord` and `compareRerun` check and repeat a record. Refusals are R-001 to R-011 in `RUN_REFUSALS`.
+
+- **One record per request.** The pathway is the record's `package`; the analytics, with their checksums, are in `x-analytics`. Results are node results in route order, then analytic results by analytic id.
+- **The id is an address.** `run-` plus the SHA-256 of the run's inputs (versions and checksums, snapshot, parameters, evaluation time, `corrects`, plan options). A changed version, observation, parameter or time gives a different id. A correction is a new record that names the original.
+- **Skipped, not guessed.** A package 3.2 does not allow to run (Needs data, Incompatible) is skipped and listed in `x-plan`. `request.runNeedsData: true` runs Needs data packages too (see F-10). Nothing runnable is a refusal and no record. A refused import or a binder refusal is a `failed` record with no results.
+- **Rerun.** `rerunFromRecord` needs only the record and the same artefacts; the new record is byte-identical, id included. `verifyRecord` detects an altered record; it cannot prevent one (storage is row 3.7).
+
 ## What is staged
 
 Shown, but not the real thing. Each is labelled in the viewer.

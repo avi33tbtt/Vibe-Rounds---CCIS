@@ -91,10 +91,12 @@ export function mountImportView({ document, root, getMarket, onState }) {
     show(importReportView(importEnvelope(parsed, { held: heldFromMarket(market) })));
   });
 
-  clear.addEventListener('click', () => {
+  const reset = () => {
     ticket += 1;
     input.value = '';
     result.replaceChildren();
     state({});
-  });
+  };
+  clear.addEventListener('click', reset);
+  return { reset };
 }

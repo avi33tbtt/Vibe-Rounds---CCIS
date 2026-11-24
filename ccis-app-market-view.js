@@ -30,7 +30,7 @@ export function mountMarketView({ document, root, onState }) {
   root.append(el('h2', 'Market'), label, document.createTextNode(' '), clear, result);
 
   let ticket = 0;
-  const report = (loaded, entries, refused, message) => onState({ loaded, entries, refused, message });
+  const report = (loaded, entries, refused, message, market = null) => onState({ loaded, entries, refused, message, market });
 
   function showMarket(market) {
     const view = marketView(market);
@@ -52,7 +52,7 @@ export function mountMarketView({ document, root, onState }) {
       el('p', 'A loaded market is not a trusted market: a checksum shows the same bytes, not who published them or that they are safe. Validation records are software checks, not clinical safety.', 'muted'),
       wrap,
     );
-    report(true, view.rows.length, false, `Market loaded: ${view.rows.length} entries. Nothing has been run.`);
+    report(true, view.rows.length, false, `Market loaded: ${view.rows.length} entries. Nothing has been run.`, market);
   }
 
   function showRefusal(r) {

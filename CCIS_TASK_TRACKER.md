@@ -30,6 +30,8 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 
 **Added 2026-11-23 (demo slice and roadmap coordination).** Rows DS0 to DS7 build a small, clearly labelled demo runner so the EMR and CCIS can be shown end to end (scope: `docs/DEMO-SLICE.md`). They use the `ccis-demo-` file prefix and are replaced by rows 2.x and 3.x, which stay `LOCKED`. The fixtures remain the regression oracle. Global build order across both repos: CCIS 1.5b -> EMR B5a, B5b -> DS1 to DS4 -> EMR DM1, DM2a, DM2b, DM3 -> DS5 to DS7 -> EMR DM4. Roadmap coordination: `docs/ROADMAP-COORDINATION.md`.
 
+**Stage 2 started 2026-11-24 (owner: "start stage 2").** Phase 3 rows 3.1 to 3.11 are `TODO`, one chunk file at a time, in order. Phases 4 to 6 stay `LOCKED` until CCIS 0.1.0 (row 3.11).
+
 ---
 
 ## STATUS LEGEND
@@ -75,7 +77,17 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 2.3 | chunk-2.3-validator-layers-6-8.md | Validator layers 6 to 8 (executable safety, test verification, governance); report writer split to 2.3a | DONE | 2026-11-24 | 1 module, pipeline and CLI edit, 1 test, ~9 rule ids | ccis-validator-governance.js, 10 ids, --fixtures, new test; 2.1/2.2 tests adjusted. npm test NOT run (owner request); 3 breakage checks seen. D-095 to D-097. |
 | 2.3a | chunk-2.3a-report-writer.md | Report writer: validation record from a validator result (subject, versions, five assurance members) | DONE | 2026-11-24 | 1 module, 1 CLI edit, 1 test | ccis-validation-record.js, --record, new test. npm test NOT run (owner request); 3 breakage checks seen. Nodes/bindings get no record. D-098 to D-100. |
 | 2.4 | chunk-2.4-compiler.md | Compiler: canonical form, checksum, equivalence harness, fail closed | DONE | 2026-11-24 | 1 module, 1 test, 1 CLI edit, 1 fixture, ~8 refusal ids | ccis-compile.js, compile command, 25 tests; npm test 466 pass, 0 fail; 3 breakage checks seen. A-005. Harness proven on stand-ins. D-102 to D-104. Next: 3.x LOCKED. |
-| 3.1 to 3.11 | (written when reached) | Importer, compatibility, executor, run records, local marketplace, CLI, browser app, hardening, slice, CCIS 0.1.0 | LOCKED |  |  | Stage 2. Replaces the demo runner (DS1 to DS5); keep `ccis-cli.js` interface and fixtures. 3.11 ends with the user's limitations review. |
+| 3.1 | chunk-3.1-importer.md | Importer: envelope to canonical context + import report (no silent loss, entered-in-error rejected, no unit conversion at import) | TODO |  | 1 module, 1 test | Chunk file written 2026-11-24; awaiting your approval. Build follows at the next "do next". No schema or spec change. |
+| 3.2 | (written when reached) | Compatibility: six checks, five outcomes with reasons, never guess a mapping; execution policy v0 | TODO |  |  | Needs 3.1. First write the chunk file, then stop for your approval. |
+| 3.3 | (written when reached) | Executor part 1: expression interpreter, operator whitelist, three-valued logic, step and depth limits, no eval | TODO |  |  | Needs 3.2. |
+| 3.4 | (written when reached) | Executor part 2: operator library v0 and decision-node walker with rule trace; reference packages match hand calculations | TODO |  |  | Needs 3.3. Must not rely on record order (3.1 sorts by id). |
+| 3.5 | (written when reached) | Run planner, batch runs, result validation, immutable content-addressed run records, byte-identical rerun | TODO |  |  | Needs 3.4. Uses the 3.1 context and envelope checksums. |
+| 3.6 | (written when reached) | Local test marketplace: publish (passing validator report and checksum), resolve, pin; lint refuses patient data | TODO |  |  | Needs 2.4. Pin verification (REQ-094) lands here. |
+| 3.7 | (written when reached) | CLI: validate, import, list compatible, run, show | TODO |  |  | Needs 3.5, 3.6. Keep the `ccis-cli.js` interface and fixtures. |
+| 3.8 | (written when reached) | Browser app 1: import workspace, report, selectors, compatibility catalogue | TODO |  |  | Needs 3.7. |
+| 3.9 | (written when reached) | Browser app 2: multi-select run, results workspace, run record export | TODO |  |  | Needs 3.8. |
+| 3.10 | (written when reached) | Browser hardening: strict CSP, shared escaper, no inline handlers, jsdom plus one real-browser smoke test | TODO |  |  | Needs 3.9. |
+| 3.11 | (written when reached) | Slice acceptance and CCIS 0.1.0: end-to-end test, negative tests, freeze, limitations list | TODO |  |  | Needs 3.10. Ends with your review of the limitations list before Phase 4. |
 | 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | After 0.1.0. |
 | 5.1 to 5.7 | (written when reached) | Templates, decision graphs, research-to-package, cohorts, access model | LOCKED |  |  | After Phase 4. 5.7 needs the D-002 server decision. |
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
@@ -83,6 +95,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 ## ITEMS ONLY YOU CAN DO
 - `npm test` was run once for 2.4 on a fresh clone: 466 pass, 0 fail, 1 todo (F-6). That also covers the earlier "not run" rows 1.6 to 2.3a and the DS5/DS6 failures, which no longer fail. Run it once on your machine after you push.
 - 2.4 took the defaults for its four questions: A-005 approved with the chunk file; array order is significant; lone nodes and bindings are refused; no schema for compiled metadata (later, with 3.6). Say so if you want any changed.
+- Review and approve `plan-chunks/chunk-3.1-importer.md` (five questions with defaults); say "approve" or list changes, then "do next".
 - Decide whether decision nodes and terminology bindings should get a manifest (or another way to name their version) so they can have validation records (D-099).
 - Findings F-7 and F-8 (`ccis/fixtures/snake/README.md`): decide whether a later package version adds a node 1 outcome for an unknown result and an estimate warning on needs-data intervals.
 - Follow `docs/DEMO-RUNBOOK.md` in the EMR repo on a clean machine with this commit (EMR DM4c asks for this).

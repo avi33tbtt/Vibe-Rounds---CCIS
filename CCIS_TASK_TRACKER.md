@@ -21,7 +21,7 @@ Trigger phrase: **"do next"**. Keep the session small (free-tier limit).
 9. **Deliver as one zip**: only new or changed files, plus the updated tracker (status `DONE`, date, files, ONE line of notes, 200 characters max). **Always** package them in a single `.zip` named `ccis-<task-id>-<date>.zip` (for example `ccis-1.3a-2026-11-24.zip`) whose internal folders are exactly the repo-relative paths (`ccis/schemas/...`, `plan-chunks/...`, `test/...`, `.github/workflows/...`), so extracting it at the repo root puts every file in place. Include `DECISIONS.md` and any changed `CHANGELOG`/`TRACEABILITY` file. List the zip contents (`unzip -l`) to check the structure, then present the zip with `present_files`. Do not present loose files, except a lone file the user asks to see. This also applies to tasks that only write a chunk file. Summary: 2 to 4 sentences: what was built, what needs the user's attention, what the next task is, and one line: "Extract the zip at the repo root, commit, push."
 10. **Never** edit a chunk file after its row has started; add a new row instead. Never mark `DONE` unless implemented and verified.
 11. If everything reachable is `DONE`, say so and offer a review.
-12. **Free-tier budget** (added 2026-11-24): read at most 5 files in a task; a row creates at most 3 new modules, or 1 module plus 1 test plus small assets; no row adds more than one dependency. If a chunk file would break this, write it narrower and add the remainder as new rows first. Completed rows live in `docs/TRACKER-ARCHIVE.md` and the long owner list in `docs/OWNER-ITEMS.md`: do not read either.
+12. **Free-tier budget** (added 2026-11-24; tightened D-151): read at most 5 files in a task, and for any source file over 5 KB read only the line ranges the chunk file names (`sed -n`), never the whole file; a chunk file stays under 5 KB; a test file has at most 8 cases; run only the new test file unless the owner says otherwise; a row creates at most 3 new modules, or 1 module plus 1 test plus small assets; no row adds more than one dependency. If a chunk file would break this, write it narrower and add the remainder as new rows first. Completed rows live in `docs/TRACKER-ARCHIVE.md` and the long owner list in `docs/OWNER-ITEMS.md`: do not read either.
 
 Other commands: `status` (summary only), `redo <id>`, `skip <id>`, `split <id>`, `start stage 2`.
 
@@ -45,16 +45,25 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 0.0 to 3.7 | `docs/TRACKER-ARCHIVE.md` | All completed rows (Phases 0 to 3.7, DS0 to DS7) | DONE | to 2026-11-24 |  | Moved to the archive. Latest: 3.7 CLI over the market. |
 | 3.8 | chunk-3.8-app-shell.md | Browser app 1: pure SHA-256 (build only), esbuild pipeline to one hashed inline script, `index.html` shell with banners, `--check` | DONE | 2026-11-24 | 2 new modules, 1 script, 3 small assets, 1 generated page, 2 tests | ccis-sha256.js, build-app.js, index.html (1.2 MB); 14 tests pass in 2 files; 3 breakage checks seen failing. Full npm test NOT run (owner). D-146. Next: 3.8a chunk file. |
 | 3.8a | chunk-3.8a-market-loader.md | Browser app 1b: market folder loader (`loadMarket` through the seam), market view, refusal view | DONE | 2026-11-24 | 2 modules, 1 test | ccis-app-market.js, ccis-app-market-view.js, test; 23 tests pass in 3 files; 3 breakages seen failing; full npm test: 1 stale test fixed (D-149). D-147 to D-149. Next: 3.8b chunk file. |
-| 3.8b | chunk-3.8b-envelope-import.md | Browser app 1c: envelope input, import report view (no values), Clear, no-storage scan | TODO | 2026-11-24 | 1 module, 1 test | Chunk file written 2026-11-24, awaiting your approval. D-150. Next "do next" builds it. |
-| 3.8c | (written when reached) | Browser app 1d: context and pathway selector | TODO |  | 1 module, 1 test | Needs 3.8b. Chunk file first. |
-| 3.8d | (written when reached) | Browser app 1e: compatibility catalogue with explanations (including Needs data and Incompatible views) | TODO |  | 1 module, 1 test | Needs 3.8c. Chunk file first. |
-| 3.9 | (written when reached) | Browser app 2: multi-select and run wiring (planner and run module in the page, no results display yet) | TODO |  | 1 module, 1 test | Needs 3.8d. |
-| 3.9a | (written when reached) | Browser app 2b: results workspace (values with units, decision path with rule trace, missingness, scope, limitations, provenance) | TODO |  | 1 module, 1 test | Needs 3.9. |
-| 3.9b | (written when reached) | Browser app 2c: run record export and verification line (see F-11) | TODO |  | 1 module, 1 test | Needs 3.9a. |
-| 3.10 | (written when reached) | Browser hardening: strict CSP, shared escaper, no inline handlers, bundle-wide forbidden-API scan, jsdom tests | TODO |  | 1 script or test, 1 test | Needs 3.9b. |
-| 3.10a | (written when reached) | One real-browser smoke test (adds one pinned dev dependency; owner approves first) | TODO |  | 1 test, 1 dependency | Needs 3.10. |
-| 3.11 | (written when reached) | Slice acceptance: one-command end-to-end test, required-observation removal, version/input change gives a distinct record, negative tests | TODO |  | 1 test, 1 script | Needs 3.10a. |
-| 3.11a | (written when reached) | Freeze CCIS 0.1.0, limitations list. Ends with your review before Phase 4 | TODO |  | docs only | Needs 3.11. |
+| 3.8b | chunk-3.8b-envelope-import.md | Browser app 1b-i: pure import report view and `heldFromMarket` (no DOM) | TODO | 2026-11-24 | 1 module, 1 test, 0 edits | Chunk file narrowed 2026-11-24 (D-151), awaiting your approval. Next "do next" builds it. |
+| 3.8b.1 | (written when reached) | Browser app 1b-ii: envelope file input, size cap, parse, import, render, Clear (module and jsdom test only, not wired) | TODO |  | 1 module, 1 test | Needs 3.8b. Chunk file first. |
+| 3.8b.2 | (written when reached) | Browser app 1b-iii: wire into `ccis-app.js`, template, CSS, market clear resets import, no-storage scan, rebuild `index.html` | TODO |  | 0 new modules, 1 test, 4 small edits | Needs 3.8b.1. Chunk file first. |
+| 3.8c | (written when reached) | Browser app 1c-i: pure context and pathway selector model | TODO |  | 1 module, 1 test | Needs 3.8b.2. Chunk file first. |
+| 3.8c.1 | (written when reached) | Browser app 1c-ii: selector view and wiring | TODO |  | 1 module, 1 test | Needs 3.8c. |
+| 3.8d | (written when reached) | Browser app 1d-i: pure catalogue model (explanations, Needs data, Incompatible) | TODO |  | 1 module, 1 test | Needs 3.8c.1. |
+| 3.8d.1 | (written when reached) | Browser app 1d-ii: catalogue view and wiring | TODO |  | 1 module, 1 test | Needs 3.8d. |
+| 3.9 | (written when reached) | Browser app 2-i: in-page run adapter (planner and run through the seam, bundle check, no UI) | TODO |  | 1 module, 1 test | Needs 3.8d.1. |
+| 3.9.1 | (written when reached) | Browser app 2-ii: multi-select and run wiring (no results display) | TODO |  | 1 module, 1 test | Needs 3.9. |
+| 3.9a | (written when reached) | Browser app 2b-i: pure results model (values with units, decision path, missingness, scope, limitations, provenance) | TODO |  | 1 module, 1 test | Needs 3.9.1. |
+| 3.9a.1 | (written when reached) | Browser app 2b-ii: results workspace view and wiring | TODO |  | 1 module, 1 test | Needs 3.9a. |
+| 3.9b | (written when reached) | Browser app 2c-i: pure run record export and verification line (see F-11) | TODO |  | 1 module, 1 test | Needs 3.9a.1. |
+| 3.9b.1 | (written when reached) | Browser app 2c-ii: export button and wiring | TODO |  | 1 module, 1 test | Needs 3.9b. |
+| 3.10 | (written when reached) | Browser hardening 1: strict CSP, no inline handlers, bundle-wide forbidden-API scan | TODO |  | 1 script or test, 1 test | Needs 3.9b.1. |
+| 3.10.1 | (written when reached) | Browser hardening 2: shared escaper, jsdom tests over every view | TODO |  | 1 module, 1 test | Needs 3.10. |
+| 3.10a | (written when reached) | One real-browser smoke test (adds one pinned dev dependency; owner approves first) | TODO |  | 1 test, 1 dependency | Needs 3.10.1. |
+| 3.11 | (written when reached) | Slice acceptance 1: one-command end-to-end test | TODO |  | 1 test, 1 script | Needs 3.10a. |
+| 3.11.1 | (written when reached) | Slice acceptance 2: required-observation removal, version or input change gives a distinct record, negative tests | TODO |  | 1 test | Needs 3.11. |
+| 3.11a | (written when reached) | Freeze CCIS 0.1.0, limitations list. Ends with your review before Phase 4 | TODO |  | docs only | Needs 3.11.1. |
 | 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | After 0.1.0. |
 | 5.1 to 5.7 | (written when reached) | Templates, decision graphs, research-to-package, cohorts, access model | LOCKED |  |  | After Phase 4. 5.7 needs the D-002 server decision. |
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |

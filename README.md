@@ -94,6 +94,16 @@ node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects
 - **Execution policy v0** (`executionPolicy`): only Compatible and Compatible with limitations may run. Preview runs every status except `rejected` and `withdrawn` with the banner "Preview. Prototype, synthetic data only, not validated, not for clinical use."; a validated status shows its scope (version, population, setting, intended use), a conditional one also says its conditions must be shown, and `reviewed` never reads as validated. Governed mode needs a validated status whose scope names the exact version.
 - **Not checked here:** conflicting observations, terminology binding resolution, enabled parameter values (so every snake package is at best "with limitations"), pins and published checksums (3.6), running anything (3.3 to 3.5). The command-line `list compatible` comes with row 3.7.
 
+### Executor, part 1 (row 3.3)
+
+`ccis-exec.js` is the whitelist expression interpreter. It reads no files, makes no network request and uses no `eval`, `Function`, dynamic import, clock or randomness. It does not read the context, convert units, do time arithmetic or walk decision nodes (rows 3.4 and 3.5).
+
+- **Two calls.** `prepareAnalytic({ analytic, checksum, runtime })` recomputes the canonical checksum (a mismatch is X-012), runs every static check, lists all refusals (sorted) and returns a deep-frozen prepared form. `evaluateOutput({ prepared, outputId, inputs, parameters })` evaluates one output and accepts nothing but a prepared form. A refusal never leaves a partial value.
+- **Implemented: 12 of the 18 whitelisted operators:** `and or not is-present state-of eq ne lt le gt ge if`. `add sub time-diff convert count select` are refused as a whole (X-002) until row 3.4, so all four snake analytics refuse at prepare for now.
+- **Three-valued.** Unknown carries the input or parameter states it came from (absent, unknown, not-collected, conflicting, parameter-not-enabled, unreadable) and never becomes false, zero or a default. `and` and `or` evaluate every argument; `if` with an unknown condition is unknown and visits neither branch.
+- **No implicit conversion.** Unlike types or units are X-010.
+- **Limits.** Steps per node visited, depth at prepare, output bytes of the canonical value. Refusal ids X-001 to X-014 are in `EXEC_REFUSALS`.
+
 ## What is staged
 
 Shown, but not the real thing. Each is labelled in the viewer.

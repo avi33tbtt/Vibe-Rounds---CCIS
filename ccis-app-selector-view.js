@@ -84,6 +84,7 @@ export function mountSelectorView({ document, root, onState }) {
 
   let held = null;
   const api = {
+    selectedPathwayKey: () => selection.pathwayKey,
     setMarket(market) {
       held = market ?? null;
       loaded = held !== null;

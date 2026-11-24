@@ -34,8 +34,10 @@ export function mountImportView({ document, root, getMarket, onState }) {
   root.append(el('h2', 'Import'), label, document.createTextNode(' '), clear, result);
 
   let ticket = 0;
+  let lastContext = null; // in this closure only; handed to the page through getContext, never put on window
   const state = (o) => onState({ imported: false, refused: false, accepted: 0, rejected: 0, unmapped: 0, ambiguous: 0, applied: [], message: NONE, ...o });
   const stop = (sentence, refused) => {
+    lastContext = null;
     result.replaceChildren(el('p', sentence, 'refusal'), el('p', S_NOTE, 'muted'));
     state({ refused, message: sentence });
   };
@@ -88,15 +90,18 @@ export function mountImportView({ document, root, getMarket, onState }) {
     } catch {
       return stop(S_JSON, true);
     }
-    show(importReportView(importEnvelope(parsed, { held: heldFromMarket(market) })));
+    const result = importEnvelope(parsed, { held: heldFromMarket(market) });
+    lastContext = result.ok === true && result.context ? result.context : null;
+    show(importReportView(result));
   });
 
   const reset = () => {
     ticket += 1;
+    lastContext = null;
     input.value = '';
     result.replaceChildren();
     state({});
   };
   clear.addEventListener('click', reset);
-  return { reset };
+  return { reset, getContext: () => lastContext };
 }

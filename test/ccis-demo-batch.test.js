@@ -30,6 +30,9 @@ test('analytic output counts equal the counts in the hand-calculated expected fi
   for (const c of index.cases) {
     const cls = (want[c.class] ??= {});
     for (const r of expectedOf(c).results) bump((cls[r.outputId] ??= {}), stateKey(r));
+    // conflicting-03 was written for analytics 0.1.0 and lists no completeness result (its notSpecified says so).
+    // On 0.1.1 the per-item table gives `conflict` when an item's records disagree (F-3 resolved in part, README), as in conflicting-04.
+    if (c.case === 'conflicting-03-two-status-records') bump((cls.itemStates ??= {}), 'conflict');
   }
   for (const [cls, v] of Object.entries(cohort.classes)) {
     for (const [out, counts] of Object.entries(want[cls])) assert.deepEqual(v.outputs[out], counts, `${cls} ${out}`);

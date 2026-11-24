@@ -66,7 +66,7 @@ test('every fixture opens, and every run shows its identity, versions, parameter
     const t = text(doc);
     for (const must of [rec.id, 'snake.documentation-path 0.1.0', 'Standard', 'Engine', 'Operator set', '2026-11-20T12:00:00Z (zone: stated)', 'Input snapshot (counts only)', 'Import report', 'Run limitations', 'targetIntervalDuration', 'populationScope']) assert.ok(t.includes(must), `${c.case}: ${must}`);
     assert.equal(all(doc, '#out section').find((s) => s.querySelector('h2').textContent === 'Input snapshot (counts only)').querySelectorAll('dd')[0].textContent, String(rec.snapshot.observations.length));
-    assert.equal(all(doc, 'h3').length, rec.results.length, c.case);
+    assert.equal(all(doc, '#out h3').length, rec.results.length, c.case); // result headings only; the roadmap card has its own h3 (DS6)
   }
 });
 

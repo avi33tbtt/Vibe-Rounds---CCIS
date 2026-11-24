@@ -17,6 +17,7 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm test
+      - run: node scripts/build-app.js --check
       - name: Run the demo from a clean checkout
         run: |
           npm run demo -- run --envelope ccis/fixtures/snake/emr-export/emr-demo-case.envelope.json --out "$RUNNER_TEMP/demo-record.json" --at 2026-11-24T12:00:00Z --demo-parameters

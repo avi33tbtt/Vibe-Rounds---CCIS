@@ -38,6 +38,10 @@ node ccis-cli.js run --market market --pathway snake.documentation-path --envelo
 node ccis-cli.js show run.json
 ```
 
+## Browser app shell (row 3.8)
+
+`node scripts/build-app.js` bundles `ccis-app.js` into one inline script (esbuild, with a pure SHA-256 standing in for `node:crypto` in the bundle only) and writes `index.html` with its script and style hashes in a strict CSP; `--check` fails if the committed file is stale. Open `index.html` in a browser: for now it shows only the banners and a ready line. It loads no market, reads no file and makes no network request; rows 3.8a onward add those one at a time.
+
 ## Validate an artefact (rows 2.1 to 2.3)
 
 All eight layers of the validator are built: syntax, structural, reference integrity (row 2.1), semantic, and graph and compatibility (rows 2.2, 2.2b), executable safety, test verification and governance (row 2.3). A layer that did not run is listed as **not run** with its reason, and "not run" is never a pass.

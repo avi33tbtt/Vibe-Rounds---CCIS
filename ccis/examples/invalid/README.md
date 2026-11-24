@@ -10,14 +10,15 @@ Prototype. Synthetic data only. Not for clinical use. **No validator exists yet.
 | 4 Semantic | `4-semantic/time-diff-on-code.json` | A time difference is taken over a code input. | No |
 | 5 Graph and compatibility | `5-graph-and-compatibility/transition-to-missing-stage.json` | A transition ends at a stage id that does not exist; a real stage becomes unreachable. | No |
 | 6 Executable safety | `6-executable-safety/extension-holds-code-text.json` | An `x-` member holds a harmless placeholder that looks like code. It is never run. | No |
-| 7 Test verification | **not built** | See layer 7 below. | n/a |
-| 8 Governance | `8-governance/validated-without-evidence.json` | Status `validated`, while the package's own evidence says none is claimed. | No |
+| 7 Test verification | `7-test-verification/test-expects-missing-output.json` | A package test expects an output id the package does not declare (one letter off). | No |
+| 8 Governance | `8-governance/validated-without-evidence.json` | Status `validated`, while the package's own evidence says none is claimed. (Carries a synthetic validation scope only because the schema requires one for that status.) | No |
+| 8 Governance (scope) | `8-governance/validated-for-another-version.json` | Status `validated` with a validation scope that names a different package version. The evidence statement is changed too, so only the scope rule fires; the three changes are one defect. | No |
 
-Layers 3, 4, 5, 6 and 8 pass the schemas on purpose: only the later validator layers can refuse them. A test proves this.
+Layers 3 to 8 pass the schemas on purpose: only the later validator layers can refuse them. A test proves this.
 
-## Layer 7 and the scope part of layer 8: amendment A-003 (approved; schema members added in row 1.6b)
+## Layer 7 and the scope part of layer 8: amendment A-003 (approved)
 
-Layer 7 checks a package's own tests against its fixtures. No schema has a place for a package to declare such a test, so there is nothing to verify and nothing to make invalid. The manifest also has no place for the version and scope a `validated` claim covers, so the layer 8 example above can only test the part the schemas can hold (a claim against the package's own evidence). `ccis/CHANGELOG.md` records the gap as proposed amendment **A-003**. Row `1.6b` added the schema members; row `1.6c` builds the layer 7 example and the scope example. The layer 8 example above now also carries a synthetic `validation` scope, because the schema requires one for status `validated`; that is not part of its defect. Nothing was stretched to fit.
+A-003 gave packages a place for their own `tests` and gave the manifest a `validation` scope (schema members added in row 1.6b). Row 1.6c built the layer 7 example and the scope example on top of them. Layer 7 checks a package's tests against the fixtures; nothing is run here, and a test carries no parameter values. All eight layers now have an example.
 
 ## Diagnostic shape
 

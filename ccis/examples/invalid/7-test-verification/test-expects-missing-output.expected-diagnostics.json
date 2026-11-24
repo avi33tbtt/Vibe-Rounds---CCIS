@@ -1,0 +1,26 @@
+{
+  "case": "test-expects-missing-output",
+  "layer": 7,
+  "layerName": "test-verification",
+  "base": "ccis/examples/snake/snake-interval.analytics.0.1.1.json",
+  "example": "ccis/examples/invalid/7-test-verification/test-expects-missing-output.json",
+  "schema": "analytics",
+  "changedPaths": [
+    "/tests/0/enables/0/parameter",
+    "/tests/0/enables/0/testOnly",
+    "/tests/0/expect/0/matchesFixture",
+    "/tests/0/expect/0/output",
+    "/tests/0/fixture",
+    "/tests/0/id"
+  ],
+  "defect": "The package declares one test. The fixture case and the enabled parameter exist, but the expected result names an output id one letter off the declared output. The schemas hold the member, so only layer 7 can refuse it. Nothing is run.",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "ruleId": "CCIS-V7-001",
+      "path": "/tests/0/expect/0/output",
+      "message": "The test expects an output that the package does not declare.",
+      "hint": "Use an output id from the package's outputs, or add the output to the package."
+    }
+  ]
+}

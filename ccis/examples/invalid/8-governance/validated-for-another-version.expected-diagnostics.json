@@ -1,0 +1,26 @@
+{
+  "case": "validated-for-another-version",
+  "layer": 8,
+  "layerName": "governance",
+  "base": "ccis/examples/snake/snake-interval.analytics.0.1.1.json",
+  "example": "ccis/examples/invalid/8-governance/validated-for-another-version.json",
+  "schema": "analytics",
+  "changedPaths": [
+    "/evidence/statement",
+    "/manifest/status",
+    "/manifest/validation/intendedUse",
+    "/manifest/validation/population",
+    "/manifest/validation/setting",
+    "/manifest/validation/version"
+  ],
+  "defect": "Status is validated and the scope is complete, but the scope names a version other than this package's version. The evidence statement is changed so the evidence rule does not also fire; the three changes form one defect (a claim for a version this is not). Passes the schemas.",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "ruleId": "CCIS-V8-002",
+      "path": "/manifest/validation/version",
+      "message": "The validation scope names a different package version from the one claimed as validated.",
+      "hint": "Validate this exact version and record its version in the scope, or return the status to draft."
+    }
+  ]
+}

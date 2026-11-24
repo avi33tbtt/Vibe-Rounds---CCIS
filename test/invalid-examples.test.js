@@ -11,11 +11,10 @@ const inv = new URL('../ccis/examples/invalid/', import.meta.url);
 const text = (u) => readFileSync(u, 'utf8');
 const parse = (u) => JSON.parse(text(u));
 const folders = readdirSync(inv, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort();
-const cases = folders.map((f) => {
-  const file = readdirSync(new URL(`${f}/`, inv)).find((n) => n.endsWith('.expected-diagnostics.json'));
+const cases = folders.flatMap((f) => readdirSync(new URL(`${f}/`, inv)).filter((n) => n.endsWith('.expected-diagnostics.json')).sort().map((file) => {
   const expected = parse(new URL(`${f}/${file}`, inv));
   return { folder: f, expected, exampleUrl: new URL(expected.example.replace(/^ccis\/examples\/invalid\//, ''), inv) };
-});
+}));
 
 const leaves = (x, p = '') => {
   if (x === null || typeof x !== 'object') return [[p, x]];
@@ -30,8 +29,8 @@ const changed = (a, b) => {
 };
 const has = (doc, ptr) => ptr.split('/').slice(1).reduce((o, k) => (o !== undefined && o !== null && typeof o === 'object' && k in o ? o[k] : undefined), doc) !== undefined;
 
-test('the eight layers: seven examples exist, layer 7 is not built and is listed as a gap', () => {
-  assert.deepEqual(cases.map((c) => c.expected.layer), [1, 2, 3, 4, 5, 6, 8]);
+test('the eight layers: every layer has an example (layer 8 has two)', () => {
+  assert.deepEqual(cases.map((c) => c.expected.layer), [1, 2, 3, 4, 5, 6, 7, 8, 8]);
   for (const c of cases) assert.ok(c.folder.startsWith(`${c.expected.layer}-`), c.folder);
   assert.match(text(new URL('README.md', inv)), /layer 7/i);
 });
@@ -98,7 +97,9 @@ test('the defects are plain: no number in any changed value, no threshold, dose 
     const doc = parse(c.exampleUrl);
     for (const p of c.expected.changedPaths) {
       const v = p.split('/').slice(1).reduce((o, k) => o[k], doc);
+      if (typeof v === 'boolean') continue;
       assert.equal(typeof v, 'string', `${c.folder} ${p}`);
+      if (/\/(version|fixture)$/.test(p)) continue; // identifiers, not clinical numbers
       assert.equal(/\d/.test(v), false, `${c.folder} ${p}`);
     }
   }
@@ -112,4 +113,24 @@ test('parameters in every example stay disabled and value-free except the one st
       if (!(c.expected.layer === 2 && i === 0)) assert.equal('value' in p, false, c.folder);
     }
   }
+});
+
+test('layer 7 example: real fixture case and parameter id, but an output id the package does not declare', () => {
+  const c = cases.find((x) => x.expected.layer === 7);
+  const doc = parse(c.exampleUrl);
+  const t = doc.tests[0];
+  const idx = parse(new URL('ccis/fixtures/snake/index.json', root));
+  assert.ok(idx.cases.some((k) => k.case === t.fixture), 'fixture case exists');
+  for (const e of t.enables) { assert.ok(doc.parameters.some((p) => p.id === e.parameter), 'parameter exists'); assert.equal(e.testOnly, true); }
+  for (const e of t.expect) assert.equal(doc.outputs.some((o) => o.id === e.output), false, 'output id is absent from the package');
+  assert.equal(doc.tests.length, 1);
+});
+
+test('layer 8 scope example: validated, complete scope, a version other than the manifest version, evidence rule not also triggered', () => {
+  const c = cases.find((x) => x.expected.layer === 8 && x.expected.case === 'validated-for-another-version');
+  const doc = parse(c.exampleUrl);
+  assert.equal(doc.manifest.status, 'validated');
+  assert.notEqual(doc.manifest.validation.version, doc.manifest.version);
+  assert.equal(/no evidence is claimed/i.test(doc.evidence.statement), false);
+  assert.deepEqual(c.expected.diagnostics.map((d) => d.ruleId), ['CCIS-V8-002']);
 });

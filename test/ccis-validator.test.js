@@ -89,18 +89,19 @@ test('no schema error is dropped: every invalid fixture gives one diagnostic per
   }
 });
 
-// (c) the examples for layers 4 to 8 pass layers 1 to 3, and layers 4 to 8 are reported as not run --------
+// (c) the examples for layers 6 to 8 pass layers 1 to 5, and layers 6 to 8 are reported as not run -------
+// (Layers 4 and 5 were built in row 2.2; their examples are matched exactly in test/ccis-validator-semantic.test.js.)
 
-test('the layer 4 to 8 examples pass layers 1 to 3 and the result lists layers 4 to 8 as not run, not passed', () => {
-  for (const dir of ['4-semantic', '5-graph-and-compatibility', '6-executable-safety', '7-test-verification', '8-governance']) {
+test('the layer 6 to 8 examples pass layers 1 to 5 and the result lists layers 6 to 8 as not run, not passed', () => {
+  for (const dir of ['6-executable-safety', '7-test-verification', '8-governance']) {
     const files = exampleFiles(dir);
     assert.ok(files.length >= 1, dir);
     for (const f of files) {
       const r = run(text(new URL(`${dir}/${f}`, invalidDir)));
       assert.deepEqual(errors(r), [], `${dir}/${f}`);
       assert.equal(r.outcome, 'no-errors-so-far');
-      for (const name of LAYER_NAMES.slice(0, 3)) assert.equal(r.layers[name].outcome, 'passed', `${f} ${name}`);
-      for (const name of LAYER_NAMES.slice(3)) {
+      for (const name of LAYER_NAMES.slice(0, 5)) assert.equal(r.layers[name].outcome, 'passed', `${f} ${name}`);
+      for (const name of LAYER_NAMES.slice(5)) {
         assert.equal(r.layers[name].outcome, 'not-run', `${f} ${name}`);
         assert.ok(r.layers[name].reason.length > 0);
         assert.deepEqual(r.layers[name].diagnostics, []);
@@ -397,5 +398,5 @@ test('the library has no dynamic code, file access, network, clock or randomness
   const src = text(new URL('../ccis-validator.js', import.meta.url));
   const forbidden = [/\beval\b/, /\bFunction\b/, /\bimport\s*\(/, /\brequire\s*\(/, /node:/, /\bfs\b/, /\bDate\b/, /Math\.random/, /performance\.now/, /\bfetch\b/, /\bprocess\b/, /XMLHttpRequest/, /WebSocket/, /localStorage/];
   for (const re of forbidden) assert.equal(re.test(src), false, String(re));
-  assert.deepEqual([...src.matchAll(/^import .* from '([^']+)';$|^\} from '([^']+)';$/gm)].map((m) => m[1] ?? m[2]), ['./ccis/validators/ccis-validators.js']);
+  assert.deepEqual([...src.matchAll(/^import .* from '([^']+)';$|^\} from '([^']+)';$/gm)].map((m) => m[1] ?? m[2]), ['./ccis/validators/ccis-validators.js', './ccis-validator-semantic.js']);
 });

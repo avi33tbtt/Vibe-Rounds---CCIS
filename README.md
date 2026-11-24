@@ -132,6 +132,10 @@ node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects
 - **Skipped, not guessed.** A package 3.2 does not allow to run (Needs data, Incompatible) is skipped and listed in `x-plan`. `request.runNeedsData: true` runs Needs data packages too (see F-10). Nothing runnable is a refusal and no record. A refused import or a binder refusal is a `failed` record with no results.
 - **Rerun.** `rerunFromRecord` needs only the record and the same artefacts; the new record is byte-identical, id included. `verifyRecord` detects an altered record; it cannot prevent one (storage is row 3.7).
 
+### Local test marketplace (row 3.6)
+
+`ccis-market.js` is a pure library with a local marketplace as a plain value (`{ index, files }`): `publishArtefact` (patient-data screen, then all eight validation layers with references resolved against what is already published, then add), `resolve` (highest satisfying version that is not rejected or withdrawn; deprecated is flagged), `pin` and `verifyPin` (a pin is `{ id, type, version, checksum }`; a missing checksum blocks use), and `loadMarket` (every file is checked against its index entry; any mismatch refuses the whole market). The folder `market/` is the same shape the later GitHub-hosted marketplace will have: `index.json` plus `artefacts/<id>/<version>.json` in canonical bytes, so `sha256sum` of a file is its checksum. `node scripts/market-build.js` rebuilds it from the snake examples (the only file that writes to disk); `--check` fails if the folder differs from a fresh build. Releases are immutable, there is no unpublish, and there is no clock. **Limits:** a checksum proves the same bytes, not who published them or that they are safe (signing is row 6.2); the patient-data lint is a screen, not a proof: it can miss data and can refuse a harmless string, and it names a rule and a path, never the value. Only elements, analytics packages and pathways can be published; decision nodes and terminology bindings wait for finding D-099.
+
 ## What is staged
 
 Shown, but not the real thing. Each is labelled in the viewer.

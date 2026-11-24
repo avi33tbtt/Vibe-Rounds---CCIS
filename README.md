@@ -82,6 +82,18 @@ node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects
 - **Whole-envelope refusal.** A file that is not an object, has an unsupported major version, fails the schema or carries an unrecognised member (identity and narrative have no member, so they arrive as one), applies an artefact version the app does not hold, uses a record id twice, or does not match `expectedChecksum` is refused with no records and no context. The reason never names the member or quotes the content.
 - All `x-` members are ignored and listed in `ignored` by JSON pointer. `ccis-demo-loader.js` is unchanged and still runs the demo until the switch in rows 3.7 and 3.11.
 
+### Compatibility (row 3.2)
+
+`ccis-compat.js` decides whether a package **can run on a context, and says why**. `resolveCompatibility({ pathway, held, context, runtime, request })` returns one entry for the pathway and one for each analytics package it lists. It reads no files and makes no network request. `context` may be `null` (a catalogue view before any import); `runtime` is passed in; `request.mode` is `preview` (default) or `governed`.
+
+- **Six checks, every entry lists all six:** artefact (held, in range, extensions understood), semantic (inputs match element fields, types and units; the context applies the held versions), schema (committed validators, standard major, context form), data readiness, runtime (engine, operator set, execution limits, FHIR), assurance suitability. Each check is `met`, `limited`, `needs-data`, `not-evaluable` or `not-met`, with its findings, a reason code (`CMP-n-nn`, 37 in the exported `COMPAT_REASONS`) and what would be needed.
+- **Five outcomes, exactly one:** Not eligible (status or scope does not permit the use), Incompatible, Needs data, Compatible with limitations, Compatible. **A check that cannot be evaluated gives Incompatible**, never Compatible. Needs data means the model matches and only data is lacking.
+- **No guessing.** Matching is by exact id, exact version or declared range, exact field key and unit. A different case, a similar name or a near version never matches; a unit differs unless a declared conversion covers it.
+- **Unknown stays unknown.** An input is missing when no observation exists, or the only ones are `absent`, `unknown` or `not-collected`. `not-applicable` and `explicitly-negative` are documented answers. Entered-in-error records are not in the context, so they count as missing.
+- **Pathway roll-up.** A required package counts in full; an optional package can only lower the pathway to "with limitations". The snake pathway lists both packages as optional.
+- **Execution policy v0** (`executionPolicy`): only Compatible and Compatible with limitations may run. Preview runs every status except `rejected` and `withdrawn` with the banner "Preview. Prototype, synthetic data only, not validated, not for clinical use."; a validated status shows its scope (version, population, setting, intended use), a conditional one also says its conditions must be shown, and `reviewed` never reads as validated. Governed mode needs a validated status whose scope names the exact version.
+- **Not checked here:** conflicting observations, terminology binding resolution, enabled parameter values (so every snake package is at best "with limitations"), pins and published checksums (3.6), running anything (3.3 to 3.5). The command-line `list compatible` comes with row 3.7.
+
 ## What is staged
 
 Shown, but not the real thing. Each is labelled in the viewer.
@@ -98,7 +110,7 @@ What the demo runner does not do, and where the real thing is planned.
 | Not done | Planned |
 |----------|---------|
 | The compiler. All eight validator layers and the validation record exist as a library and `validate` command, but the demo runner does not call them. A full UCUM check is not done (small built-in table). | Row 2.4 |
-| Importer with compatibility rules: only the exact 0.1.0 package is held, and the loader refuses anything else. The EMR maps its own version 1 to 0.1.0 outside CCIS. | Rows 3.x (importer, compatibility) |
+| The demo loader still decides what runs: only the exact 0.1.0 package is held, and it refuses anything else. The importer (3.1) and compatibility resolver (3.2) exist as libraries but the demo does not call them yet. The EMR maps its own version 1 to 0.1.0 outside CCIS. | Rows 3.7 and 3.11 (switch) |
 | Executor: a whitelist interpreter for only the operators the two snake analytics and two nodes use. An unknown operator is refused. | Row 3.4 |
 | Run records: built and content-addressed, but no batch records and no integrity or signature fields (gaps G-03, G-05). | Rows 3.x |
 | One package only (snake envenomation, two analytics, two nodes). No marketplace, no templates, no research-to-package, no AI drafting. | Rows 3.x, 4.x, 5.x |

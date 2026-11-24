@@ -89,23 +89,16 @@ test('no schema error is dropped: every invalid fixture gives one diagnostic per
   }
 });
 
-// (c) the examples for layers 6 to 8 pass layers 1 to 5, and layers 6 to 8 are reported as not run -------
+// (c) the examples for layers 6 to 8 pass layers 1 to 5 (their own layers are matched in test/ccis-validator-governance.test.js) ---
 // (Layers 4 and 5 were built in row 2.2; their examples are matched exactly in test/ccis-validator-semantic.test.js.)
 
-test('the layer 6 to 8 examples pass layers 1 to 5 and the result lists layers 6 to 8 as not run, not passed', () => {
+test('the layer 6 to 8 examples pass layers 1 to 5', () => {
   for (const dir of ['6-executable-safety', '7-test-verification', '8-governance']) {
     const files = exampleFiles(dir);
     assert.ok(files.length >= 1, dir);
     for (const f of files) {
       const r = run(text(new URL(`${dir}/${f}`, invalidDir)));
-      assert.deepEqual(errors(r), [], `${dir}/${f}`);
-      assert.equal(r.outcome, 'no-errors-so-far');
       for (const name of LAYER_NAMES.slice(0, 5)) assert.equal(r.layers[name].outcome, 'passed', `${f} ${name}`);
-      for (const name of LAYER_NAMES.slice(5)) {
-        assert.equal(r.layers[name].outcome, 'not-run', `${f} ${name}`);
-        assert.ok(r.layers[name].reason.length > 0);
-        assert.deepEqual(r.layers[name].diagnostics, []);
-      }
     }
   }
 });

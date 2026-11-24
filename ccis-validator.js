@@ -12,8 +12,9 @@
 //   artefact is reported, never assumed.
 // - `schema` names a committed validator (for example "analytics") and replaces the choice made from the
 //   artefact's own type. Used for schema fixtures that are not whole artefacts.
-// - Layers 4 and 5 (row 2.2) live in ccis-validator-semantic.js. Layers 6 to 8 are built in row 2.3; the result lists
-//   them as `not-run`. Not run is never a pass.
+// - Layers 4 and 5 (row 2.2) live in ccis-validator-semantic.js. Layers 6 to 8 (row 2.3) live in ccis-validator-governance.js. A layer that did not run is
+//   listed as `not-run` with a reason. Not run is never a pass.
+// - `fixtures` is a list of fixture case names for layer 7. Without it, a test's case name is not checked (a warning).
 // - A layer that fails (any error diagnostic) stops the later layers for that artefact (fail closed, CCIS-REQ-088).
 //
 // Diagnostics have the parts fixed in row 1.6 (CCIS-REQ-089): severity, ruleId, path, message, hint.
@@ -26,6 +27,7 @@ import {
   importReport as vReport, validationRecord as vRecord, runResult as vResult, runRecord as vRun,
 } from './ccis/validators/ccis-validators.js';
 import { semanticLayer, graphLayer, SEMANTIC_RULES } from './ccis-validator-semantic.js';
+import { executableSafetyLayer, testVerificationLayer, governanceLayer, GOVERNANCE_RULES } from './ccis-validator-governance.js';
 
 export const LAYER_NAMES = [
   'syntax', 'structural', 'reference-integrity', 'semantic',
@@ -47,6 +49,7 @@ export const RULES = [
   { ruleId: 'CCIS-V3-004', layer: 3, severity: 'error', summary: 'A referenced artefact is not among the known artefacts.' },
   { ruleId: 'CCIS-V3-005', layer: 3, severity: 'error', summary: 'A referenced artefact is known, but no known version satisfies the reference.' },
   ...SEMANTIC_RULES,
+  ...GOVERNANCE_RULES,
 ];
 
 const isObj = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
@@ -544,15 +547,13 @@ function comparePath(a, b) {
 }
 const ordered = (d) => d.slice().sort((a, b) => comparePath(a.path, b.path) || sign(a.ruleId, b.ruleId) || sign(a.message, b.message));
 
-const NOT_BUILT = 'This layer is built in a later row (2.3) and was not run. Not run is not a pass.';
-
 export function validateArtefact(input, options = {}) {
   const layers = {};
   // Layers 4 and 5 list diagnostics by rule id first, then path, so that the defects of one rule sit together
   // (the order of the row 1.6 expected files). Layers 1 to 3 order by path.
   const byRule = (d) => d.slice().sort((a, b) => sign(a.ruleId, b.ruleId) || comparePath(a.path, b.path) || sign(a.message, b.message));
   const mark = (name, diagnostics) => {
-    const later = name === 'semantic' || name === 'graph-and-compatibility';
+    const later = LAYER_NAMES.indexOf(name) >= 3;
     layers[name] = { outcome: hasError(diagnostics) ? 'failed' : 'passed', diagnostics: later ? byRule(diagnostics) : ordered(diagnostics) };
   };
   const skip = (name, reason) => { layers[name] = { outcome: 'not-run', reason, diagnostics: [] }; };
@@ -586,7 +587,16 @@ export function validateArtefact(input, options = {}) {
     const index = indexKnown(options.known);
     mark('graph-and-compatibility', graphLayer(first.doc, kind, { resolve: (ref) => resolve(index, ref) }));
   }
-  for (const name of LAYER_NAMES.slice(5)) skip(name, NOT_BUILT);
+  // Layers 6 to 8 (row 2.3). Each runs only if the one before passed (fail closed). `options.fixtures` is a list of fixture case names.
+  const chain = [
+    ['executable-safety', 'graph-and-compatibility', () => executableSafetyLayer(first.doc)],
+    ['test-verification', 'executable-safety', () => testVerificationLayer(first.doc, kind, { fixtures: options.fixtures })],
+    ['governance', 'test-verification', () => governanceLayer(first.doc)],
+  ];
+  for (const [name, before, check] of chain) {
+    if (layers[before].outcome !== 'passed') skip(name, stopped(before));
+    else mark(name, check());
+  }
 
   const diagnostics = LAYER_NAMES.flatMap((name) => layers[name].diagnostics);
   const outcome = hasError(diagnostics) ? 'failed' : 'no-errors-so-far';
@@ -603,11 +613,8 @@ export function renderText(result, label = 'artefact') {
   const lines = [`${label}: ${result.outcome}`];
   LAYER_NAMES.forEach((name, i) => {
     const l = result.layers[name];
-    lines.push(`  layer ${i + 1} ${name}: ${l.outcome}${l.outcome === 'not-run' && i < 5 ? ` (${l.reason})` : ''}`);
+    lines.push(`  layer ${i + 1} ${name}: ${l.outcome}${l.outcome === 'not-run' ? ` (${l.reason})` : ''}`);
   });
-  if (LAYER_NAMES.slice(5).every((n) => result.layers[n].outcome === 'not-run')) {
-    lines.push('  layers 6 to 8 were not run (built in row 2.3). Not run is not a pass.');
-  }
   for (const d of result.diagnostics) {
     lines.push(`  ${d.severity} ${d.ruleId} at ${where(d.path)}: ${d.message}`, `    hint: ${d.hint}`);
   }

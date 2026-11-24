@@ -2,7 +2,7 @@
 // Prototype. Synthetic data only. Not for clinical use.
 //
 //   node ccis-cli.js run --envelope <file> --out <file> --at <ISO time with offset> [--demo-parameters]
-//   node ccis-cli.js validate <file>... [--known <dir>] [--json]      (row 2.1, layers 1 to 3 of the validator)
+//   node ccis-cli.js validate <file>... [--known <dir>] [--fixtures <dir>] [--json]      (rows 2.1 to 2.3, layers 1 to 8 of the validator)
 //
 // Reads the envelope and the demo package (ccis/examples/snake), calls the pure demo modules and writes one
 // run record. No network, no clock: the evaluation time is the `--at` value and is required.
@@ -103,12 +103,13 @@ export function runDemo({ envelope, parameters, evaluationTime, artefacts }) {
 // ---- validate (row 2.1) -------------------------------------------------------------------------
 // Layers 1 to 3 over each file. The files given are known to each other; `--known <dir>` adds every
 // `.json` file in that folder (not its subfolders). References resolve only against these artefacts.
-const VALIDATE_USAGE = 'usage: node ccis-cli.js validate <file>... [--known <dir>] [--json]';
+const VALIDATE_USAGE = 'usage: node ccis-cli.js validate <file>... [--known <dir>] [--fixtures <dir>] [--json]';
 
 function validateMain(args, io) {
   try {
     const files = [];
     let knownDir = null;
+    let fixturesDir = null;
     let json = false;
     for (let i = 0; i < args.length; i += 1) {
       const a = args[i];
@@ -117,6 +118,11 @@ function validateMain(args, io) {
         const v = args[i + 1];
         if (v === undefined || v.startsWith('--')) usage('--known needs a value');
         knownDir = v;
+        i += 1;
+      } else if (a === '--fixtures') {
+        const v = args[i + 1];
+        if (v === undefined || v.startsWith('--')) usage('--fixtures needs a value');
+        fixturesDir = v;
         i += 1;
       } else if (a.startsWith('--')) usage(`unknown argument ${a}`);
       else files.push(a);
@@ -136,11 +142,19 @@ function validateMain(args, io) {
         try { known.push(JSON.parse(text)); } catch { usage(`${n} in the known folder is not JSON`); }
       }
     }
+    // Fixture case names for layer 7: the `case` of every entry in <dir>/index.json. Names only.
+    let fixtures;
+    if (fixturesDir !== null) {
+      let index;
+      try { index = JSON.parse(readFileSync(`${fixturesDir}/index.json`, 'utf8')); } catch { usage('cannot read index.json in the fixtures folder'); }
+      if (!Array.isArray(index.cases) || !index.cases.every((c) => c && typeof c.case === 'string')) usage('index.json in the fixtures folder has no list of cases');
+      fixtures = index.cases.map((c) => c.case);
+    }
     for (const t of texts) {
       try { known.push(JSON.parse(t)); } catch { /* reported as a layer 1 diagnostic below */ }
     }
 
-    const results = files.map((f, i) => ({ file: f, result: validateArtefact(texts[i], { known }) }));
+    const results = files.map((f, i) => ({ file: f, result: validateArtefact(texts[i], { known, fixtures }) }));
     if (json) io.out(JSON.stringify(results.map((r) => ({ file: r.file, ...r.result })), null, 2));
     else for (const r of results) io.out(renderText(r.result, r.file));
     return results.some((r) => r.result.outcome === 'failed') ? 1 : 0;

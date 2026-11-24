@@ -37,28 +37,25 @@ for (const dir of ['4-semantic', '5-graph-and-compatibility']) {
 
 // (b) every valid snake artefact passes through layer 5 --------------------------------------------
 
-test('every valid snake artefact has no error diagnostics through layer 5 (and layers 6 to 8 are not run)', () => {
+test('every valid snake artefact has no error diagnostics through layer 5 (layers 6 to 8: see test/ccis-validator-governance.test.js)', () => {
   assert.ok(snakeFiles.length >= 9);
   for (const f of snakeFiles) {
     const r = run(text(new URL(f, snakeDir)));
     assert.deepEqual(errors(r), [], f);
     assert.equal(r.outcome, 'no-errors-so-far', f);
     for (const name of LAYER_NAMES.slice(0, 5)) assert.equal(r.layers[name].outcome, 'passed', `${f} ${name}`);
-    for (const name of LAYER_NAMES.slice(5)) assert.equal(r.layers[name].outcome, 'not-run', `${f} ${name}`);
   }
 });
 
 // (c) the layer 6, 7 and 8 examples pass layers 1 to 5 ---------------------------------------------
 
-test('the layer 6, 7 and 8 examples pass layers 1 to 5 and list layers 6 to 8 as not run', () => {
+test('the layer 6, 7 and 8 examples pass layers 1 to 5 (their own layers are matched in the governance test)', () => {
   for (const dir of ['6-executable-safety', '7-test-verification', '8-governance']) {
     const files = readdirSync(new URL(`${dir}/`, invalidDir)).filter((f) => !f.includes('expected'));
     assert.ok(files.length >= 1, dir);
     for (const f of files) {
       const r = run(text(new URL(`${dir}/${f}`, invalidDir)));
-      assert.deepEqual(errors(r), [], `${dir}/${f}`);
       for (const name of LAYER_NAMES.slice(0, 5)) assert.equal(r.layers[name].outcome, 'passed', `${f} ${name}`);
-      for (const name of LAYER_NAMES.slice(5)) assert.equal(r.layers[name].outcome, 'not-run', `${f} ${name}`);
     }
   }
 });

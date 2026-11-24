@@ -26,20 +26,21 @@ Leave out `--demo-parameters` and every parameter stays disabled: the results th
 
 To produce a fresh export, run the demo from the EMR Enhancer repository (https://github.com/avi33tbtt/Vibe-Rounds---EMR-Enhancer-App, `docs/DEMO-RUNBOOK.md`). Its bridge calls this CLI.
 
-## Validate an artefact (rows 2.1 and 2.2)
+## Validate an artefact (rows 2.1 to 2.3)
 
-Layers 1 to 5 of the validator are built: syntax, structural, reference integrity (row 2.1), semantic, and graph and compatibility (row 2.2). Layers 6 to 8 are row 2.3; until then the result lists them as **not run**, and "not run" is never a pass.
+All eight layers of the validator are built: syntax, structural, reference integrity (row 2.1), semantic, and graph and compatibility (rows 2.2, 2.2b), executable safety, test verification and governance (row 2.3). A layer that did not run is listed as **not run** with its reason, and "not run" is never a pass.
 
 ```
 node ccis-cli.js validate ccis/examples/snake/snake-interval.analytics.0.1.1.json --known ccis/examples/snake
 node ccis-cli.js validate ccis/examples/invalid/4-semantic/time-diff-on-code.json --known ccis/examples/snake
 node ccis-cli.js validate ccis/examples/invalid/5-graph-and-compatibility/transition-to-missing-stage.json --known ccis/examples/snake
+node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects-missing-output.json --known ccis/examples/snake --fixtures ccis/fixtures/snake
 ```
 
-- Exit code 0: no error diagnostics (warnings do not count). 1: at least one error. 2: usage error or an unreadable file. `--json` prints the same data as JSON.
+- Exit code 0: no error diagnostics (warnings do not count). 1: at least one error. 2: usage error or an unreadable file. `--json` prints the same data as JSON. `--fixtures <dir>` reads the case names in `<dir>/index.json` for layer 7; without it a test's fixture name is not checked and a warning says so (CCIS-V7-004).
 - References resolve only against the artefacts given: the files on the command line (known to each other) and the `.json` files in `--known <dir>`. A reference to anything else is reported (CCIS-V3-004), never assumed.
-- A layer that fails stops the later layers for that artefact (fail closed). Every diagnostic has a severity, a stable rule id, a location, a message and a hint. Layers 4 and 5 list diagnostics by rule id, then location.
-- As a library: `validateArtefact(textOrObject, { known, schema })` in `ccis-validator.js`; layers 4 and 5 are in `ccis-validator-semantic.js`. Pure: no files, no network, no clock.
+- A layer that fails stops the later layers for that artefact (fail closed). Every diagnostic has a severity, a stable rule id, a location, a message and a hint. Layers 4 to 8 list diagnostics by rule id, then location.
+- As a library: `validateArtefact(textOrObject, { known, schema, fixtures })` in `ccis-validator.js`; layers 4 and 5 are in `ccis-validator-semantic.js`, layers 6 to 8 in `ccis-validator-governance.js`. Pure: no files, no network, no clock.
 
 | Layer | Rule ids | What they check |
 |-------|----------|-----------------|
@@ -48,8 +49,11 @@ node ccis-cli.js validate ccis/examples/invalid/5-graph-and-compatibility/transi
 | 3 Reference integrity | `V3-001` to `V3-005` | Fields, keys and referenced artefacts exist. |
 | 4 Semantic | `V4-001` to `V4-006`, `V4-009`, `V4-010` errors; `V4-007`, `V4-008`, `V4-011` warnings | Analytics: operator argument types and counts; ids resolve; units and declared conversions; states an output declares; known time zones; unused inputs and parameters. Elements: a binding only on a code field; unit strings are UCUM (a small offline grammar; what it cannot decide is a warning that says "not checked"). |
 | 5 Graph and compatibility | `V5-001` to `V5-006`, `V5-008` errors; `V5-007` warning | Stages and transitions exist and are reachable; outcomes test the node's inputs and cover its first input's six record states; timing parameters exist; every non-report stage has a way out; supported standard and operator-set versions. A cycle is a warning only. |
+| 6 Executable safety | `V6-001`, `V6-002` | No code-like text in `x-` members; no runnable markup in any text; no network address in an `x-` member. By pattern only: it can miss clever text, and the executor's whitelist is the real barrier. |
+| 7 Test verification | `V7-001` to `V7-003`, `V7-005` errors; `V7-004` warning | A package's declared tests name outputs, parameters, states and fixture cases that exist. Nothing is run. |
+| 8 Governance | `V8-001`, `V8-002` errors; `V8-003` warning | A validated status is not claimed against an evidence statement that says none is claimed; the validation scope names the artefact's own version. It never judges whether a claim is true. |
 
-- Known gaps: duplicate keys inside a JSON object are not detected; a leading byte order mark is a syntax error. **Not checked:** a full UCUM check (units outside the small built-in table and brace annotations give a warning only, CCIS-V4-011); whether a cycle is bounded (gap G-09, row 5.3); execution-profile feasibility and pin resolution (row 2.4); layers 6 to 8 (row 2.3). `criteria` parameters are never reported as unused, because their use lies outside the expression tree.
+- Known gaps: duplicate keys inside a JSON object are not detected; a leading byte order mark is a syntax error. **Not checked:** a full UCUM check (units outside the small built-in table and brace annotations give a warning only, CCIS-V4-011); whether a cycle is bounded (gap G-09, row 5.3); execution-profile feasibility and pin resolution (row 2.4); whether a review really took place (a claim is compared with claims, never with the world). `criteria` parameters are never reported as unused, because their use lies outside the expression tree.
 
 ## What is staged
 
@@ -66,7 +70,7 @@ What the demo runner does not do, and where the real thing is planned.
 
 | Not done | Planned |
 |----------|---------|
-| Validator layers 6 to 8 and the compiler. Layers 1 to 5 exist as a library and `validate` command, but the demo runner does not call them. UCUM units and bindings on non-code fields are not checked yet. | Rows 2.2b, 2.3, 2.4 |
+| The compiler and the report writer. All eight validator layers exist as a library and `validate` command, but the demo runner does not call them. A full UCUM check is not done (small built-in table). | Rows 2.3a, 2.4 |
 | Importer with compatibility rules: only the exact 0.1.0 package is held, and the loader refuses anything else. The EMR maps its own version 1 to 0.1.0 outside CCIS. | Rows 3.x (importer, compatibility) |
 | Executor: a whitelist interpreter for only the operators the two snake analytics and two nodes use. An unknown operator is refused. | Row 3.4 |
 | Run records: built and content-addressed, but no batch records and no integrity or signature fields (gaps G-03, G-05). | Rows 3.x |

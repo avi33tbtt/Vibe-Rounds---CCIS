@@ -84,7 +84,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 3.4a | chunk-3.4a-bind.md | `ccis-bind.js`: bind context and parameters, map values to run results and output contract, wording tables; 32 fixtures plus EMR export as oracle | DONE | 2026-11-24 | 1 module, 1 test | ccis-bind.js, 17 pass + 1 todo (F-6) in its own file; 33 oracle cases match; 3 breakage checks seen failing. Full npm test NOT run (owner request). D-126 to D-128. Next: 3.4b chunk file. |
 | 3.4b | chunk-3.4b-walk.md | `ccis-walk.js`: decision-node walker with rule trace; 32 routes as oracle | DONE | 2026-11-24 | 1 module, 1 test | ccis-walk.js, 15 tests pass in its own file; 33 routes and node results match the demo walker; 3 breakage checks seen failing. Full npm test NOT run (owner request). D-130, D-131. Next: 3.5 chunk file. |
 | 3.5 | chunk-3.5-run.md | `ccis-run.js`: planner, batch of several analytics on one context without mutating the source, result validation, immutable content-addressed run records with snapshot, rerun-from-record is byte-identical | DONE | 2026-11-24 | 1 module, 1 test | ccis-run.js, 15 tests pass in own file; 33 rerun byte-identical; 3 breakage checks seen failing. Full npm test NOT run (owner request). F-10. D-133 to D-135. Next: 3.6 chunk file. |
-| 3.6 | (written when reached) | Local test marketplace: publish (passing validator report and checksum), resolve, pin; lint refuses patient data | TODO |  |  | Needs 2.4. Pin verification (REQ-094) lands here. |
+| 3.6 | chunk-3.6-market.md | `ccis-market.js` + `market/` local test marketplace: publish (passing validator report and checksum), resolve, pin; lint refuses patient data | TODO |  |  | Chunk file written 2026-11-24 (docs only); awaiting your approval. Needs 2.4. Pin verification (REQ-094) lands here. |
 | 3.7 | (written when reached) | CLI: validate, import, list compatible, run, show | TODO |  |  | Needs 3.5, 3.6. Keep the `ccis-cli.js` interface and fixtures. |
 | 3.8 | (written when reached) | Browser app 1: import workspace, report, selectors, compatibility catalogue | TODO |  |  | Needs 3.7. |
 | 3.9 | (written when reached) | Browser app 2: multi-select run, results workspace, run record export | TODO |  |  | Needs 3.8. |
@@ -95,6 +95,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 ## ITEMS ONLY YOU CAN DO
+- Approve the 3.6 chunk file (`plan-chunks/chunk-3.6-market.md`) by saying "do next" (defaults apply) or answer its five questions.
 - Row 3.5 took the defaults for its five questions (D-133): one record per request; id includes `corrects`; shared parameter ids declared identically; Needs data items skipped and listed; D-112 left open. One addition: `request.runNeedsData` (opt-in). Say so if any should change.
 - Finding F-10 (D-134): by default the completeness analytic is skipped when an input is missing, though its results are real. Decide whether a package may declare it reports on missing data (schema change, new row) or whether callers just pass `runNeedsData`. Row 3.7 (CLI) needs the answer.
 - `npm test` was NOT run for 3.5; only `node --test test/ccis-run.test.js` (15 pass). Run the full `npm test` once on your machine after you push.

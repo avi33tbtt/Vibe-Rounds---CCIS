@@ -2,7 +2,7 @@
 // Prototype. Synthetic data only. Not for clinical use.
 //
 //   node ccis-cli.js run --envelope <file> --out <file> --at <ISO time with offset> [--demo-parameters]
-//   node ccis-cli.js validate <file>... [--known <dir>] [--fixtures <dir>] [--json]      (rows 2.1 to 2.3, layers 1 to 8 of the validator)
+//   node ccis-cli.js validate <file>... [--known <dir>] [--fixtures <dir>] [--record <dir>] [--json]      (rows 2.1 to 2.3a)
 //
 // Reads the envelope and the demo package (ccis/examples/snake), calls the pure demo modules and writes one
 // run record. No network, no clock: the evaluation time is the `--at` value and is required.
@@ -22,6 +22,7 @@ import { evaluatePathway } from './ccis-demo-pathway.js';
 import { evaluateAnalytic } from './ccis-demo-exec.js';
 import { buildRunRecord, runIdInput, canonicalJson } from './ccis-demo-record.js';
 import { validateArtefact, renderText } from './ccis-validator.js';
+import { buildValidationRecord, recordText } from './ccis-validation-record.js';
 
 const NOTE = 'test-only placeholder, not a clinical value';
 // Same values as the fixture normal-01 (a test keeps them equal). Whole minutes for easy arithmetic.
@@ -103,13 +104,14 @@ export function runDemo({ envelope, parameters, evaluationTime, artefacts }) {
 // ---- validate (row 2.1) -------------------------------------------------------------------------
 // Layers 1 to 3 over each file. The files given are known to each other; `--known <dir>` adds every
 // `.json` file in that folder (not its subfolders). References resolve only against these artefacts.
-const VALIDATE_USAGE = 'usage: node ccis-cli.js validate <file>... [--known <dir>] [--fixtures <dir>] [--json]';
+const VALIDATE_USAGE = 'usage: node ccis-cli.js validate <file>... [--known <dir>] [--fixtures <dir>] [--record <dir>] [--json]';
 
 function validateMain(args, io) {
   try {
     const files = [];
     let knownDir = null;
     let fixturesDir = null;
+    let recordDir = null;
     let json = false;
     for (let i = 0; i < args.length; i += 1) {
       const a = args[i];
@@ -118,6 +120,11 @@ function validateMain(args, io) {
         const v = args[i + 1];
         if (v === undefined || v.startsWith('--')) usage('--known needs a value');
         knownDir = v;
+        i += 1;
+      } else if (a === '--record') {
+        const v = args[i + 1];
+        if (v === undefined || v.startsWith('--')) usage('--record needs a value');
+        recordDir = v;
         i += 1;
       } else if (a === '--fixtures') {
         const v = args[i + 1];
@@ -157,6 +164,25 @@ function validateMain(args, io) {
     const results = files.map((f, i) => ({ file: f, result: validateArtefact(texts[i], { known, fixtures }) }));
     if (json) io.out(JSON.stringify(results.map((r) => ({ file: r.file, ...r.result })), null, 2));
     else for (const r of results) io.out(renderText(r.result, r.file));
+    // Validation records (row 2.3a). A file that cannot give a record says why on the error stream. A record is never
+    // written over a different one (as for run records); every target is checked before any file is written.
+    if (recordDir !== null) {
+      const planned = [];
+      results.forEach((r, i) => {
+        let doc = null;
+        try { doc = JSON.parse(texts[i]); } catch { /* a layer 1 failure: no record */ }
+        const built = buildValidationRecord(doc, r.result);
+        if (!built.ok) { io.err(`${r.file}: ${built.reason}`); return; }
+        const base = r.file.split(/[\\/]/).pop().replace(/\.json$/, '');
+        const target = `${recordDir}/${base}.validation-record.json`;
+        const bytes = recordText(built.record);
+        if (existsSync(target) && readFileSync(target, 'utf8') !== bytes) usage(`${target} already holds a different record`);
+        planned.push([target, bytes]);
+      });
+      for (const [target, bytes] of planned) {
+        try { writeFileSync(target, bytes); } catch { usage(`cannot write ${target}`); }
+      }
+    }
     return results.some((r) => r.result.outcome === 'failed') ? 1 : 0;
   } catch (err) {
     if (err instanceof Usage) { io.err(`error: ${err.message}\n${VALIDATE_USAGE}`); return 2; }

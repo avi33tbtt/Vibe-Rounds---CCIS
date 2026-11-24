@@ -55,6 +55,13 @@ node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects
 
 - Known gaps: duplicate keys inside a JSON object are not detected; a leading byte order mark is a syntax error. **Not checked:** a full UCUM check (units outside the small built-in table and brace annotations give a warning only, CCIS-V4-011); whether a cycle is bounded (gap G-09, row 5.3); execution-profile feasibility and pin resolution (row 2.4); whether a review really took place (a claim is compared with claims, never with the world). `criteria` parameters are never reported as unused, because their use lies outside the expression tree.
 
+### Validation record (row 2.3a)
+
+`node ccis-cli.js validate <file>... --known <dir> --record <dir>` also writes `<file name>.validation-record.json` (canonical JSON) for each artefact, as `ccis-validation-record.js` builds it: the artefact id, type and version; the standard and validator versions; all eight layers with their diagnostics; and five assurance members. Only **structural** (layers 1 to 3) and **semantic** (layers 4 and 5) can be `met`, and only as a software check. **Clinical**, **execution** and **security-privacy** are always `not assessed`: no software check says anything about them. A `passed` outcome means no layer found an error. It does not mean safe. Warnings are listed in the `conditions` of the member they belong to.
+
+- No record is written when layer 1 or 2 failed, or when the artefact has no manifest (decision nodes and terminology bindings have none yet). The reason is printed, and the validation result is shown as before.
+- A record is never written over a different one (exit 2). Rule ids in a record are lowercase, for example `ccis.v4-009` for `CCIS-V4-009`.
+
 ## What is staged
 
 Shown, but not the real thing. Each is labelled in the viewer.
@@ -70,7 +77,7 @@ What the demo runner does not do, and where the real thing is planned.
 
 | Not done | Planned |
 |----------|---------|
-| The compiler and the report writer. All eight validator layers exist as a library and `validate` command, but the demo runner does not call them. A full UCUM check is not done (small built-in table). | Rows 2.3a, 2.4 |
+| The compiler. All eight validator layers and the validation record exist as a library and `validate` command, but the demo runner does not call them. A full UCUM check is not done (small built-in table). | Row 2.4 |
 | Importer with compatibility rules: only the exact 0.1.0 package is held, and the loader refuses anything else. The EMR maps its own version 1 to 0.1.0 outside CCIS. | Rows 3.x (importer, compatibility) |
 | Executor: a whitelist interpreter for only the operators the two snake analytics and two nodes use. An unknown operator is refused. | Row 3.4 |
 | Run records: built and content-addressed, but no batch records and no integrity or signature fields (gaps G-03, G-05). | Rows 3.x |

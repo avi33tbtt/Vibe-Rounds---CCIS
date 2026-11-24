@@ -114,6 +114,15 @@ node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects
 - **Wording is a labelled table (`WORDING`, D-047),** keyed by analytic id. Other analytics get generic notes only. The omission rule (D-050) and finding F-6 (D-052) are unchanged.
 - **Oracle.** The 32 fixture cases plus the EMR export reproduce their expected files. Decision-node walking is row 3.4b.
 
+### Decision-node walker (row 3.4b)
+
+`ccis-walk.js` walks a pathway over a 3.1 context. It is pure (no file, clock, network, randomness or `eval`). `walkPathway({ pathway, context })` returns `{ ok, route, results, trace }`, or one refusal (ids W-001 to W-008 in `WALK_REFUSALS`) and nothing else.
+
+- **Records only (D-018).** A node tests the recorded state of each input: present, absent, unknown, not-collected, not-applicable, explicitly-negative or conflicting. A field's records are found by concept, never by position; two agreeing records are still conflicting.
+- **No outcome matches (D-053):** `indeterminate`, outcome null, and the route stops at the report stage. Two matches refuse the whole pathway. Unknown never routes as documented.
+- **Rule trace.** One entry per node visited: the states found, the number and ids of the records (never values), every outcome considered in package order with each test and whether it passed, and the outcome taken. It is a separate member; the run-result schema is unchanged.
+- **Oracle.** The 33 routes (32 cases plus the EMR export) and the node results equal the demo walker's.
+
 ## What is staged
 
 Shown, but not the real thing. Each is labelled in the viewer.

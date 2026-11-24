@@ -74,30 +74,20 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 2.2b | chunk-2.2b-validator-element-binding-checks.md | Layer 4 element and binding checks: binding on a non-code field, UCUM unit grammar (offline; undecidable gives a warning) | DONE | 2026-11-24 | 1 module edit, 1 test, ~3 rule ids | V4-009 to V4-011, 1 module edit, new test, 2.2 test adjusted. npm test NOT run (owner request); 3 breakage checks seen. D-092 to D-094. Next: 2.3 chunk file. |
 | 2.3 | chunk-2.3-validator-layers-6-8.md | Validator layers 6 to 8 (executable safety, test verification, governance); report writer split to 2.3a | DONE | 2026-11-24 | 1 module, pipeline and CLI edit, 1 test, ~9 rule ids | ccis-validator-governance.js, 10 ids, --fixtures, new test; 2.1/2.2 tests adjusted. npm test NOT run (owner request); 3 breakage checks seen. D-095 to D-097. |
 | 2.3a | chunk-2.3a-report-writer.md | Report writer: validation record from a validator result (subject, versions, five assurance members) | DONE | 2026-11-24 | 1 module, 1 CLI edit, 1 test | ccis-validation-record.js, --record, new test. npm test NOT run (owner request); 3 breakage checks seen. Nodes/bindings get no record. D-098 to D-100. |
-| 2.4 | chunk-2.4-compiler.md | Compiler: canonical form, checksum, equivalence harness, fail closed | TODO |  | 1 module, 1 test, 1 CLI edit, 1 fixture, ~8 refusal ids | Chunk file written 2026-11-24 (includes amendment A-005); awaiting your approval. Build follows at the next "do next". |
+| 2.4 | chunk-2.4-compiler.md | Compiler: canonical form, checksum, equivalence harness, fail closed | DONE | 2026-11-24 | 1 module, 1 test, 1 CLI edit, 1 fixture, ~8 refusal ids | ccis-compile.js, compile command, 25 tests; npm test 466 pass, 0 fail; 3 breakage checks seen. A-005. Harness proven on stand-ins. D-102 to D-104. Next: 3.x LOCKED. |
 | 3.1 to 3.11 | (written when reached) | Importer, compatibility, executor, run records, local marketplace, CLI, browser app, hardening, slice, CCIS 0.1.0 | LOCKED |  |  | Stage 2. Replaces the demo runner (DS1 to DS5); keep `ccis-cli.js` interface and fixtures. 3.11 ends with the user's limitations review. |
 | 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | After 0.1.0. |
 | 5.1 to 5.7 | (written when reached) | Templates, decision graphs, research-to-package, cohorts, access model | LOCKED |  |  | After Phase 4. 5.7 needs the D-002 server decision. |
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 ## ITEMS ONLY YOU CAN DO
-- Review and approve `plan-chunks/chunk-2.4-compiler.md` (includes amendment A-005 for package integrity, and four questions with defaults); say "approve" or list changes, then "do next".
-- Run `npm test` once for 2.3a (not run at your request; new `ccis-validation-record.js` and `test/ccis-validation-record.test.js`; `ccis-cli.js` changed); if it fails, say "redo 2.3a".
+- `npm test` was run once for 2.4 on a fresh clone: 466 pass, 0 fail, 1 todo (F-6). That also covers the earlier "not run" rows 1.6 to 2.3a and the DS5/DS6 failures, which no longer fail. Run it once on your machine after you push.
+- 2.4 took the defaults for its four questions: A-005 approved with the chunk file; array order is significant; lone nodes and bindings are refused; no schema for compiled metadata (later, with 3.6). Say so if you want any changed.
 - Decide whether decision nodes and terminology bindings should get a manifest (or another way to name their version) so they can have validation records (D-099).
-- Run `npm test` once for 2.3 (not run at your request; new `ccis-validator-governance.js` and `test/ccis-validator-governance.test.js`; `ccis-validator.js`, `ccis-cli.js` and two older validator tests changed); if it fails, say "redo 2.3".
-- Run `npm test` once for 2.2b (not run at your request; new `test/ccis-validator-element.test.js`; `ccis-validator-semantic.js` and `test/ccis-validator-semantic.test.js` changed); if it fails, say "redo 2.2b".
-- Run `npm test` once for 2.2 (not run at your request; new `ccis-validator-semantic.js` and `test/ccis-validator-semantic.test.js`; `ccis-validator.js` and `test/ccis-validator.test.js` changed); if it fails, say "redo 2.2".
-- Run `npm test` once for 2.1 (not run at your request; new test `test/ccis-validator.test.js`, plus the `validate` command added to `ccis-cli.js`); if it fails, say "redo 2.1".
-- Run `npm test` once for 1.6c (`test/invalid-examples.test.js` was extended); if it fails, say "redo 1.6c".
-- Run `npm test` once for 1.6b (`test/schemas-a003.test.js`, plus the rebuilt validators and the changed 1.6 layer 8 example); if it fails, say "redo 1.6b".
-- Run `npm test` once for 1.6a (it was not run at your request; the new test is `test/fhir-mode-example.test.js`); if it fails, say "redo 1.6a".
-- Run `npm test` once for 1.6 (it was not run at your request); if it fails, say "redo 1.6".
-- `npm test` has 2 failures from earlier rows, also on a clean checkout: DS6 `ccis-demo-batch.test.js` test 11 (conflicting `itemStates` counts 2, hand count 1) and DS5 `ccis-viewer.test.js` test 99 (normal-01 snapshot shows 8 observations, record has 9). Say "redo DS6" or "redo DS5" to fix each.
 - Findings F-7 and F-8 (`ccis/fixtures/snake/README.md`): decide whether a later package version adds a node 1 outcome for an unknown result and an estimate warning on needs-data intervals.
 - Follow `docs/DEMO-RUNBOOK.md` in the EMR repo on a clean machine with this commit (EMR DM4c asks for this).
 - Finding F-6 (`ccis/fixtures/snake/README.md`): a not-collected expected item gives overall `complete`. Approve a 0.1.2 fix as a new row (not blocking DS2b).
 - Confirm the omission rule D-050 (conflicting inputs: count, overall status and window are left out).
-- Run `npm test` once on your machine for DS6 (it was not run here at your request); if it fails, say "redo DS6".
 - Review `docs/DEMO-SLICE.md` and `docs/ROADMAP-COORDINATION.md` (rows DS0 and DS-X are drafts).
 - Answer findings F-4 and F-5 (`ccis/fixtures/snake/README.md`): by amending the dossier or by accepting the 0.1.0 tree behaviour. Two deferred fixture cases wait on them.
 - Confirm D-042: `convert` on a duration parameter is read as "express in the target unit" (identity when already minutes). Phase 2 must define it.

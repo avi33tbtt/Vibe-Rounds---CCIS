@@ -2,6 +2,14 @@
 
 Newest first. The standard follows semantic versioning (CCIS-REQ-012 in `SPEC.md`; the amendment rule below implements CCIS-REQ-019).
 
+## A-005 (2026-11-24): package integrity, a checksum over canonical bytes (gap G-05)
+
+- **Requirements affected:** adds **CCIS-REQ-093** and **CCIS-REQ-094** (the next free numbers); supports CCIS-REQ-064, 065 and 067.
+- **Change:** CCIS-REQ-093: a compiled artefact MUST carry a checksum computed over its canonical bytes, naming the algorithm and the canonical-form version; the checksum is not held inside the artefact it covers. CCIS-REQ-094: a consumer (importer, marketplace client, engine preflight) MUST verify a pinned checksum before use; a mismatch, or a pin with no checksum where one is required, blocks use. Signing and publisher identity are deferred to row 6.2. A checksum proves the bytes are the same bytes; it says nothing about who published them or whether they are clinically safe.
+- **Reason:** the specification required pinned versions but no integrity check (gap G-05), so a pin could not name an exact artefact.
+- **Raised by:** task 2.4 (`plan-chunks/chunk-2.4-compiler.md`). Built in `ccis-compile.js`: canonical form `ccis-canonical-json/1`, checksum `sha256:<hex>`. Verification at use is for rows 3.6 and 4.1.
+- **Approved:** by the project owner on 2026-11-24, by approving that chunk file ("do next"). `ccis/SPEC.md` text is not edited; this entry is the amendment.
+
 ## A-001 (2026-11-23): informant source class (gap G-01)
 
 - **Requirements affected:** CCIS-REQ-036 (every value carries a source class from a closed set); clarifies, does not change, CCIS-REQ-037.

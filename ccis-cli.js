@@ -3,6 +3,7 @@
 //
 //   node ccis-cli.js run --envelope <file> --out <file> --at <ISO time with offset> [--demo-parameters]
 //   node ccis-cli.js validate <file>... [--known <dir>] [--fixtures <dir>] [--record <dir>] [--json]      (rows 2.1 to 2.3a)
+//   node ccis-cli.js compile <file> --out <dir> [--known <dir>] [--fixtures <dir>]                        (row 2.4)
 //
 // Reads the envelope and the demo package (ccis/examples/snake), calls the pure demo modules and writes one
 // run record. No network, no clock: the evaluation time is the `--at` value and is required.
@@ -10,6 +11,7 @@
 // Exit codes of `run`: 0 a record was written (a `failed` record counts); 2 usage error (bad arguments, an unreadable
 // or non-JSON file, a missing `--at`, an output path that cannot be written or already holds a different record).
 // Exit codes of `validate`: 0 no error diagnostics, 1 at least one error diagnostic, 2 usage error or an unreadable file.
+// Exit codes of `compile`: 0 compiled, 1 refused (nothing written), 2 usage error, an unreadable file, or a different file already there.
 //
 // Parameters stay disabled unless `--demo-parameters` is given. Then the test-only placeholders below are
 // enabled, and the record says "demo placeholders, not clinical values". They are not clinical values.
@@ -23,6 +25,7 @@ import { evaluateAnalytic } from './ccis-demo-exec.js';
 import { buildRunRecord, runIdInput, canonicalJson } from './ccis-demo-record.js';
 import { validateArtefact, renderText } from './ccis-validator.js';
 import { buildValidationRecord, recordText } from './ccis-validation-record.js';
+import { compileArtefact } from './ccis-compile.js';
 
 const NOTE = 'test-only placeholder, not a clinical value';
 // Same values as the fixture normal-01 (a test keeps them equal). Whole minutes for easy arithmetic.
@@ -104,6 +107,27 @@ export function runDemo({ envelope, parameters, evaluationTime, artefacts }) {
 // ---- validate (row 2.1) -------------------------------------------------------------------------
 // Layers 1 to 3 over each file. The files given are known to each other; `--known <dir>` adds every
 // `.json` file in that folder (not its subfolders). References resolve only against these artefacts.
+function readKnown(knownDir) {
+  const known = [];
+  if (knownDir === null) return known;
+  let names;
+  try { names = readdirSync(knownDir).filter((n) => n.endsWith('.json')).sort(); } catch { usage('cannot read the known folder'); }
+  for (const n of names) {
+    let text;
+    try { text = readFileSync(`${knownDir}/${n}`, 'utf8'); } catch { usage(`cannot read ${n} in the known folder`); }
+    try { known.push(JSON.parse(text)); } catch { usage(`${n} in the known folder is not JSON`); }
+  }
+  return known;
+}
+
+function readFixtureNames(fixturesDir) {
+  if (fixturesDir === null) return undefined;
+  let index;
+  try { index = JSON.parse(readFileSync(`${fixturesDir}/index.json`, 'utf8')); } catch { usage('cannot read index.json in the fixtures folder'); }
+  if (!Array.isArray(index.cases) || !index.cases.every((c) => c && typeof c.case === 'string')) usage('index.json in the fixtures folder has no list of cases');
+  return index.cases.map((c) => c.case);
+}
+
 const VALIDATE_USAGE = 'usage: node ccis-cli.js validate <file>... [--known <dir>] [--fixtures <dir>] [--record <dir>] [--json]';
 
 function validateMain(args, io) {
@@ -139,24 +163,9 @@ function validateMain(args, io) {
     const texts = files.map((f) => {
       try { return readFileSync(f, 'utf8'); } catch { return usage(`cannot read ${f}`); }
     });
-    const known = [];
-    if (knownDir !== null) {
-      let names;
-      try { names = readdirSync(knownDir).filter((n) => n.endsWith('.json')).sort(); } catch { usage('cannot read the known folder'); }
-      for (const n of names) {
-        let text;
-        try { text = readFileSync(`${knownDir}/${n}`, 'utf8'); } catch { usage(`cannot read ${n} in the known folder`); }
-        try { known.push(JSON.parse(text)); } catch { usage(`${n} in the known folder is not JSON`); }
-      }
-    }
+    const known = readKnown(knownDir);
     // Fixture case names for layer 7: the `case` of every entry in <dir>/index.json. Names only.
-    let fixtures;
-    if (fixturesDir !== null) {
-      let index;
-      try { index = JSON.parse(readFileSync(`${fixturesDir}/index.json`, 'utf8')); } catch { usage('cannot read index.json in the fixtures folder'); }
-      if (!Array.isArray(index.cases) || !index.cases.every((c) => c && typeof c.case === 'string')) usage('index.json in the fixtures folder has no list of cases');
-      fixtures = index.cases.map((c) => c.case);
-    }
+    const fixtures = readFixtureNames(fixturesDir);
     for (const t of texts) {
       try { known.push(JSON.parse(t)); } catch { /* reported as a layer 1 diagnostic below */ }
     }
@@ -190,9 +199,64 @@ function validateMain(args, io) {
   }
 }
 
+// ---- compile (row 2.4) ---------------------------------------------------------------------------
+// One artefact in; `<name>.canonical.json` (the exact checked bytes, no trailing newline, so `sha256sum` of the file
+// equals the checksum) and `<name>.compiled.json` (the metadata) out. A refusal writes nothing.
+const COMPILE_USAGE = 'usage: node ccis-cli.js compile <file> --out <dir> [--known <dir>] [--fixtures <dir>]';
+
+function compileMain(args, io) {
+  try {
+    const files = [];
+    let outDir = null;
+    let knownDir = null;
+    let fixturesDir = null;
+    for (let i = 0; i < args.length; i += 1) {
+      const a = args[i];
+      if (a === '--out' || a === '--known' || a === '--fixtures') {
+        const v = args[i + 1];
+        if (v === undefined || v.startsWith('--')) usage(`${a} needs a value`);
+        if (a === '--out') outDir = v; else if (a === '--known') knownDir = v; else fixturesDir = v;
+        i += 1;
+      } else if (a.startsWith('--')) usage(`unknown argument ${a}`);
+      else files.push(a);
+    }
+    if (files.length !== 1) usage('exactly one file is required');
+    if (outDir === null) usage('--out is required');
+    const file = files[0];
+    let text;
+    try { text = readFileSync(file, 'utf8'); } catch { usage(`cannot read ${file}`); }
+    const known = readKnown(knownDir);
+    const fixtures = readFixtureNames(fixturesDir);
+    try { known.push(JSON.parse(text)); } catch { /* refused below with a reason */ }
+
+    const built = compileArtefact(text, { known, fixtures });
+    if (!built.ok) {
+      io.err(`${file}: refused ${built.code}: ${built.reason}`);
+      for (const d of built.diagnostics) io.err(`  ${d.severity} ${d.ruleId} at ${typeof d.path === 'string' ? (d.path || 'the top level') : `line ${d.path.line}, column ${d.path.column}`}: ${d.message}`);
+      return 1;
+    }
+    const c = built.compiled;
+    const { canonical, ...meta } = c;
+    const base = file.split(/[\\/]/).pop().replace(/\.json$/, '');
+    const targets = [[`${outDir}/${base}.canonical.json`, canonical], [`${outDir}/${base}.compiled.json`, `${canonicalJson(meta)}\n`]];
+    for (const [target, bytes] of targets) {
+      if (existsSync(target) && readFileSync(target, 'utf8') !== bytes) usage(`${target} already holds different bytes`);
+    }
+    for (const [target, bytes] of targets) {
+      try { writeFileSync(target, bytes); } catch { usage(`cannot write ${target}`); }
+    }
+    io.out(`compiled: ${c.subject.id} ${c.subject.version} ${c.checksum}${c.warnings.length ? ` (${c.warnings.length} warning${c.warnings.length === 1 ? '' : 's'})` : ''}`);
+    return 0;
+  } catch (err) {
+    if (err instanceof Usage) { io.err(`error: ${err.message}\n${COMPILE_USAGE}`); return 2; }
+    throw err;
+  }
+}
+
 // Returns the exit code. `io` lets tests capture output.
 export function main(argv, io = { out: (s) => process.stdout.write(`${s}\n`), err: (s) => process.stderr.write(`${s}\n`) }) {
   if (argv[0] === 'validate') return validateMain(argv.slice(1), io);
+  if (argv[0] === 'compile') return compileMain(argv.slice(1), io);
   try {
     const o = parseArgs(argv);
     const envelope = readJson(o.envelope, 'the envelope file');

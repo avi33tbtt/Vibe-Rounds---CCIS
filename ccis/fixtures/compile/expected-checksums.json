@@ -1,0 +1,12 @@
+{
+  "note": "Independent calculation (Python json.dumps sort_keys, hashlib). A changed example needs a deliberate update here. Synthetic data only.",
+  "canonicalForm": "ccis-canonical-json/1",
+  "checksums": {
+    "snake-completeness.analytics.0.1.1.json": "sha256:6005691003a96ffe22e3df2eabaa0e619d7d1ae014d8374d3ad569ba038b6728",
+    "snake-completeness.analytics.json": "sha256:7eb44c6e62704a7ae3c1a9fa365a465f6abc5bcd53d944cc0bed479c6d544110",
+    "snake-documentation.pathway.json": "sha256:fda440830d0135e76f341764b423ac7d597b02ccb61a4c89a9918b159a6b0a09",
+    "snake-envenomation.element.json": "sha256:2ec4b4d6f6767d3b15c1b3fe6eb7a5cfd0a935fad171b812e30a6875fb91aa32",
+    "snake-interval.analytics.0.1.1.json": "sha256:24652fc31e4ee731970658094d6ac4c605ba46acf709d1cb952caf98451dbf10",
+    "snake-interval.analytics.json": "sha256:87e7ed435a85c382b89eaf9161169d3df5d13248862ac8c1cf81537076e32b16"
+  }
+}

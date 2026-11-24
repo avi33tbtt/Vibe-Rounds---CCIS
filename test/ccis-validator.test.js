@@ -306,7 +306,8 @@ test('the result shape, the rule catalogue and the plain-text rendering', () => 
   assert.match(t, /^x\.json: failed/);
   assert.match(t, /error CCIS-V3-001 at \/inputs\/3\/field: /);
   assert.match(t, /hint: /);
-  assert.match(t, /Not run is not a pass\./);
+  assert.match(t, /layer 4 semantic: not-run \(Layer 3 \(reference-integrity\) found errors/);
+  assert.match(t, /layer 8 governance: not-run/);
   assert.match(renderText(run('{"a":}'), 'b.json'), /at line 1, column 6/);
 });
 
@@ -391,5 +392,5 @@ test('the library has no dynamic code, file access, network, clock or randomness
   const src = text(new URL('../ccis-validator.js', import.meta.url));
   const forbidden = [/\beval\b/, /\bFunction\b/, /\bimport\s*\(/, /\brequire\s*\(/, /node:/, /\bfs\b/, /\bDate\b/, /Math\.random/, /performance\.now/, /\bfetch\b/, /\bprocess\b/, /XMLHttpRequest/, /WebSocket/, /localStorage/];
   for (const re of forbidden) assert.equal(re.test(src), false, String(re));
-  assert.deepEqual([...src.matchAll(/^import .* from '([^']+)';$|^\} from '([^']+)';$/gm)].map((m) => m[1] ?? m[2]), ['./ccis/validators/ccis-validators.js', './ccis-validator-semantic.js']);
+  assert.deepEqual([...src.matchAll(/^import .* from '([^']+)';$|^\} from '([^']+)';$/gm)].map((m) => m[1] ?? m[2]), ['./ccis/validators/ccis-validators.js', './ccis-validator-semantic.js', './ccis-validator-governance.js']);
 });

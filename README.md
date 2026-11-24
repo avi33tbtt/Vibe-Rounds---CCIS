@@ -62,6 +62,15 @@ node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects
 - No record is written when layer 1 or 2 failed, or when the artefact has no manifest (decision nodes and terminology bindings have none yet). The reason is printed, and the validation result is shown as before.
 - A record is never written over a different one (exit 2). Rule ids in a record are lowercase, for example `ccis.v4-009` for `CCIS-V4-009`.
 
+### Compile and checksum (row 2.4)
+
+`node ccis-cli.js compile <file> --out <dir> [--known <dir>] [--fixtures <dir>]` validates one artefact through all eight layers and, only if every layer passes, writes `<name>.canonical.json` (the canonical bytes, no trailing newline) and `<name>.compiled.json` (subject, canonical-form id, compiler version, checksum, warnings). `sha256sum` of the canonical file equals the checksum. Otherwise nothing is written (exit 1, with a code `CCIS-C-001` to `CCIS-C-008` and a reason). The library is `ccis-compile.js`.
+
+- Canonical form `ccis-canonical-json/1`: sorted member names, array order kept, no whitespace, `x-` members covered. The checksum is `sha256:` and 64 hex characters, and is never stored inside the artefact. It shows the bytes are the same bytes; it says nothing about who published them or whether they are clinically safe.
+- The text route refuses duplicate member names, unsafe numbers and invalid Unicode, which `JSON.parse` would hide.
+- **The equivalence harness (`compareRoutes`) is proven here on three stand-ins for one route** (the committed text, an in-memory copy and a re-formatted copy). The code SDK (row 4.2), the form editor (4.4) and FHIR Mode (6.1) are not built; they plug into the same harness.
+- **Limits:** array order is significant, so two routes that list the same items in a different order give different bytes. A lone decision node or terminology binding has no manifest and is refused (C-008). One artefact is compiled at a time; a bundle of pinned artefacts and the check of a pin at use come with rows 3.x. No signing.
+
 ## What is staged
 
 Shown, but not the real thing. Each is labelled in the viewer.

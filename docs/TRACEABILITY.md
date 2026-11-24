@@ -22,7 +22,7 @@
 | Ch6 | 3 The GitHub knowledge marketplace | Partial | REQ-017, REQ-079, REQ-080, REQ-081 | 3.6, 4.1 | Repository organisation and index not specified (G-06). Content boundary is covered. |
 | Ch6 | 3.1 Two primary package families | Covered | REQ-020 | 1.1 to 1.3 | Ch7 refines this to six artefact families. |
 | Ch6 | 3.2 Suggested repository organisation | Gap | (none) | 3.6, 4.1 | No requirement; layout is Stage 2 (G-06). |
-| Ch6 | 3.3 A package manifest is mandatory | Partial | REQ-009, REQ-010, REQ-011, REQ-014 | 1.1 | Manifest contents are Stage 2. Integrity and checksum are not yet a requirement (G-05). |
+| Ch6 | 3.3 A package manifest is mandatory | Partial | REQ-009, REQ-010, REQ-011, REQ-014 | 1.1 | Manifest contents are Stage 2. Integrity and checksum: A-005 (REQ-093, 094; row 2.4). |
 | Ch6 | 4 Compatibility: the key marketplace capability | Covered | REQ-055, REQ-056, REQ-057, REQ-058, REQ-059, REQ-060, REQ-061 | 3.2 |  |
 | Ch6 | 4.1 Three levels of compatibility | Covered | REQ-055 | 3.2 | Superseded by Ch7 s11.1 (six checks). |
 | Ch6 | 4.2 Compatibility matching sequence | Covered | REQ-055, REQ-060 | 3.2, 3.6 |  |
@@ -73,7 +73,7 @@
 | Ch7 | 9.1 LLM authoring guardrails | Covered | REQ-008, REQ-054, REQ-087 | 4.3 |  |
 | Ch7 | 10 Validation, compilation and conformance | Covered | REQ-064, REQ-065, REQ-088, REQ-089, REQ-090 | 2.1 to 2.4 |  |
 | Ch7 | 10.1 Distinct assurance dimensions | Covered | REQ-048 | 2.3, 6.2 |  |
-| Ch7 | 10.2 Compile to a canonical runtime representation | Covered | REQ-064, REQ-065 | 2.4 |  |
+| Ch7 | 10.2 Compile to a canonical runtime representation | Covered | REQ-064, REQ-065, REQ-093, REQ-094 | 2.4 |  |
 | Ch7 | 11 Marketplace discovery and compatibility | Covered | REQ-055, REQ-056, REQ-057, REQ-058, REQ-059, REQ-060, REQ-061 | 3.2, 3.6 |  |
 | Ch7 | 11.1 Compatibility dimensions | Covered | REQ-055 | 3.2 |  |
 | Ch7 | 11.2 Explainable compatibility outcomes | Covered | REQ-056, REQ-057, REQ-058, REQ-059, REQ-060, REQ-061 | 3.2 |  |
@@ -123,7 +123,7 @@
 | Ch10 | 4 Build the cohort execution engine | Gap | (none) | 5.5, 5.6, 5.7 | G-11. |
 | Ch10 | 5 Add the future EMR Enhancer cohort exporter | Gap | (none) | 6.4 | G-11. EMR row D8b. |
 | Ch10 | 6 Harden FHIR Mode and interoperability | Covered | REQ-039, REQ-091, REQ-092 | 6.1 |  |
-| Ch10 | 7 Establish external review and release governance | Partial | REQ-017, REQ-047, REQ-051, REQ-052, REQ-054 | 6.2 | Independence rule and signing: G-02, G-05. Deprecation visibility: G-14. |
+| Ch10 | 7 Establish external review and release governance | Partial | REQ-017, REQ-047, REQ-051, REQ-052, REQ-054 | 6.2 | Independence rule: G-02. Signing deferred here (A-005). Deprecation visibility: G-14. |
 | Ch10 | 8 Evaluate clinical quality and operational reliability | Partial | REQ-006, REQ-067, REQ-077 | 6.3 | Evaluation measures are not requirements (G-12). |
 | Ch10 | 9 Use LLMs as governed authoring assistants | Covered | REQ-008, REQ-037, REQ-054, REQ-074, REQ-087 | 4.3 |  |
 | Ch10 | 10 Sequence the implementation programme | No requirement needed | (none) | (plan section 7) |  |
@@ -141,7 +141,7 @@ Concepts the book contains that the specification does not yet require. "When" s
 | G-02 | Independence rule | Ch7 s12.2 and plan row 6.2: an author is never the reviewer. Not yet a requirement. | Add with row 6.2. | Phase 6 |
 | G-03 | Batch runs | Ch6 s7: several analytics on one context; each keeps its own contract, parameters and result; shared work must not leak between them. Not yet a requirement. | Decide before row 3.5. | 0.1.0 slice |
 | G-04 | Result kinds | Ch6 s7.2: values, classifications, tables, series. The spec only says outputs are checked against a declared contract. | Closed by amendment A-002 (row 1.3, 2026-11-23). | 0.1.0 slice |
-| G-05 | Package integrity | Checksums, pin verification and signing (Ch6 s3.3; plan rows 2.4, 3.6, 4.1, 6.2). The spec requires pinned versions but not integrity checks. | Decide before row 2.4. | 0.1.0 slice |
+| G-05 | Package integrity | Checksums, pin verification and signing (Ch6 s3.3; plan rows 2.4, 3.6, 4.1, 6.2). The spec requires pinned versions but not integrity checks. | Closed by amendment A-005 (row 2.4, 2026-11-24); signing stays with row 6.2. | 0.1.0 slice |
 | G-06 | Marketplace layout and index | Ch6 s3.2 and s3.3: repository organisation, index, mandatory manifest. | Add with row 3.6 or 4.1. | Phase 3 and 4 |
 | G-07 | Result ranking | Ch7 s11.3: how compatible packages are ordered. Must not rely on text similarity (REQ-060). | Add with row 3.2. | Phase 3 |
 | G-08 | Analytics templates and composition | Ch8 s2, s4; Ch10 s2. | Add with rows 5.1 and 5.2. | Phase 5 |
@@ -358,3 +358,5 @@ Every requirement in `ccis/SPEC.md`, with the book concepts that justify it and 
 | REQ-090 | Reports retained | Ch7 s10; Ch9 s4 | 2.1 to 2.3, 2.1 to 2.4 |
 | REQ-091 | FHIR Mode is one route | Ch6 s6.2; Ch7 s2; Ch7 s3.2; Ch7 s8; Ch7 s8.2; Ch10 s6 | 2.4, 4.2, 6.1 |
 | REQ-092 | Unsupported FHIR reported | Ch6 s6.2; Ch7 s8; Ch7 s8.1; Ch10 s6 | 6.1 |
+| REQ-093 | Checksum over canonical bytes (A-005) | Ch6 s3.3; Ch7 s10.2 | 2.4 |
+| REQ-094 | Verify a pinned checksum before use (A-005) | Ch6 s3.3 | 3.6, 4.1 |

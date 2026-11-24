@@ -64,7 +64,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | DS4 | chunk-DS4-demo-cli.md | `ccis-cli.js run` (envelope in, run record out, no network) | DONE | 2026-11-23 | 1 CLI, 1 test file | ccis-cli.js, npm run demo, 9 tests (196+1 todo pass); exit 0/2 rules; 3 breakage checks seen failing. D-059 to D-061. EMR DM3 can call it. Next: DS5 after EMR DM1 to DM3. |
 | DS5 | chunk-DS5-demo-viewer.md | Static result viewer with banners (CSP-safe) | DONE | 2026-11-23 | 1 page, 1 test file | ccis-viewer.html (hash CSP, no innerHTML), 10 jsdom tests (206+1 todo pass); 3 breakage checks seen failing. jsdom devDep. D-062 to D-064. Next: DS6 (EMR DM1 to DM3 first). |
 | DS6 | chunk-DS6-demo-staged-cohort.md | Staged cohort view (batch of real runner over fixtures) + second-package card | DONE | 2026-11-23 | 1 script, 1 page edit, 1 test | scripts/demo-batch.js, cohort-demo.json (32 cases, counts only), viewer section, 7 tests. npm test NOT run (owner's request); counts checked by hand. D-065 to D-067. Next: DS7. |
-| DS7 | chunk-DS7-demo-hardening.md | EMR-export end-to-end test, README "Run the demo", limitations | TODO | | 1 test, 1 fixture pair, README | Needs EMR DM1. |
+| DS7 | chunk-DS7-demo-hardening.md | EMR-export end-to-end test, README "Run the demo", limitations | DONE | 2026-11-24 | 1 test, 1 fixture pair, README | emr-export fixture pair, 6 tests pass; 3 breakage checks seen failing. README run/staged/limits, CI demo step. F-7, F-8. D-068 to D-070. Suite: 2 older failures (DS5/DS6). |
 | 1.6 | (written when reached) | Invalid examples, one per validator layer; FHIR-Mode example | LOCKED |  |  | Stage 2. Unlocks after 1.5a. |
 | 2.1 to 2.4 | (written when reached) | Validator and compiler | LOCKED |  |  | Stage 2. |
 | 3.1 to 3.11 | (written when reached) | Importer, compatibility, executor, run records, local marketplace, CLI, browser app, hardening, slice, CCIS 0.1.0 | LOCKED |  |  | Stage 2. Replaces the demo runner (DS1 to DS5); keep `ccis-cli.js` interface and fixtures. 3.11 ends with the user's limitations review. |
@@ -73,6 +73,9 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 ## ITEMS ONLY YOU CAN DO
+- `npm test` has 2 failures from earlier rows, also on a clean checkout: DS6 `ccis-demo-batch.test.js` test 11 (conflicting `itemStates` counts 2, hand count 1) and DS5 `ccis-viewer.test.js` test 99 (normal-01 snapshot shows 8 observations, record has 9). Say "redo DS6" or "redo DS5" to fix each.
+- Findings F-7 and F-8 (`ccis/fixtures/snake/README.md`): decide whether a later package version adds a node 1 outcome for an unknown result and an estimate warning on needs-data intervals.
+- Follow `docs/DEMO-RUNBOOK.md` in the EMR repo on a clean machine with this commit (EMR DM4c asks for this).
 - Finding F-6 (`ccis/fixtures/snake/README.md`): a not-collected expected item gives overall `complete`. Approve a 0.1.2 fix as a new row (not blocking DS2b).
 - Confirm the omission rule D-050 (conflicting inputs: count, overall status and window are left out).
 - Run `npm test` once on your machine for DS6 (it was not run here at your request); if it fails, say "redo DS6".

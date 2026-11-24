@@ -1,0 +1,296 @@
+{
+  "envelope": {
+    "version": "0.1.0",
+    "exportedAt": "2026-11-24T12:00:00.000Z",
+    "producer": {
+      "system": "emr-enhancer",
+      "version": "0.1.0"
+    }
+  },
+  "inclusions": {
+    "identity": false,
+    "narrative": false,
+    "enteredInError": false
+  },
+  "case": {
+    "ref": "cx_83496a4c58d0b476679233d7d631a396"
+  },
+  "applied": {
+    "elements": [
+      {
+        "id": "snake.envenomation-timing",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      }
+    ],
+    "pathways": [
+      {
+        "id": "snake.documentation-path",
+        "type": "pathway",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "observations": [
+    {
+      "id": "ob-1",
+      "concept": {
+        "id": "snake.envenomation-timing.bite-time",
+        "codes": []
+      },
+      "kind": "datetime",
+      "value": {
+        "value": "2026-11-24T07:00:00Z",
+        "zone": "stated"
+      },
+      "effective": {
+        "value": "2026-11-24T07:00:00.000Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-11-24T07:02:00.000Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "patient-reported",
+      "provenance": {
+        "roleClass": "doctor",
+        "origin": "emr-enhancer/snake-envenomation-timing@1.0.0",
+        "verified": false,
+        "corrected": false
+      }
+    },
+    {
+      "id": "ob-2",
+      "concept": {
+        "id": "snake.envenomation-timing.bite-time-certainty",
+        "codes": [
+          {
+            "system": "ccis-demo",
+            "systemVersion": "0.1.0",
+            "code": "bite-time-certainty",
+            "verification": "unverified"
+          }
+        ]
+      },
+      "kind": "code",
+      "value": {
+        "system": "ccis-demo",
+        "code": "estimated"
+      },
+      "effective": {
+        "value": "2026-11-24T07:00:00.000Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-11-24T07:02:00.000Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "patient-reported",
+      "provenance": {
+        "roleClass": "doctor",
+        "origin": "emr-enhancer/snake-envenomation-timing@1.0.0",
+        "verified": false,
+        "corrected": false
+      }
+    },
+    {
+      "id": "ob-3",
+      "concept": {
+        "id": "snake.envenomation-timing.arrival-time",
+        "codes": []
+      },
+      "kind": "datetime",
+      "value": {
+        "value": "2026-11-24T07:45:00Z",
+        "zone": "stated"
+      },
+      "effective": {
+        "value": "2026-11-24T07:45:00.000Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-11-24T07:47:00.000Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "doctor",
+        "origin": "emr-enhancer/snake-envenomation-timing@1.0.0",
+        "verified": false,
+        "corrected": false
+      }
+    },
+    {
+      "id": "ob-4",
+      "concept": {
+        "id": "snake.envenomation-timing.clotting-test-status",
+        "codes": [
+          {
+            "system": "ccis-demo",
+            "systemVersion": "0.1.0",
+            "code": "clotting-test-status",
+            "verification": "unverified"
+          }
+        ]
+      },
+      "kind": "code",
+      "value": {
+        "system": "ccis-demo",
+        "code": "performed"
+      },
+      "effective": {
+        "value": "2026-11-24T08:00:00.000Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-11-24T08:02:00.000Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "doctor",
+        "origin": "emr-enhancer/snake-envenomation-timing@1.0.0",
+        "verified": false,
+        "corrected": false
+      }
+    },
+    {
+      "id": "ob-5",
+      "concept": {
+        "id": "snake.envenomation-timing.clotting-test-start-time",
+        "codes": []
+      },
+      "kind": "datetime",
+      "value": {
+        "value": "2026-11-24T08:00:00Z",
+        "zone": "stated"
+      },
+      "effective": {
+        "value": "2026-11-24T08:00:00.000Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-11-24T08:02:00.000Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "doctor",
+        "origin": "emr-enhancer/snake-envenomation-timing@1.0.0",
+        "verified": false,
+        "corrected": false
+      }
+    },
+    {
+      "id": "ob-6",
+      "concept": {
+        "id": "snake.envenomation-timing.clotting-result-read-time",
+        "codes": []
+      },
+      "kind": "datetime",
+      "value": {
+        "value": "2026-11-24T08:20:00Z",
+        "zone": "stated"
+      },
+      "effective": {
+        "value": "2026-11-24T08:20:00.000Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-11-24T08:22:00.000Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "doctor",
+        "origin": "emr-enhancer/snake-envenomation-timing@1.0.0",
+        "verified": false,
+        "corrected": false
+      }
+    },
+    {
+      "id": "ob-7",
+      "concept": {
+        "id": "snake.envenomation-timing.clotting-result",
+        "codes": [
+          {
+            "system": "ccis-demo",
+            "systemVersion": "0.1.0",
+            "code": "clotting-test-result",
+            "verification": "unverified"
+          }
+        ]
+      },
+      "kind": "code",
+      "state": "unknown",
+      "effective": {
+        "value": "2026-11-24T08:20:00.000Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-11-24T08:22:00.000Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "doctor",
+        "origin": "emr-enhancer/snake-envenomation-timing@1.0.0",
+        "verified": false,
+        "corrected": false
+      }
+    },
+    {
+      "id": "ob-8",
+      "concept": {
+        "id": "snake.envenomation-timing.antivenom-status",
+        "codes": [
+          {
+            "system": "ccis-demo",
+            "systemVersion": "0.1.0",
+            "code": "antivenom-status",
+            "verification": "unverified"
+          }
+        ]
+      },
+      "kind": "code",
+      "value": {
+        "system": "ccis-demo",
+        "code": "given"
+      },
+      "effective": {
+        "value": "2026-11-24T08:30:00.000Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-11-24T08:32:00.000Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "doctor",
+        "origin": "emr-enhancer/snake-envenomation-timing@1.0.0",
+        "verified": false,
+        "corrected": false
+      }
+    }
+  ],
+  "events": [],
+  "x-emr": {
+    "withheld": {
+      "narrativeObservations": 0,
+      "enteredInErrorObservations": 0,
+      "unitlessNumbers": 0,
+      "derivedObservations": 0,
+      "correctionTargetsWithheld": 0,
+      "events": 0
+    }
+  }
+}

@@ -102,3 +102,13 @@ Nothing here is clinical. The cases show that the hand calculation is consistent
 ## What the later rows add
 
 Row 3.4 runs these envelopes through the executor and compares the output with the expected files. Row 1.6 adds invalid examples, one per validator layer.
+
+## EMR export case (row DS7)
+
+`emr-export/` holds one case that is **not** part of `index.json` and not one of the 32 cases: the EMR Enhancer's own export of its seeded demo case, as the bridge hands it to the CLI (built with the EMR's pure envelope builder and its demo mapper, at fixed times). `emr-demo-case.expected.json` is worked out by hand from the dossier, with the demo placeholder parameters. `test/ccis-demo-emr-export.test.js` runs it through the CLI.
+
+Two findings came out of it (both described in D-069; neither is fixed here):
+
+- **F-7. Node 1 has no outcome for a performed test whose result is explicitly unknown.** The dossier table covers a result that is present, absent, or not performed, not one recorded as unknown. The route stops at indeterminate with no outcome and goes to the gap report (D-053), so the pathway never says "documented". It also never reaches node 2.
+- **F-8. An estimated bite time leaves no warning on an interval that is needs-data for another reason.** When the start time is missing the output has no value to mislead, so the executor adds no estimate warning. The dossier does not say whether it should.
+

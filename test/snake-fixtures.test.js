@@ -23,7 +23,8 @@ const pk = (c) => pkgs[verOf(c)];
 const UNIT_MIN = { min: 1, h: 60 }; // plain arithmetic for the independent recomputation; not read from the artefacts
 const EL = element.manifest.id;
 
-const classDirs = readdirSync(fx).filter((d) => statSync(new URL(d, fx)).isDirectory()).sort();
+// emr-export holds the EMR's own demo-case export (row DS7, tested in ccis-demo-emr-export.test.js); it is not a case class of index.json.
+const classDirs = readdirSync(fx).filter((d) => d !== 'emr-export' && statSync(new URL(d, fx)).isDirectory()).sort();
 const cases = index.cases.map((c) => ({
   ...c,
   envelope: read(new URL(`${c.class}/${c.case}.envelope.json`, fx)),

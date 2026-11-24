@@ -1,0 +1,166 @@
+{
+  "case": "emr-demo-case",
+  "class": "emr-export",
+  "tests": "The EMR Enhancer demo case as exported (row DM1 values): bite time estimated, clotting test performed and read, result explicitly unknown, antivenom given, start time never recorded.",
+  "parameters": {
+    "targetIntervalDuration": {
+      "value": {
+        "amount": 120,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "acceptedCertainty": {
+      "value": "accept",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "edgeRule": {
+      "value": "inside",
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "expectedItems": {
+      "value": [
+        "clottingTestStatus",
+        "clottingTestStartTime",
+        "clottingResultReadTime",
+        "clottingResult"
+      ],
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    },
+    "readTimeWindow": {
+      "value": {
+        "amount": 30,
+        "unit": "min"
+      },
+      "testOnly": true,
+      "note": "test-only placeholder, not a clinical value"
+    }
+  },
+  "evaluationTime": "2026-11-24T12:00:00Z",
+  "results": [
+    {
+      "outputId": "interval",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [
+        "Anti-snake-venom start time is not documented."
+      ],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "state": "needs-data"
+    },
+    {
+      "outputId": "comparison",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes the record only. It does not say what care should have been given and is not decision support."
+      ],
+      "missingDataNotes": [
+        "Anti-snake-venom start time is not documented."
+      ],
+      "x-analytic": "snake.bite-to-antivenom-interval",
+      "state": "needs-data"
+    },
+    {
+      "outputId": "itemStates",
+      "kind": "table",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "columns": [
+          "clottingTestStatus",
+          "clottingTestStartTime",
+          "clottingResultReadTime",
+          "clottingResult"
+        ],
+        "rows": [
+          [
+            "documented",
+            "documented",
+            "documented",
+            "unknown"
+          ]
+        ]
+      }
+    },
+    {
+      "outputId": "expectedDocumentedCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "amount": 3,
+        "unit": "1"
+      }
+    },
+    {
+      "outputId": "overallStatus",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "label": "indeterminate"
+      }
+    },
+    {
+      "outputId": "readTimeInWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Measures the record, not the care. Not documented means nothing was recorded. It does not mean the test was not done."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "snake.clotting-documentation-completeness",
+      "value": {
+        "label": "in-time"
+      }
+    }
+  ],
+  "workings": [
+    "times (UTC): bite 07:00 (estimated), arrival 07:45, test start 08:00, read 08:20, antivenom given at 08:30 with no start time recorded.",
+    "interval and comparison: F8 has no record, so needs-data and no value, never zero (dossier 4.1). Same as fixture missing-04.",
+    "itemStates: F3, F4, F5 documented; F6 is recorded as unknown and stays unknown, never documented and never not documented (dossier 4.2).",
+    "count: expected items are F3 to F6 (demo placeholder); unknown is not documented, so 3 of 4.",
+    "overall: no expected item has nothing recorded and one is unknown, so indeterminate, never complete (dossier 4.2).",
+    "readTimeInWindow: 08:00 to 08:20 is 20 min, inside the 30 min window, so in-time. It does not use F6 (same as fixture missing-07).",
+    "route: node 1 has no outcome for \"performed, read time present, result unknown\" (finding F-7). The stop-without-guessing rule (D-053) gives indeterminate with no outcome, then the gap report. Node 2 is not reached."
+  ],
+  "pathwayRoute": [
+    {
+      "stage": "presentation"
+    },
+    {
+      "stage": "clotting-documentation",
+      "node": "clotting-test-documented",
+      "outcome": null
+    },
+    {
+      "stage": "gap-report"
+    }
+  ],
+  "noValueOutputs": [
+    "interval",
+    "comparison"
+  ],
+  "notSpecified": [],
+  "x-provenance": "Envelope built by the EMR Enhancer pure builder (envelope.js) and the demo mapper (scripts/demo-map.js) from the DM1 seed values, at fixed times. Synthetic. Mapped file is the exact input the bridge gives the CLI."
+}

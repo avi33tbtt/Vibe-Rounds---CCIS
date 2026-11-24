@@ -69,8 +69,8 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 1.6a | chunk-1.6a-fhir-mode-example.md | FHIR-Mode example with mapping report and declared limits (split from 1.6 for size; chunk file first) | DONE | 2026-11-24 | 3 example files, 1 README, 1 test | 3 example files, README, 7 tests. Element passes schema; report counts hand-checked. npm test NOT run (owner request). A-004 proposed. D-074 to D-076. |
 | 1.6b | chunk-1.6b-schemas-tests-validation.md | Schema members for A-003: package `tests` (analytics) and manifest `validation` scope, with fixtures (chunk file first; replaces the old 1.6b plan) | DONE | 2026-11-24 | 2 schemas, ~8 fixtures, 1 test | 2 schemas (manifest validation, analytics tests), 8 fixtures, 5 tests; validators rebuilt. npm test NOT run (owner request). 1.6 layer 8 example adjusted. D-077 to D-079. Next: 1.6c chunk file. |
 | 1.6c | chunk-1.6c-layer7-layer8-examples.md | Layer 7 invalid example and layer 8 scope example (needs 1.6b) | DONE | 2026-11-24 | 2 examples, 2 expected files, 1 README, 1 test | 2 examples (layer 7; layer 8 scope), 2 expected files, README, test extended. All 8 layers covered. npm test NOT run (owner request). Fixed 1.6b test conflict. D-080, D-081. Next: 2.1 chunk file. |
-| 2.1 | chunk-2.1-validator-layers-1-3.md | Validator layers 1 to 3 (syntax, structure, reference integrity), library and CLI, diagnostics | IN PROGRESS | 2026-11-24 | 1 module, 1 CLI edit, 1 test | Chunk file written, awaiting your approval. Next "do next" builds it. ID table: V2-001 to 004, V3-001 to 005 proposed. |
-| 2.2 | (written when reached) | Validator layers 4 to 5 (semantic; graph and compatibility) | LOCKED |  |  | Needs 2.1. |
+| 2.1 | chunk-2.1-validator-layers-1-3.md | Validator layers 1 to 3 (syntax, structure, reference integrity), library and CLI, diagnostics | DONE | 2026-11-24 | 1 module, 1 CLI edit, 1 test | ccis-validator.js, `validate` command, test file. npm test NOT run (owner request); a script matched the 3 examples and valid files passed. D-085 to D-087. Next: 2.2 chunk file. |
+| 2.2 | (written when reached) | Validator layers 4 to 5 (semantic; graph and compatibility) | TODO |  |  | Needs 2.1 (done). Next "do next" writes the chunk file. |
 | 2.3 | (written when reached) | Validator layers 6 to 8 and report writer | LOCKED |  |  | Needs 2.2. |
 | 2.4 | (written when reached) | Compiler: canonical form, checksum, equivalence harness, fail closed | LOCKED |  |  | Needs 2.3. |
 | 3.1 to 3.11 | (written when reached) | Importer, compatibility, executor, run records, local marketplace, CLI, browser app, hardening, slice, CCIS 0.1.0 | LOCKED |  |  | Stage 2. Replaces the demo runner (DS1 to DS5); keep `ccis-cli.js` interface and fixtures. 3.11 ends with the user's limitations review. |
@@ -79,6 +79,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 ## ITEMS ONLY YOU CAN DO
+- Run `npm test` once for 2.1 (not run at your request; new test `test/ccis-validator.test.js`, plus the `validate` command added to `ccis-cli.js`); if it fails, say "redo 2.1".
 - Run `npm test` once for 1.6c (`test/invalid-examples.test.js` was extended); if it fails, say "redo 1.6c".
 - Run `npm test` once for 1.6b (`test/schemas-a003.test.js`, plus the rebuilt validators and the changed 1.6 layer 8 example); if it fails, say "redo 1.6b".
 - Run `npm test` once for 1.6a (it was not run at your request; the new test is `test/fhir-mode-example.test.js`); if it fails, say "redo 1.6a".

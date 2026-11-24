@@ -26,6 +26,21 @@ Leave out `--demo-parameters` and every parameter stays disabled: the results th
 
 To produce a fresh export, run the demo from the EMR Enhancer repository (https://github.com/avi33tbtt/Vibe-Rounds---EMR-Enhancer-App, `docs/DEMO-RUNBOOK.md`). Its bridge calls this CLI.
 
+## Validate an artefact (row 2.1)
+
+Layers 1 to 3 of the validator (syntax, structural, reference integrity) are built. Layers 4 to 8 are rows 2.2 and 2.3; until then the result lists them as **not run**, and "not run" is never a pass.
+
+```
+node ccis-cli.js validate ccis/examples/snake/snake-interval.analytics.0.1.1.json --known ccis/examples/snake
+node ccis-cli.js validate ccis/examples/invalid/3-reference-integrity/input-field-missing.json --known ccis/examples/snake
+```
+
+- Exit code 0: no error diagnostics. 1: at least one error. 2: usage error or an unreadable file. `--json` prints the same data as JSON.
+- References resolve only against the artefacts given: the files on the command line (known to each other) and the `.json` files in `--known <dir>`. A reference to anything else is reported (CCIS-V3-004), never assumed.
+- A layer that fails stops the later layers for that artefact. Every diagnostic has a severity, a stable rule id (`CCIS-V1-001`, `CCIS-V2-001` to `V2-006`, `CCIS-V3-001` to `V3-005`), a location, a message and a hint.
+- As a library: `validateArtefact(textOrObject, { known, schema })` in `ccis-validator.js`. Pure: it reads no files and no clock.
+- Known gaps: duplicate keys inside a JSON object are not detected (the built-in parser keeps the last one); a leading byte order mark is reported as a syntax error at line 1, column 1. Binding fit and UCUM units are layer 4 (row 2.2).
+
 ## What is staged
 
 Shown, but not the real thing. Each is labelled in the viewer.

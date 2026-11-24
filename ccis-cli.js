@@ -2,23 +2,26 @@
 // Prototype. Synthetic data only. Not for clinical use.
 //
 //   node ccis-cli.js run --envelope <file> --out <file> --at <ISO time with offset> [--demo-parameters]
+//   node ccis-cli.js validate <file>... [--known <dir>] [--json]      (row 2.1, layers 1 to 3 of the validator)
 //
 // Reads the envelope and the demo package (ccis/examples/snake), calls the pure demo modules and writes one
 // run record. No network, no clock: the evaluation time is the `--at` value and is required.
 //
-// Exit codes: 0 a record was written (a `failed` record counts); 2 usage error (bad arguments, an unreadable
+// Exit codes of `run`: 0 a record was written (a `failed` record counts); 2 usage error (bad arguments, an unreadable
 // or non-JSON file, a missing `--at`, an output path that cannot be written or already holds a different record).
+// Exit codes of `validate`: 0 no error diagnostics, 1 at least one error diagnostic, 2 usage error or an unreadable file.
 //
 // Parameters stay disabled unless `--demo-parameters` is given. Then the test-only placeholders below are
 // enabled, and the record says "demo placeholders, not clinical values". They are not clinical values.
 
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { loadDemo } from './ccis-demo-loader.js';
 import { evaluatePathway } from './ccis-demo-pathway.js';
 import { evaluateAnalytic } from './ccis-demo-exec.js';
 import { buildRunRecord, runIdInput, canonicalJson } from './ccis-demo-record.js';
+import { validateArtefact, renderText } from './ccis-validator.js';
 
 const NOTE = 'test-only placeholder, not a clinical value';
 // Same values as the fixture normal-01 (a test keeps them equal). Whole minutes for easy arithmetic.
@@ -39,7 +42,7 @@ const usage = (m) => { throw new Usage(m); };
 
 function parseArgs(argv) {
   const [cmd, ...rest] = argv;
-  if (cmd !== 'run') usage('the only command is "run"');
+  if (cmd !== 'run') usage('the only commands are "run" and "validate"');
   const o = { demo: false };
   for (let i = 0; i < rest.length; i += 1) {
     const a = rest[i];
@@ -97,8 +100,59 @@ export function runDemo({ envelope, parameters, evaluationTime, artefacts }) {
   return buildRunRecord({ ...base, id, importReport: loaded.importReport, results });
 }
 
+// ---- validate (row 2.1) -------------------------------------------------------------------------
+// Layers 1 to 3 over each file. The files given are known to each other; `--known <dir>` adds every
+// `.json` file in that folder (not its subfolders). References resolve only against these artefacts.
+const VALIDATE_USAGE = 'usage: node ccis-cli.js validate <file>... [--known <dir>] [--json]';
+
+function validateMain(args, io) {
+  try {
+    const files = [];
+    let knownDir = null;
+    let json = false;
+    for (let i = 0; i < args.length; i += 1) {
+      const a = args[i];
+      if (a === '--json') json = true;
+      else if (a === '--known') {
+        const v = args[i + 1];
+        if (v === undefined || v.startsWith('--')) usage('--known needs a value');
+        knownDir = v;
+        i += 1;
+      } else if (a.startsWith('--')) usage(`unknown argument ${a}`);
+      else files.push(a);
+    }
+    if (files.length === 0) usage('at least one file is required');
+
+    const texts = files.map((f) => {
+      try { return readFileSync(f, 'utf8'); } catch { return usage(`cannot read ${f}`); }
+    });
+    const known = [];
+    if (knownDir !== null) {
+      let names;
+      try { names = readdirSync(knownDir).filter((n) => n.endsWith('.json')).sort(); } catch { usage('cannot read the known folder'); }
+      for (const n of names) {
+        let text;
+        try { text = readFileSync(`${knownDir}/${n}`, 'utf8'); } catch { usage(`cannot read ${n} in the known folder`); }
+        try { known.push(JSON.parse(text)); } catch { usage(`${n} in the known folder is not JSON`); }
+      }
+    }
+    for (const t of texts) {
+      try { known.push(JSON.parse(t)); } catch { /* reported as a layer 1 diagnostic below */ }
+    }
+
+    const results = files.map((f, i) => ({ file: f, result: validateArtefact(texts[i], { known }) }));
+    if (json) io.out(JSON.stringify(results.map((r) => ({ file: r.file, ...r.result })), null, 2));
+    else for (const r of results) io.out(renderText(r.result, r.file));
+    return results.some((r) => r.result.outcome === 'failed') ? 1 : 0;
+  } catch (err) {
+    if (err instanceof Usage) { io.err(`error: ${err.message}\n${VALIDATE_USAGE}`); return 2; }
+    throw err;
+  }
+}
+
 // Returns the exit code. `io` lets tests capture output.
 export function main(argv, io = { out: (s) => process.stdout.write(`${s}\n`), err: (s) => process.stderr.write(`${s}\n`) }) {
+  if (argv[0] === 'validate') return validateMain(argv.slice(1), io);
   try {
     const o = parseArgs(argv);
     const envelope = readJson(o.envelope, 'the envelope file');

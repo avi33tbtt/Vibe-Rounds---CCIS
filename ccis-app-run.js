@@ -1,6 +1,6 @@
 // BROWSER APP, row 3.9: pure in-page run adapter. Prototype. Synthetic data only. Not for clinical use.
 //
-//   runForPage({ market, pathwayKey, importResult, supplied, evaluationTime, runNeedsData })
+//   runForPage({ market, pathwayKey, importResult, supplied, evaluationTime, runNeedsData, only })
 //     -> { ok: true, record, skipped } | { ok: false, sentence }
 //
 // The browser twin of the CLI `run` command (ccis-cli-flow.js, runCmd): the same pins, planner and executor, but the
@@ -21,8 +21,9 @@ const S_NO_TIME = 'An evaluation time is needed.';
 const S_PIN = 'The market could not be checked against its pins.';
 const S_REFUSED = 'The run was refused.';
 const S_DEFECT = 'The run could not be completed.';
+const S_NONE_CHOSEN = 'Choose at least one package.';
 
-export const RUN_SENTENCES = Object.freeze([S_NO_MARKET, S_NO_KEY, S_NOT_FOUND, S_NO_IMPORT, S_NO_TIME, S_PIN, S_REFUSED, S_DEFECT]);
+export const RUN_SENTENCES = Object.freeze([S_NO_MARKET, S_NO_KEY, S_NOT_FOUND, S_NO_IMPORT, S_NO_TIME, S_PIN, S_REFUSED, S_DEFECT, S_NONE_CHOSEN]);
 
 const isObj = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
 const no = (sentence) => ({ ok: false, sentence });
@@ -38,7 +39,7 @@ function pinned(market, ref) {
   return v.ok ? { artefact: v.artefact, checksum: p.pin.checksum } : null;
 }
 
-export function runForPage({ market, pathwayKey, importResult, supplied, evaluationTime, runNeedsData } = {}) {
+export function runForPage({ market, pathwayKey, importResult, supplied, evaluationTime, runNeedsData, only } = {}) {
   const entries = isObj(market) && isObj(market.index) && Array.isArray(market.index.entries) ? market.index.entries : null;
   if (entries === null) return no(S_NO_MARKET);
   if (typeof pathwayKey !== 'string' || pathwayKey === '') return no(S_NO_KEY);
@@ -51,7 +52,11 @@ export function runForPage({ market, pathwayKey, importResult, supplied, evaluat
     if (top === null) return no(S_PIN);
     const pathway = top.artefact;
     const analytics = [];
-    for (const a of Array.isArray(pathway.analytics) ? pathway.analytics : []) {
+    const declared = Array.isArray(pathway.analytics) ? pathway.analytics : [];
+    // `only` (row 3.9.1) keeps just the listed analytic ids; absent, every declared package is pinned as before.
+    const chosen = Array.isArray(only) ? declared.filter((a) => only.includes(a?.ref?.id)) : declared;
+    if (Array.isArray(only) && chosen.length === 0) return no(S_NONE_CHOSEN);
+    for (const a of chosen) {
       const p = pinned(market, a?.ref);
       if (p === null) return no(S_PIN);
       analytics.push({ analytic: p.artefact, checksum: p.checksum });

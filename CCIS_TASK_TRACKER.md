@@ -65,7 +65,8 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | DS5 | chunk-DS5-demo-viewer.md | Static result viewer with banners (CSP-safe) | DONE | 2026-11-23 | 1 page, 1 test file | ccis-viewer.html (hash CSP, no innerHTML), 10 jsdom tests (206+1 todo pass); 3 breakage checks seen failing. jsdom devDep. D-062 to D-064. Next: DS6 (EMR DM1 to DM3 first). |
 | DS6 | chunk-DS6-demo-staged-cohort.md | Staged cohort view (batch of real runner over fixtures) + second-package card | DONE | 2026-11-23 | 1 script, 1 page edit, 1 test | scripts/demo-batch.js, cohort-demo.json (32 cases, counts only), viewer section, 7 tests. npm test NOT run (owner's request); counts checked by hand. D-065 to D-067. Next: DS7. |
 | DS7 | chunk-DS7-demo-hardening.md | EMR-export end-to-end test, README "Run the demo", limitations | DONE | 2026-11-24 | 1 test, 1 fixture pair, README | emr-export fixture pair, 6 tests pass; 3 breakage checks seen failing. README run/staged/limits, CI demo step. F-7, F-8. D-068 to D-070. Suite: 2 older failures (DS5/DS6). |
-| 1.6 | (written when reached) | Invalid examples, one per validator layer; FHIR-Mode example | LOCKED |  |  | Stage 2. Unlocks after 1.5a. |
+| 1.6 | chunk-1.6-invalid-examples.md | Invalid examples, one per validator layer, with expected diagnostics (chunk file first; FHIR-Mode example split to 1.6a) | IN PROGRESS | 2026-11-24 | 8 examples, 8 expected files, 1 test | Stage 2 started. Chunk file written, awaiting your approval. Next "do next" builds it. |
+| 1.6a | (written when reached) | FHIR-Mode example with mapping report and declared limits (split from 1.6 for size) | LOCKED |  |  | Unlocks after 1.6. REQ-091, 092; no invented codes. |
 | 2.1 to 2.4 | (written when reached) | Validator and compiler | LOCKED |  |  | Stage 2. |
 | 3.1 to 3.11 | (written when reached) | Importer, compatibility, executor, run records, local marketplace, CLI, browser app, hardening, slice, CCIS 0.1.0 | LOCKED |  |  | Stage 2. Replaces the demo runner (DS1 to DS5); keep `ccis-cli.js` interface and fixtures. 3.11 ends with the user's limitations review. |
 | 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | After 0.1.0. |
@@ -84,7 +85,6 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 - Confirm D-042: `convert` on a duration parameter is read as "express in the target unit" (identity when already minutes). Phase 2 must define it.
 - Decide whether test-only placeholder parameter values may be shown in the demo (labelled), or the demo should show only "not enabled" states.
 - Review and approve gate R0.
-- Say "start stage 2" when ready for schemas and formal contracts.
 - Name a clinician owner for the snake-envenomation parameters.
 - Confirm D-002 (local-first, no server/database in 0.1.0).
 - Turn on branch protection for `main` and require the CI check once CI exists.

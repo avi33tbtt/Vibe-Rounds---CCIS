@@ -26,6 +26,18 @@ Leave out `--demo-parameters` and every parameter stays disabled: the results th
 
 To produce a fresh export, run the demo from the EMR Enhancer repository (https://github.com/avi33tbtt/Vibe-Rounds---EMR-Enhancer-App, `docs/DEMO-RUNBOOK.md`). Its bridge calls this CLI.
 
+## Run through the local market (row 3.7)
+
+Four commands take a market folder (`market/`, built by `node scripts/market-build.js`) and an export file to a run record, with no browser and no network. `run` without `--market` is still the demo above. `--at` is required (nothing reads the clock). Parameters stay disabled unless `--params <file>` supplies them (`{ "id": { "value": ... } }`); a package that needs data to report on missing data runs only with `--run-needs-data`. Output never shows observation values, and `show` never prints the input snapshot. Exit codes: 0 done, 1 refused (nothing written), 2 usage error.
+
+```
+E=ccis/fixtures/snake/normal/normal-01-all-enabled.envelope.json
+node ccis-cli.js import --envelope $E --market market
+node ccis-cli.js compat --envelope $E --market market --pathway snake.documentation-path
+node ccis-cli.js run --market market --pathway snake.documentation-path --envelope $E --out run.json --at 2026-11-24T12:00:00Z
+node ccis-cli.js show run.json
+```
+
 ## Validate an artefact (rows 2.1 to 2.3)
 
 All eight layers of the validator are built: syntax, structural, reference integrity (row 2.1), semantic, and graph and compatibility (rows 2.2, 2.2b), executable safety, test verification and governance (row 2.3). A layer that did not run is listed as **not run** with its reason, and "not run" is never a pass.

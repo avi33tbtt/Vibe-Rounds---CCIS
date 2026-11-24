@@ -4,6 +4,7 @@
 //   node ccis-cli.js run --envelope <file> --out <file> --at <ISO time with offset> [--demo-parameters]
 //   node ccis-cli.js validate <file>... [--known <dir>] [--fixtures <dir>] [--record <dir>] [--json]      (rows 2.1 to 2.3a)
 //   node ccis-cli.js compile <file> --out <dir> [--known <dir>] [--fixtures <dir>]                        (row 2.4)
+//   node ccis-cli.js import | compat | show, and run with --market <dir>      (row 3.7, see ccis-cli-flow.js)
 //
 // Reads the envelope and the demo package (ccis/examples/snake), calls the pure demo modules and writes one
 // run record. No network, no clock: the evaluation time is the `--at` value and is required.
@@ -26,6 +27,7 @@ import { buildRunRecord, runIdInput, canonicalJson } from './ccis-demo-record.js
 import { validateArtefact, renderText } from './ccis-validator.js';
 import { buildValidationRecord, recordText } from './ccis-validation-record.js';
 import { compileArtefact } from './ccis-compile.js';
+import { flowMain, FLOW_COMMANDS } from './ccis-cli-flow.js';
 
 const NOTE = 'test-only placeholder, not a clinical value';
 // Same values as the fixture normal-01 (a test keeps them equal). Whole minutes for easy arithmetic.
@@ -257,6 +259,7 @@ function compileMain(args, io) {
 export function main(argv, io = { out: (s) => process.stdout.write(`${s}\n`), err: (s) => process.stderr.write(`${s}\n`) }) {
   if (argv[0] === 'validate') return validateMain(argv.slice(1), io);
   if (argv[0] === 'compile') return compileMain(argv.slice(1), io);
+  if (FLOW_COMMANDS.includes(argv[0]) && (argv[0] !== 'run' || argv.includes('--market'))) return flowMain(argv, io);
   try {
     const o = parseArgs(argv);
     const envelope = readJson(o.envelope, 'the envelope file');

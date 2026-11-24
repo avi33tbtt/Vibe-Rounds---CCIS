@@ -1,0 +1,13 @@
+{
+  "id": "synthetic.demo-element",
+  "name": "Synthetic demo element",
+  "type": "contextual-element",
+  "version": "0.1.0",
+  "publisher": {
+    "name": "Synthetic test publisher"
+  },
+  "standard": {
+    "version": "0.1.0"
+  },
+  "status": "validated"
+}

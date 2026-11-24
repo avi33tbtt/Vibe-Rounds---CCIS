@@ -17,7 +17,13 @@
         "type": "contextual-element",
         "version": "0.1.0"
       }
-    ]
+    ],
+    "validation": {
+      "version": "0.1.1",
+      "population": "Synthetic population",
+      "setting": "Synthetic setting",
+      "intendedUse": "Synthetic intended use"
+    }
   },
   "question": "For this case, how much time passed between the bite and the start of anti-snake-venom administration?",
   "intendedUsers": [

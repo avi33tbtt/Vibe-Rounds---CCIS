@@ -67,7 +67,8 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | DS7 | chunk-DS7-demo-hardening.md | EMR-export end-to-end test, README "Run the demo", limitations | DONE | 2026-11-24 | 1 test, 1 fixture pair, README | emr-export fixture pair, 6 tests pass; 3 breakage checks seen failing. README run/staged/limits, CI demo step. F-7, F-8. D-068 to D-070. Suite: 2 older failures (DS5/DS6). |
 | 1.6 | chunk-1.6-invalid-examples.md | Invalid examples, one per validator layer, with expected diagnostics (FHIR-Mode example split to 1.6a) | DONE | 2026-11-24 | 8 examples, 8 expected files, 1 test | 7 examples (layers 1-6, 8), README, test. Layer 7 gap: A-003 proposed, row 1.6b. npm test NOT run (owner request). D-071 to D-073. |
 | 1.6a | chunk-1.6a-fhir-mode-example.md | FHIR-Mode example with mapping report and declared limits (split from 1.6 for size; chunk file first) | DONE | 2026-11-24 | 3 example files, 1 README, 1 test | 3 example files, README, 7 tests. Element passes schema; report counts hand-checked. npm test NOT run (owner request). A-004 proposed. D-074 to D-076. |
-| 1.6b | (written when reached) | Layer 7 invalid example and layer 8 scope example (split from 1.6; needs A-003 decided) | LOCKED |  |  | Unlocks when you decide A-003 in `ccis/CHANGELOG.md`. |
+| 1.6b | chunk-1.6b-schemas-tests-validation.md | Schema members for A-003: package `tests` (analytics) and manifest `validation` scope, with fixtures (chunk file first; replaces the old 1.6b plan) | DONE | 2026-11-24 | 2 schemas, ~8 fixtures, 1 test | 2 schemas (manifest validation, analytics tests), 8 fixtures, 5 tests; validators rebuilt. npm test NOT run (owner request). 1.6 layer 8 example adjusted. D-077 to D-079. Next: 1.6c chunk file. |
+| 1.6c | (written when reached) | Layer 7 invalid example and layer 8 scope example (needs 1.6b) | TODO |  |  | 1.6b is DONE. Next "do next" writes the chunk file. |
 | 2.1 to 2.4 | (written when reached) | Validator and compiler | LOCKED |  |  | Stage 2. |
 | 3.1 to 3.11 | (written when reached) | Importer, compatibility, executor, run records, local marketplace, CLI, browser app, hardening, slice, CCIS 0.1.0 | LOCKED |  |  | Stage 2. Replaces the demo runner (DS1 to DS5); keep `ccis-cli.js` interface and fixtures. 3.11 ends with the user's limitations review. |
 | 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | After 0.1.0. |
@@ -75,9 +76,8 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 ## ITEMS ONLY YOU CAN DO
-- Decide proposed amendment A-004 (`ccis/CHANGELOG.md`): a conversion report for FHIR Mode. Say "approve A-004" or give changes; row 6.1 uses it.
+- Run `npm test` once for 1.6b (`test/schemas-a003.test.js`, plus the rebuilt validators and the changed 1.6 layer 8 example); if it fails, say "redo 1.6b".
 - Run `npm test` once for 1.6a (it was not run at your request; the new test is `test/fhir-mode-example.test.js`); if it fails, say "redo 1.6a".
-- Decide proposed amendment A-003 (`ccis/CHANGELOG.md`): package-declared tests and a validation scope. Say "approve A-003" or give changes; it unlocks 1.6b.
 - Run `npm test` once for 1.6 (it was not run at your request); if it fails, say "redo 1.6".
 - `npm test` has 2 failures from earlier rows, also on a clean checkout: DS6 `ccis-demo-batch.test.js` test 11 (conflicting `itemStates` counts 2, hand count 1) and DS5 `ccis-viewer.test.js` test 99 (normal-01 snapshot shows 8 observations, record has 9). Say "redo DS6" or "redo DS5" to fix each.
 - Findings F-7 and F-8 (`ccis/fixtures/snake/README.md`): decide whether a later package version adds a node 1 outcome for an unknown result and an estimate warning on needs-data intervals.

@@ -6,9 +6,13 @@
   "example": "ccis/examples/invalid/8-governance/validated-without-evidence.json",
   "schema": "analytics",
   "changedPaths": [
-    "/manifest/status"
+    "/manifest/status",
+    "/manifest/validation/intendedUse",
+    "/manifest/validation/population",
+    "/manifest/validation/setting",
+    "/manifest/validation/version"
   ],
-  "defect": "Status is set to validated while the artefact's own evidence says none is claimed. Passes the schemas. The missing place for a validation scope is proposed amendment A-003.",
+  "defect": "Status is set to validated while the artefact's own evidence says none is claimed. A synthetic validation scope is added only because approved A-003 makes it required for that status; it is not part of the defect. Passes the schemas.",
   "diagnostics": [
     {
       "severity": "error",

@@ -553,5 +553,70 @@
       "where": "/engine/version"
     },
     "diagnostic": "REQ-011, 075: the exact engine that ran"
+  },
+  {
+    "file": "manifest-good-validated.json",
+    "schema": "manifest",
+    "valid": true
+  },
+  {
+    "file": "manifest-good-conditionally-validated.json",
+    "schema": "manifest",
+    "valid": true
+  },
+  {
+    "file": "manifest-bad-validated-no-validation.json",
+    "schema": "manifest",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "validation"
+    },
+    "diagnostic": "A-003: a validated status must carry its validation scope"
+  },
+  {
+    "file": "manifest-bad-validation-empty-population.json",
+    "schema": "manifest",
+    "valid": false,
+    "expect": {
+      "keyword": "pattern",
+      "where": "population"
+    },
+    "diagnostic": "A-003: the validation scope needs a stated population"
+  },
+  {
+    "file": "analytics-good-with-tests.json",
+    "schema": "analytics",
+    "valid": true
+  },
+  {
+    "file": "analytics-bad-test-no-expect.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "expect"
+    },
+    "diagnostic": "A-003: a test names an expected result"
+  },
+  {
+    "file": "analytics-bad-test-enable-not-testonly.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "required",
+      "where": "testOnly"
+    },
+    "diagnostic": "A-003: an enabled parameter in a test is marked test-only"
+  },
+  {
+    "file": "analytics-bad-test-value-member.json",
+    "schema": "analytics",
+    "valid": false,
+    "expect": {
+      "keyword": "additionalProperties",
+      "where": "value"
+    },
+    "diagnostic": "D-022, D-078: a test carries no parameter value"
   }
 ]

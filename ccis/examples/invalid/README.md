@@ -15,9 +15,9 @@ Prototype. Synthetic data only. Not for clinical use. **No validator exists yet.
 
 Layers 3, 4, 5, 6 and 8 pass the schemas on purpose: only the later validator layers can refuse them. A test proves this.
 
-## Layer 7 and the scope part of layer 8: schema gap, amendment A-003 (proposed)
+## Layer 7 and the scope part of layer 8: amendment A-003 (approved; schema members added in row 1.6b)
 
-Layer 7 checks a package's own tests against its fixtures. No schema has a place for a package to declare such a test, so there is nothing to verify and nothing to make invalid. The manifest also has no place for the version and scope a `validated` claim covers, so the layer 8 example above can only test the part the schemas can hold (a claim against the package's own evidence). `ccis/CHANGELOG.md` records the gap as proposed amendment **A-003**. Row `1.6b` builds the layer 7 example and the scope example once the owner decides A-003. Nothing was stretched to fit.
+Layer 7 checks a package's own tests against its fixtures. No schema has a place for a package to declare such a test, so there is nothing to verify and nothing to make invalid. The manifest also has no place for the version and scope a `validated` claim covers, so the layer 8 example above can only test the part the schemas can hold (a claim against the package's own evidence). `ccis/CHANGELOG.md` records the gap as proposed amendment **A-003**. Row `1.6b` added the schema members; row `1.6c` builds the layer 7 example and the scope example. The layer 8 example above now also carries a synthetic `validation` scope, because the schema requires one for status `validated`; that is not part of its defect. Nothing was stretched to fit.
 
 ## Diagnostic shape
 

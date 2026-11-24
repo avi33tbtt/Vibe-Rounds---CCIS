@@ -10,6 +10,15 @@ Newest first. The standard follows semantic versioning (CCIS-REQ-012 in `SPEC.md
 - **Raised by:** task 1.4 (`plan-chunks/chunk-1.4-schemas-envelope-report.md`).
 - **Approved:** by the project owner on 2026-11-23, by approving that chunk file ("do next"). `ccis/SPEC.md` text is not edited; this entry is the amendment.
 
+## A-004 (proposed 2026-11-24, awaiting owner approval): a conversion report for FHIR Mode
+
+- **Requirements affected:** CCIS-REQ-092 (every unsupported or lossy construct in a conversion is reported; a valid FHIR resource is never assumed to be a valid CCIS artefact); CCIS-REQ-091.
+- **Gap:** no schema or contract says what a conversion report holds, so a converter has nothing to be tested against.
+- **Proposed change (words only, for the owner to approve or change):** a conversion report lists each source construct exactly once, with an outcome (mapped, mapped with a note, excluded by policy, unsupported, ignored as presentation), a reason or note, and a hint for refused constructs; it gives counts per outcome that add up to the number of source constructs; it names the source version label and the CCIS standard version; it lists the defaults the converter added; it states that the result is unreviewed. A schema follows in row 6.1 once decided.
+- **Reason:** the worked example in `ccis/examples/fhir-mode/` needs a report shape to aim at; today it is illustrative only.
+- **Raised by:** task 1.6a (`plan-chunks/chunk-1.6a-fhir-mode-example.md`).
+- **Approved:** not yet. `ccis/SPEC.md` text is not edited.
+
 ## A-003 (proposed 2026-11-24, awaiting owner approval): where a package declares its own tests and its validation scope
 
 - **Requirements affected:** CCIS-REQ-088 (eight validator layers; layer 7 test verification and layer 8 governance); CCIS-REQ-089 (diagnostics must be demonstrable).

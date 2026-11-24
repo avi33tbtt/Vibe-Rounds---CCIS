@@ -1,0 +1,112 @@
+{
+  "kind": "illustrative-conversion-report",
+  "note": "Illustrative shape only. No schema exists yet (proposed amendment A-004). Written by hand as a target for row 6.1.",
+  "source": {
+    "file": "ccis/examples/fhir-mode/snake-timing.questionnaire.json",
+    "fhirVersionLabel": "R4 (4.0.1), a label and not a claim of full conformance"
+  },
+  "result": {
+    "file": "ccis/examples/fhir-mode/snake-timing-fhir.element.json",
+    "standardVersion": "0.1.0",
+    "review": "unreviewed"
+  },
+  "entries": [
+    {
+      "source": "item:bite-time",
+      "outcome": "mapped-with-note",
+      "field": "biteTime",
+      "confidence": 0.5,
+      "note": "A FHIR date-time answer has no way to say it is an estimate, or to keep the recorded time apart from the event time."
+    },
+    {
+      "source": "extension:bite-time#https://example.invalid/synthetic/presentation-style",
+      "outcome": "ignored-presentation",
+      "reason": "Styling only. No clinical meaning. Dropped, and reported."
+    },
+    {
+      "source": "item:bite-time-certainty",
+      "outcome": "mapped",
+      "field": "biteTimeCertainty"
+    },
+    {
+      "source": "item:arrival-time",
+      "outcome": "mapped",
+      "field": "arrivalTime"
+    },
+    {
+      "source": "item:clotting-test-status",
+      "outcome": "mapped",
+      "field": "clottingTestStatus"
+    },
+    {
+      "source": "item:clotting-test-start-time",
+      "outcome": "mapped",
+      "field": "clottingTestStartTime"
+    },
+    {
+      "source": "item:clotting-result-read-time",
+      "outcome": "mapped-with-note",
+      "field": "clottingResultReadTime",
+      "confidence": 0.5,
+      "note": "The form cannot say this is the time the result was read, rather than the time it was typed in; the CCIS field states that meaning."
+    },
+    {
+      "source": "item:clotting-result",
+      "outcome": "mapped",
+      "field": "clottingResult"
+    },
+    {
+      "source": "item:antivenom-status",
+      "outcome": "mapped",
+      "field": "antivenomStatus"
+    },
+    {
+      "source": "item:antivenom-start-time",
+      "outcome": "mapped",
+      "field": "antivenomStartTime"
+    },
+    {
+      "source": "item:antivenom-not-given-reason",
+      "outcome": "mapped",
+      "field": "antivenomNotGivenReason"
+    },
+    {
+      "source": "item:clinician-notes",
+      "outcome": "excluded-by-policy",
+      "reason": "Free text is excluded from the import by default (core rule on narrative).",
+      "hint": "A package that needs narrative must declare it and the local site must opt in."
+    },
+    {
+      "source": "item:bite-to-arrival-gap",
+      "outcome": "unsupported",
+      "reason": "A derived value. An element holds facts, not calculations.",
+      "hint": "Ask the question in an analytics package, over the bite time and arrival time fields."
+    },
+    {
+      "source": "extension:bite-to-arrival-gap#https://example.invalid/synthetic/calculated-expression",
+      "outcome": "unsupported",
+      "reason": "A calculated expression is code-like text. CCIS packages are data only and nothing is run.",
+      "hint": "Express the calculation as an analytics expression tree."
+    }
+  ],
+  "counts": {
+    "total": 14,
+    "mapped-with-note": 2,
+    "ignored-presentation": 1,
+    "mapped": 8,
+    "excluded-by-policy": 1,
+    "unsupported": 2
+  },
+  "defaultsApplied": [
+    "Every field carries all six data states, because CCIS requires them. The form does not state them.",
+    "Every field has source class imported. The form does not say who entered a value.",
+    "Setting, population and exclusions are marked as not stated. The form does not give them.",
+    "No relationships between fields are inferred. The form declares none."
+  ],
+  "limits": [
+    "One-way only: no round trip back to FHIR is claimed.",
+    "No SDC conformance is claimed.",
+    "No real terminology is resolved: coded answers point at the local demonstration value sets only, and the extension urls are synthetic stand-ins.",
+    "The converted element is unreviewed and draft. A valid Questionnaire does not make a valid CCIS element (REQ-092), so the element is checked against the element schema, and validator layers 1 to 8 still apply."
+  ]
+}

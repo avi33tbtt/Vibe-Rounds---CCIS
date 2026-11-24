@@ -1,0 +1,345 @@
+{
+  "manifest": {
+    "id": "snake.envenomation-timing.from-fhir",
+    "name": "Snake bite timing and documentation (converted from a FHIR form, example)",
+    "type": "contextual-element",
+    "version": "0.1.0",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft"
+  },
+  "intent": {
+    "purpose": "Record when things happened and what was documented for a suspected snake bite, as asked by a synthetic FHIR form.",
+    "setting": "Not stated in the source form. For the local clinician to declare.",
+    "population": "Not stated in the source form. For the local clinician to declare.",
+    "exclusions": [
+      "Not stated in the source form. For the local clinician to declare."
+    ],
+    "rationale": "A worked example of what a FHIR Mode conversion gives and reports. Unreviewed."
+  },
+  "fields": [
+    {
+      "key": "biteTime",
+      "label": "Time of the bite",
+      "type": "datetime",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "timeSemantics": "event-time",
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "imported"
+      ],
+      "constraints": [
+        "Taken from a FHIR form by conversion. No rule about when this applies, or how it relates to other fields, is stated in the source."
+      ]
+    },
+    {
+      "key": "biteTimeCertainty",
+      "label": "How certain the bite time is",
+      "type": "code",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "binding": {
+        "codeSystem": {
+          "id": "ccis-demo",
+          "version": "0.1.0"
+        },
+        "valueSet": {
+          "id": "ccis-demo.bite-time-certainty",
+          "version": "0.1.0"
+        },
+        "code": "bite-time-certainty",
+        "display": "Bite time certainty (demonstration)",
+        "mapping": {
+          "status": "mapped",
+          "note": "Demonstration code in a local demonstration code system. Unverified. Not a real terminology code."
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "imported"
+      ],
+      "constraints": [
+        "Taken from a FHIR form by conversion. No rule about when this applies, or how it relates to other fields, is stated in the source."
+      ]
+    },
+    {
+      "key": "arrivalTime",
+      "label": "Time of arrival at the facility",
+      "type": "datetime",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "timeSemantics": "event-time",
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "imported"
+      ],
+      "constraints": [
+        "Taken from a FHIR form by conversion. No rule about when this applies, or how it relates to other fields, is stated in the source."
+      ]
+    },
+    {
+      "key": "clottingTestStatus",
+      "label": "Clotting test status",
+      "type": "code",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "binding": {
+        "codeSystem": {
+          "id": "ccis-demo",
+          "version": "0.1.0"
+        },
+        "valueSet": {
+          "id": "ccis-demo.clotting-test-status",
+          "version": "0.1.0"
+        },
+        "code": "clotting-test-status",
+        "display": "Clotting test status (demonstration)",
+        "mapping": {
+          "status": "mapped",
+          "note": "Demonstration code in a local demonstration code system. Unverified. Not a real terminology code."
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "imported"
+      ],
+      "constraints": [
+        "Taken from a FHIR form by conversion. No rule about when this applies, or how it relates to other fields, is stated in the source."
+      ]
+    },
+    {
+      "key": "clottingTestStartTime",
+      "label": "Time the clotting test was started",
+      "type": "datetime",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "timeSemantics": "event-time",
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "imported"
+      ],
+      "constraints": [
+        "Taken from a FHIR form by conversion. No rule about when this applies, or how it relates to other fields, is stated in the source."
+      ]
+    },
+    {
+      "key": "clottingResultReadTime",
+      "label": "Time the clotting test result was read",
+      "type": "datetime",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "timeSemantics": "event-time",
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "imported"
+      ],
+      "constraints": [
+        "Taken from a FHIR form by conversion. No rule about when this applies, or how it relates to other fields, is stated in the source."
+      ]
+    },
+    {
+      "key": "clottingResult",
+      "label": "Result of the clotting test",
+      "type": "code",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "binding": {
+        "codeSystem": {
+          "id": "ccis-demo",
+          "version": "0.1.0"
+        },
+        "valueSet": {
+          "id": "ccis-demo.clotting-test-result",
+          "version": "0.1.0"
+        },
+        "code": "clotting-test-result",
+        "display": "Clotting test result (demonstration)",
+        "mapping": {
+          "status": "mapped",
+          "note": "Demonstration code in a local demonstration code system. Unverified. Not a real terminology code."
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "imported"
+      ],
+      "constraints": [
+        "Taken from a FHIR form by conversion. No rule about when this applies, or how it relates to other fields, is stated in the source."
+      ]
+    },
+    {
+      "key": "antivenomStatus",
+      "label": "Anti-snake-venom administration status",
+      "type": "code",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "binding": {
+        "codeSystem": {
+          "id": "ccis-demo",
+          "version": "0.1.0"
+        },
+        "valueSet": {
+          "id": "ccis-demo.antivenom-status",
+          "version": "0.1.0"
+        },
+        "code": "antivenom-status",
+        "display": "Anti-snake-venom status (demonstration)",
+        "mapping": {
+          "status": "mapped",
+          "note": "Demonstration code in a local demonstration code system. Unverified. Not a real terminology code."
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "imported"
+      ],
+      "constraints": [
+        "Taken from a FHIR form by conversion. No rule about when this applies, or how it relates to other fields, is stated in the source."
+      ]
+    },
+    {
+      "key": "antivenomStartTime",
+      "label": "Time anti-snake-venom administration began",
+      "type": "datetime",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "timeSemantics": "event-time",
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "imported"
+      ],
+      "constraints": [
+        "Taken from a FHIR form by conversion. No rule about when this applies, or how it relates to other fields, is stated in the source."
+      ]
+    },
+    {
+      "key": "antivenomNotGivenReason",
+      "label": "Reason anti-snake-venom was not given",
+      "type": "code",
+      "cardinality": {
+        "min": 0,
+        "max": 1
+      },
+      "binding": {
+        "codeSystem": {
+          "id": "ccis-demo",
+          "version": "0.1.0"
+        },
+        "valueSet": {
+          "id": "ccis-demo.antivenom-not-given-reason",
+          "version": "0.1.0"
+        },
+        "code": "antivenom-not-given-reason",
+        "display": "Reason not given (demonstration)",
+        "mapping": {
+          "status": "mapped",
+          "note": "Demonstration code in a local demonstration code system. Unverified. Not a real terminology code."
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "sourceClasses": [
+        "imported"
+      ],
+      "constraints": [
+        "Taken from a FHIR form by conversion. No rule about when this applies, or how it relates to other fields, is stated in the source."
+      ]
+    }
+  ],
+  "provenance": {
+    "origin": "Written by hand from snake-timing.questionnaire.json as a target for row 6.1. No converter exists.",
+    "basis": "The mappable items of the synthetic form only. Unreviewed. No clinical review has taken place."
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "snake-timing-synthetic",
+  "status": "draft",
+  "title": "Snake bite timing and documentation (synthetic FHIR form)",
+  "description": "Synthetic, hand-written demonstration form. Not a real form, not reviewed, not for clinical use. Coded answers point at the local demonstration value sets only.",
+  "publisher": "Synthetic test publisher",
+  "item": [
+    {
+      "linkId": "bite-time",
+      "text": "Time of the bite",
+      "type": "dateTime",
+      "extension": [
+        {
+          "url": "https://example.invalid/synthetic/presentation-style",
+          "valueString": "bold, large text"
+        }
+      ]
+    },
+    {
+      "linkId": "bite-time-certainty",
+      "text": "How certain the bite time is",
+      "type": "choice",
+      "answerValueSet": "ccis-demo.bite-time-certainty|0.1.0"
+    },
+    {
+      "linkId": "arrival-time",
+      "text": "Time of arrival at the facility",
+      "type": "dateTime"
+    },
+    {
+      "linkId": "clotting-test-status",
+      "text": "Clotting test status",
+      "type": "choice",
+      "answerValueSet": "ccis-demo.clotting-test-status|0.1.0"
+    },
+    {
+      "linkId": "clotting-test-start-time",
+      "text": "Time the clotting test was started",
+      "type": "dateTime"
+    },
+    {
+      "linkId": "clotting-result-read-time",
+      "text": "Time the clotting test result was read",
+      "type": "dateTime"
+    },
+    {
+      "linkId": "clotting-result",
+      "text": "Result of the clotting test",
+      "type": "choice",
+      "answerValueSet": "ccis-demo.clotting-test-result|0.1.0"
+    },
+    {
+      "linkId": "antivenom-status",
+      "text": "Anti-snake-venom administration status",
+      "type": "choice",
+      "answerValueSet": "ccis-demo.antivenom-status|0.1.0"
+    },
+    {
+      "linkId": "antivenom-start-time",
+      "text": "Time anti-snake-venom administration began",
+      "type": "dateTime"
+    },
+    {
+      "linkId": "antivenom-not-given-reason",
+      "text": "Reason anti-snake-venom was not given",
+      "type": "choice",
+      "answerValueSet": "ccis-demo.antivenom-not-given-reason|0.1.0"
+    },
+    {
+      "linkId": "clinician-notes",
+      "text": "Notes (free text)",
+      "type": "text"
+    },
+    {
+      "linkId": "bite-to-arrival-gap",
+      "text": "Gap between bite and arrival",
+      "type": "string",
+      "readOnly": true,
+      "extension": [
+        {
+          "url": "https://example.invalid/synthetic/calculated-expression",
+          "valueString": "arrival-time minus bite-time (stand-in text, never run)"
+        }
+      ]
+    }
+  ]
+}

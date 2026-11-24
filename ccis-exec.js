@@ -2,8 +2,8 @@
 //
 // CCIS executor, part 1 (row 3.3): the whitelist expression interpreter. Pure: no network, file access, clock
 // read, randomness, eval, Function or dynamic import (CCIS-REQ-063, 067, 068). It evaluates one declarative
-// expression tree to one value. It does not read the context, walk decision nodes, convert units, do time
-// arithmetic or build run results; those are rows 3.4 and 3.5.
+// expression tree to one value. It does not read the context, walk decision nodes or build run results; those
+// are rows 3.4a, 3.4b and 3.5. All 18 whitelisted operators are implemented (row 3.4).
 //
 //   prepareAnalytic({ analytic, checksum, runtime })
 //     -> { ok: true, prepared, checksum, operators } | { ok: false, refusals: [{ id, meaning, output, path, op? }] }
@@ -28,14 +28,15 @@ export const OPERATOR_SET = Object.freeze({ name: 'ccis-core-ops', version: '0.1
 export const RUNTIME_LIMIT_FIELDS = Object.freeze(['maxSteps', 'maxDepth', 'maxOutputBytes']);
 export const UNKNOWN_KIND = Object.freeze(['input', 'parameter']);
 
-// The 18 operators the analytics schema allows (D-006), and the 12 this engine version implements.
+// The 18 operators the analytics schema allows (D-006). Since row 3.4 this engine version implements all 18.
 export const WHITELIST_OPS = Object.freeze(['and', 'or', 'not', 'is-present', 'state-of', 'eq', 'ne', 'lt', 'le', 'gt', 'ge', 'add', 'sub', 'time-diff', 'convert', 'if', 'count', 'select']);
-export const IMPLEMENTED_OPS = Object.freeze(['and', 'or', 'not', 'is-present', 'state-of', 'eq', 'ne', 'lt', 'le', 'gt', 'ge', 'if']);
+export const IMPLEMENTED_OPS = Object.freeze([...WHITELIST_OPS]);
 
 const HARD_MAX_DEPTH = 256; // protects the JavaScript stack whatever a package asks for
 const ARITY = new Map([
   ['and', [1, Infinity]], ['or', [1, Infinity]], ['not', [1, 1]], ['is-present', [1, 1]], ['state-of', [1, 1]],
   ['eq', [2, 2]], ['ne', [2, 2]], ['lt', [2, 2]], ['le', [2, 2]], ['gt', [2, 2]], ['ge', [2, 2]], ['if', [3, 3]],
+  ['add', [2, Infinity]], ['sub', [2, 2]], ['time-diff', [2, 2]], ['convert', [2, 2]], ['count', [1, Infinity]], ['select', [1, Infinity]],
 ]);
 const WHITELIST = new Set(WHITELIST_OPS);
 const IMPLEMENTED = new Set(IMPLEMENTED_OPS);
@@ -56,6 +57,8 @@ export const EXEC_REFUSALS = Object.freeze([
   ['X-012', 'The analytic is not a prepared, pinned and well-formed compiled form.'],
   ['X-013', 'A number is not finite or cannot be written in canonical form.'],
   ['X-014', 'A bound input or parameter is malformed or missing.'],
+  ['X-015', 'A conversion of a kind this engine does not apply in convert is used.'],
+  ['X-016', 'A select is not a valid membership test or table row for its output.'],
 ].map(([id, meaning]) => Object.freeze({ id, meaning })));
 const MEANING = new Map(EXEC_REFUSALS.map((r) => [r.id, r.meaning]));
 const refusalOf = (id) => ({ id, meaning: MEANING.get(id) });
@@ -115,6 +118,9 @@ export function prepareAnalytic({ analytic, checksum, runtime } = {}) {
   const paramKind = new Map(doc.parameters.map((p) => [p.id, p.kind]));
   const convs = new Set(convList.map((c) => c.id));
   const outputIds = new Set(doc.outputs.map((o) => o.id));
+  const outputDecl = new Map(doc.outputs.map((o) => [o.id, o]));
+  const convDecl = new Map(convList.map((c) => [c.id, c]));
+  const paramDecl = new Map(doc.parameters.map((p) => [p.id, p]));
 
   const seen = new Set();
   const trees = [];
@@ -150,7 +156,25 @@ export function prepareAnalytic({ analytic, checksum, runtime } = {}) {
     else {
       const [lo, hi] = ARITY.get(e.op);
       if (e.args.length < lo || e.args.length > hi) add('X-003', output, path);
-      else if (e.op === 'is-present' || e.op === 'state-of') {
+      else if (e.op === 'convert') {
+        const c = e.args[1];
+        if (!(isObj(c) && c.ref === 'conversion')) add('X-005', output, `${path}.args[1]`);
+        else if (convDecl.has(c.id)) {
+          const d = convDecl.get(c.id);
+          if (d.kind !== 'linear' || typeof d.factor !== 'number' || !Number.isFinite(d.factor)) add('X-015', output, `${path}.args[1]`);
+        }
+      } else if (e.op === 'select') {
+        const a0 = e.args[0];
+        const isSet = (x) => isObj(x) && x.ref === 'parameter' && paramKind.get(x.id) === 'set';
+        if (isSet(a0)) {
+          const members = paramDecl.get(a0.id).allowedMembers;
+          const lit = e.args[1];
+          if (e.args.length !== 2 || !isObj(lit) || typeof lit.literal !== 'string' || !Array.isArray(members) || !members.includes(lit.literal)) add('X-016', output, path);
+        } else {
+          const decl = outputDecl.get(output);
+          if (!decl || decl.kind !== 'table' || !Array.isArray(decl.columns) || e.args.length !== decl.columns.length || e.args.some(isSet)) add('X-016', output, path);
+        }
+      } else if (e.op === 'is-present' || e.op === 'state-of') {
         const a = e.args[0];
         const okRef = isObj(a) && Object.hasOwn(a, 'ref') && (e.op === 'state-of' ? a.ref === 'input' : a.ref === 'input' || a.ref === 'parameter');
         if (!okRef) add('X-005', output, `${path}.args[0]`);
@@ -189,8 +213,12 @@ function mergeBecause(unknowns) {
 }
 
 // A bound value is read field by field into a fresh object; anything else is malformed (X-014).
-function readValue(v) {
+function readValue(v, allowSet = false) {
   if (!isObj(v)) fail('X-014');
+  if (allowSet && v.t === 'set') {
+    if (!Array.isArray(v.members) || v.members.length === 0 || !v.members.every((m) => typeof m === 'string' && m !== '') || new Set(v.members).size !== v.members.length) fail('X-014');
+    return { t: 'set', members: [...v.members].sort() };
+  }
   if (v.t === 'bool' && typeof v.v === 'boolean') return bool(v.v);
   if (v.t === 'text' && typeof v.v === 'string') return text(v.v);
   if (v.t === 'instant' && Number.isSafeInteger(v.ms)) return { t: 'instant', ms: v.ms };
@@ -224,7 +252,7 @@ function bindParameters(prepared, parameters) {
     if (!b.enabled) map.set(decl.id, { enabled: false });
     else {
       if (!Object.hasOwn(b, 'value') || b.value === undefined) fail('X-014');
-      map.set(decl.id, { enabled: true, value: readValue(b.value) });
+      map.set(decl.id, { enabled: true, value: readValue(b.value, true) });
     }
   }
   return map;
@@ -256,6 +284,8 @@ export function evaluateOutput({ prepared, outputId, inputs, parameters } = {}) 
     const inMap = bindInputs(prepared, inputs);
     const parMap = bindParameters(prepared, parameters);
     const { maxSteps, maxOutputBytes } = prepared.limits;
+    const paramKinds = new Map(prepared.analytic.parameters.map((p) => [p.id, p.kind]));
+    const convs = new Map((prepared.analytic.conversions ?? []).map((c) => [c.id, c]));
     let steps = 0;
     const tick = () => { steps += 1; if (steps > maxSteps) fail('X-009'); };
 
@@ -293,6 +323,18 @@ export function evaluateOutput({ prepared, outputId, inputs, parameters } = {}) 
         if (c.t !== 'bool') fail('X-010');
         return ev(e.args[c.v ? 1 : 2]);
       }
+      if (op === 'convert') {
+        const x = ev(e.args[0]);
+        tick(); // the conversion reference leaf
+        if (x.t === 'unknown') return x;
+        if (x.t !== 'number') fail('X-010');
+        const c = convs.get(e.args[1].id);
+        if (x.unit === c.to) return x;
+        if (x.unit !== c.from) fail('X-010');
+        const v = x.v * c.factor;
+        if (!Number.isFinite(v)) fail('X-013');
+        return { t: 'number', v, unit: c.to };
+      }
       const vals = e.args.map(ev); // every argument, always (no short-circuit)
       if (op === 'and' || op === 'or' || op === 'not') {
         if (vals.some((v) => v.t !== 'bool' && v.t !== 'unknown')) fail('X-010');
@@ -303,7 +345,30 @@ export function evaluateOutput({ prepared, outputId, inputs, parameters } = {}) 
         return unk.length ? mergeBecause(unk) : bool(!decisive);
       }
       const unk = vals.filter((v) => v.t === 'unknown');
+      if (op === 'count') {
+        if (vals.some((v) => v.t !== 'bool' && v.t !== 'unknown')) fail('X-010');
+        return unk.length ? mergeBecause(unk) : { t: 'number', v: vals.filter((v) => v.v === true).length, unit: '1' };
+      }
+      if (op === 'select') {
+        const a0 = e.args[0];
+        if (a0.ref === 'parameter' && paramKinds.get(a0.id) === 'set') {
+          if (unk.length) return mergeBecause(unk);
+          return bool(vals[0].members.includes(vals[1].v));
+        }
+        if (vals.some((v) => v.t !== 'text' && v.t !== 'unknown')) fail('X-010');
+        return unk.length ? mergeBecause(unk) : { t: 'row', cells: vals.map((v) => v.v) };
+      }
       if (unk.length) return mergeBecause(unk);
+      if (op === 'time-diff') {
+        if (vals[0].t !== 'instant' || vals[1].t !== 'instant') fail('X-010');
+        return { t: 'number', v: (vals[1].ms - vals[0].ms) / 60000, unit: 'min' };
+      }
+      if (op === 'add' || op === 'sub') {
+        if (vals.some((v) => v.t !== 'number' || v.unit !== vals[0].unit)) fail('X-010');
+        const v = op === 'add' ? vals.reduce((n, x) => n + x.v, 0) : vals[0].v - vals[1].v;
+        if (!Number.isFinite(v)) fail('X-013');
+        return { t: 'number', v, unit: vals[0].unit };
+      }
       return bool(compareKnown(op, vals[0], vals[1]));
     };
 

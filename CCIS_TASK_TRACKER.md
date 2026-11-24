@@ -80,7 +80,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 3.1 | chunk-3.1-importer.md | Importer: envelope to canonical context + import report (no silent loss, entered-in-error rejected, no unit conversion at import) | DONE | 2026-11-24 | 1 module, 1 test | ccis-import.js, 9 tests; npm test 475 pass, 0 fail; 3 breakage checks seen. Oracle matches demo loader on 33 envelopes. D-106 to D-108. Next: 3.2 chunk file. |
 | 3.2 | chunk-3.2-compatibility.md | Compatibility: six checks, five outcomes with reasons, never guess a mapping; execution policy v0 | DONE | 2026-11-24 | 1 module, 1 test | ccis-compat.js, 27 tests; npm test 502 pass, 0 fail; 3 breakage checks seen failing. 37 reason codes. D-110 to D-112. Next: 3.3 chunk file. |
 | 3.3 | chunk-3.3-exec-interpreter.md | Executor part 1: expression interpreter, operator whitelist, three-valued logic, step and depth limits, no eval | DONE | 2026-11-24 | 1 module, 1 test | ccis-exec.js, 29 tests; npm test 531 pass, 0 fail; 3 breakage checks seen failing. 12 of 18 ops; X-001 to X-014. D-116 to D-118. F-9 open. Next: 3.4 chunk file. |
-| 3.4 | chunk-3.4-operators.md | Executor part 2: the six remaining operators (add, sub, time-diff, convert, count, select); snake packages prepare | TODO |  | 1 module edit, 1 test | Chunk file written 2026-11-24, awaiting approval. Split: binder/results to 3.4a, walker to 3.4b. F-9: no new ops. D-119 to D-121. |
+| 3.4 | chunk-3.4-operators.md | Executor part 2: the six remaining operators (add, sub, time-diff, convert, count, select); snake packages prepare | DONE | 2026-11-24 | 1 module edit, 1 test | ccis-exec.js: 18 of 18 ops, X-015, X-016; 14 new tests; npm test 545 pass, 0 fail; 3 breakage checks seen failing. D-122 to D-124. Next: 3.4a chunk file. |
 | 3.4a | (written when reached) | `ccis-bind.js`: bind context and parameters, map values to run results and output contract, wording tables; 32 fixtures plus EMR export as oracle | TODO |  |  | Needs 3.4. |
 | 3.4b | (written when reached) | `ccis-walk.js`: decision-node walker with rule trace; 32 routes as oracle | TODO |  |  | Needs 3.4a. Must not rely on record order (3.1 sorts by id). |
 | 3.5 | (written when reached) | Run planner, batch runs, result validation, immutable content-addressed run records, byte-identical rerun | TODO |  |  | Needs 3.4b. Uses the 3.1 context and envelope checksums. |
@@ -95,9 +95,9 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 ## ITEMS ONLY YOU CAN DO
-- Approve `plan-chunks/chunk-3.4-operators.md` (row 3.4). Its five questions have defaults (D-120); they include confirming D-042, deciding F-9 (no new operators now) and the split into 3.4, 3.4a and 3.4b.
+- Row 3.4 took the defaults for its five questions (D-122, D-123): D-042 confirmed; no first, last, min, max, coalesce (F-9); split into 3.4, 3.4a, 3.4b; X-002 kept but unreachable. Say so if any should change.
 - Row 3.3 took the defaults for its five questions (D-116, D-117): no short-circuit; `is-present` always true or false; pinned checksum required; unimplemented operators refuse the whole analytic; no implicit unit conversion. Say so if any should change. Finding F-9 (D-115): first, last, min, max and coalesce are not in the schema enum; the 3.4 chunk file must choose.
-- `npm test` was run once for 3.3 on a fresh clone with the new files: 531 pass, 0 fail, 1 todo (F-6). Earlier: 502 for 3.2, 475 for 3.1, 466 for 2.4. Run it once on your machine after you push.
+- `npm test` was run once for 3.4 on a fresh clone with the new files: 545 pass, 0 fail, 1 todo (F-6). Earlier: 531 for 3.3, 502 for 3.2, 475 for 3.1, 466 for 2.4. Run it once on your machine after you push.
 - 2.4 took the defaults for its four questions: A-005 approved with the chunk file; array order is significant; lone nodes and bindings are refused; no schema for compiled metadata (later, with 3.6). Say so if you want any changed.
 - Row 3.2 took the defaults for its five questions (D-110, D-111): one outcome per package plus the pathway; an unevaluable check gives Incompatible (now on all six checks); Needs data does not run; preview/governed rules; missing means no observation or only absent, unknown or not-collected. Say so if any should change.
 - Decide how a clinician's enabled parameter values reach the compatibility check (D-112): until then every snake package is at best "Compatible with limitations". Row 3.5 needs the answer.
@@ -109,7 +109,6 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 - Confirm the omission rule D-050 (conflicting inputs: count, overall status and window are left out).
 - Review `docs/DEMO-SLICE.md` and `docs/ROADMAP-COORDINATION.md` (rows DS0 and DS-X are drafts).
 - Answer findings F-4 and F-5 (`ccis/fixtures/snake/README.md`): by amending the dossier or by accepting the 0.1.0 tree behaviour. Two deferred fixture cases wait on them.
-- Confirm D-042: `convert` on a duration parameter is read as "express in the target unit" (identity when already minutes). Phase 2 must define it.
 - Decide whether test-only placeholder parameter values may be shown in the demo (labelled), or the demo should show only "not enabled" states.
 - Review and approve gate R0.
 - Name a clinician owner for the snake-envenomation parameters.

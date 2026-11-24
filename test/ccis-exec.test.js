@@ -45,11 +45,13 @@ const refusalOf = (expr, inputs, parameters) => { const r = run(base({ o: expr }
 
 // ---------------------------------------------------------------------------------------------
 test('catalogue and constants', () => {
-  assert.deepEqual(EXEC_REFUSALS.map((r) => r.id), Array.from({ length: 14 }, (_, i) => `X-${String(i + 1).padStart(3, '0')}`));
+  assert.deepEqual(EXEC_REFUSALS.map((r) => r.id), Array.from({ length: 16 }, (_, i) => `X-${String(i + 1).padStart(3, '0')}`));
   assert.ok(EXEC_REFUSALS.every((r) => r.meaning.endsWith('.') && Object.isFrozen(r)));
   assert.equal(WHITELIST_OPS.length, 18);
-  assert.equal(IMPLEMENTED_OPS.length, 12);
-  assert.ok(IMPLEMENTED_OPS.every((o) => WHITELIST_OPS.includes(o)));
+  assert.equal(IMPLEMENTED_OPS.length, 18); // row 3.4: every whitelisted operator is implemented
+  assert.deepEqual([...IMPLEMENTED_OPS], [...WHITELIST_OPS]);
+  // X-002 stays in the catalogue for a future whitelist growth, but cannot be reached now.
+  assert.ok(EXEC_REFUSALS.some((r) => r.id === 'X-002'));
   assert.deepEqual(ENGINE, { name: 'ccis-exec', version: '0.1.0' });
   assert.deepEqual(OPERATOR_SET, { name: 'ccis-core-ops', version: '0.1.0' });
   assert.deepEqual(RUNTIME_LIMIT_FIELDS, ['maxSteps', 'maxDepth', 'maxOutputBytes']);
@@ -171,7 +173,7 @@ const refuseWith = (analytic, runtime) => { const r = prep(analytic, runtime); a
 
 test('(d) each static refusal is reached, and nothing is evaluated when one exists', () => {
   assert.deepEqual(ids(refuseWith(base({ o: op('eval', T) }))), ['X-001']);
-  assert.deepEqual(ids(refuseWith(base({ o: op('add', T, T) }))), ['X-002']);
+  mustPrep(base({ o: op('add', I('n1'), I('n2')) })); // formerly X-002; now implemented
   assert.deepEqual(ids(refuseWith(base({ o: op('not', T, T) }))), ['X-003']);
   assert.deepEqual(ids(refuseWith(base({ o: op('if', T, T) }))), ['X-003']);
   assert.deepEqual(ids(refuseWith(base({ o: op('and') }))), ['X-003']);
@@ -232,32 +234,31 @@ test('(d) malformed nodes are X-012; the prepared object cannot be changed', () 
 test('(d) all refusals are listed together, sorted by output then path, and nothing runs', () => {
   const a = base({
     z: op('eval', T),
-    m: op('and', I('nope'), op('add', T, T), op('not', T, T)),
+    m: op('and', I('nope'), op('eval', T), op('not', T, T)),
     k: op('is-present', L('x')),
   });
   const r = refuseWith(a);
   assert.deepEqual(r.refusals.map((x) => [x.output, x.path, x.id]), [
     ['k', 'computation[2].expr.args[0]', 'X-005'],
     ['m', 'computation[1].expr.args[0]', 'X-004'],
-    ['m', 'computation[1].expr.args[1]', 'X-002'],
+    ['m', 'computation[1].expr.args[1]', 'X-001'],
     ['m', 'computation[1].expr.args[2]', 'X-003'],
     ['z', 'computation[0].expr', 'X-001'],
   ]);
-  assert.equal(r.refusals.find((x) => x.id === 'X-002').op, 'add');
   assert.equal('prepared' in r, false);
   assert.ok(r.refusals.every((x) => EXEC_REFUSALS.find((c) => c.id === x.id).meaning === x.meaning));
 });
 
 test('(d) the same input gives the same refusals', () => {
-  const a = base({ z: op('eval', T), m: op('add', T, T) });
+  const a = base({ z: op('eval', T), m: op('nope', T) });
   assert.deepEqual(refuseWith(a), refuseWith(clone(a)));
 });
 
 // (e) real packages --------------------------------------------------------------------------
 const snakeFiles = readdirSync(ex).filter((f) => f.includes('.analytics')).sort();
 
-test('(e) the four snake analytics prepare with only X-002, naming the operators 3.4 must add', () => {
-  const expected = {
+test('(e) the four snake analytics now prepare, and report the operators they use', () => {
+  const used = {
     'snake-completeness.analytics.0.1.1.json': ['convert', 'count', 'select', 'time-diff'],
     'snake-completeness.analytics.json': ['count', 'select', 'time-diff'],
     'snake-interval.analytics.0.1.1.json': ['convert', 'time-diff'],
@@ -267,9 +268,9 @@ test('(e) the four snake analytics prepare with only X-002, naming the operators
   for (const f of snakeFiles) {
     const a = JSON.parse(readFileSync(new URL(f, ex), 'utf8'));
     const r = prepareAnalytic({ analytic: a, checksum: sumOf(a), runtime: RUNTIME });
-    assert.equal(r.ok, false, f);
-    assert.deepEqual([...new Set(ids(r))], ['X-002'], f);
-    assert.deepEqual([...new Set(r.refusals.map((x) => x.op))].sort(), expected[f], f);
+    assert.equal(r.ok, true, f + JSON.stringify(r.refusals));
+    for (const o of used[f]) assert.ok(r.operators.includes(o), `${f} ${o}`);
+    assert.ok(r.operators.every((o) => WHITELIST_OPS.includes(o)));
   }
 });
 
@@ -410,4 +411,225 @@ test('(g) the module is a pure library: it imports only the compiler and uses no
   for (const banned of [/\beval\s*\(/, /\bnew Function\b/, /\bFunction\s*\(/, /\bimport\s*\(/, /\bDate\b/, /Math\.random/, /\bprocess\b/, /\bfs\b/, /\brequire\b/, /\bfetch\s*\(/, /setTimeout/, /performance\./, /crypto\.random/]) {
     assert.equal(banned.test(code), false, String(banned));
   }
+});
+
+// =============================================================================================
+// Row 3.4: the six remaining operators
+// =============================================================================================
+const CONV = [{ id: 'h2m', from: 'h', to: 'min', kind: 'linear', factor: 60 }, { id: 'tz', from: 'x', to: 'y', kind: 'time-zone' }];
+const C = (id) => ({ ref: 'conversion', id });
+const SETDECL = [{ id: 'p', kind: 'choice' }, { id: 'q', kind: 'duration' }, { id: 'setp', kind: 'set', allowedMembers: ['m1', 'm2'] }];
+const TABLE2 = [{ id: 'o', kind: 'table', columns: [{ key: 'x' }, { key: 'y' }] }];
+const X = { conversions: CONV, parameters: SETDECL };
+const vx = (expr, inputs, parameters, over = {}) => { const r = run(base({ o: expr }, { ...X, ...over }), 'o', inputs, parameters); assert.equal(r.ok, true, JSON.stringify(r)); return r.value; };
+const rx = (expr, inputs, parameters, over = {}) => { const r = run(base({ o: expr }, { ...X, ...over }), 'o', inputs, parameters); assert.equal(r.ok, false); assert.equal('value' in r, false); return r.refusal.id; };
+const num = (v, unit = 'min') => ({ t: 'number', v, unit });
+const dur = (v, unit) => ({ q: { enabled: true, value: { t: 'number', v, unit } } });
+const SET = (...m) => ({ setp: { enabled: true, value: { t: 'set', members: m } } });
+const ABSENT = (k) => ({ [k]: st('absent') });
+const bec = (k, state, kind = 'input') => ({ t: 'unknown', because: [{ kind, id: k, state }] });
+
+test('(3.4 a) time-diff is end minus start in minutes, unrounded; unknown stays unknown; other types are X-010', () => {
+  assert.deepEqual(vx(op('time-diff', I('i1'), I('i2')), IN({ i1: iv(0), i2: iv(60000) })), num(1));
+  assert.deepEqual(vx(op('time-diff', I('i1'), I('i2')), IN({ i1: iv(0), i2: iv(90000) })), num(1.5));
+  assert.deepEqual(vx(op('time-diff', I('i1'), I('i2')), IN({ i1: iv(60000), i2: iv(0) })), num(-1));
+  assert.deepEqual(vx(op('time-diff', I('i1'), I('i1')), IN()), num(0));
+  assert.deepEqual(vx(op('time-diff', I('i1'), I('i2')), IN({ i1: st('absent') })), bec('i1', 'absent'));
+  assert.deepEqual(vx(op('time-diff', I('i1'), I('i2')), IN({ i1: st('absent'), i2: st('unknown') })).because.length, 2);
+  assert.equal(rx(op('time-diff', I('n1'), I('i2'))), 'X-010');
+  assert.equal(rx(op('time-diff', I('i1'), I('t1'))), 'X-010');
+  assert.equal(run(base({ o: op('time-diff', I('i1'), I('i2')) }), 'o').steps, 3);
+});
+
+test('(3.4 a) add and sub: numbers of one unit only', () => {
+  assert.deepEqual(vx(op('add', I('n1'), I('n2'))), num(12));
+  assert.deepEqual(vx(op('add', I('n1'), I('n1'), I('n2'))), num(17));
+  assert.deepEqual(vx(op('sub', I('n2'), I('n1'))), num(2));
+  assert.deepEqual(vx(op('sub', I('n1'), I('n2'))), num(-2));
+  assert.equal(rx(op('add', I('n1'), I('n2')), IN({ n2: nv(7, 'h') })), 'X-010');
+  assert.equal(rx(op('sub', I('n1'), I('n2')), IN({ n2: nv(7, 'h') })), 'X-010');
+  assert.equal(rx(op('add', I('i1'), I('i2'))), 'X-010');
+  assert.equal(rx(op('add', I('n1'), I('t1'))), 'X-010');
+  assert.deepEqual(vx(op('add', I('n1'), I('n2')), IN({ n2: st('not-collected') })), bec('n2', 'not-collected'));
+  assert.deepEqual(vx(op('sub', I('n1'), I('n2')), IN({ n1: st('absent') })), bec('n1', 'absent'));
+  assert.equal(rx(op('add', I('n1'), I('n2')), IN({ n1: nv(1e308), n2: nv(1e308) })), 'X-013');
+  assert.deepEqual(ids(refuseWith(base({ o: op('sub', I('n1'), I('n2'), I('n1')) }, X))), ['X-003']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('add', I('n1')) }, X))), ['X-003']);
+});
+
+test('(3.4 a) convert: express in the target unit (D-042)', () => {
+  assert.deepEqual(vx(op('convert', P('q'), C('h2m')), IN(), PAR(dur(2, 'h'))), num(120));
+  assert.deepEqual(vx(op('convert', P('q'), C('h2m')), IN(), PAR(dur(2.5, 'h'))), num(150));
+  assert.deepEqual(vx(op('convert', P('q'), C('h2m')), IN(), PAR(dur(90, 'min'))), num(90));
+  assert.deepEqual(vx(op('convert', I('n1'), C('h2m'))), num(5));
+  assert.equal(rx(op('convert', P('q'), C('h2m')), IN(), PAR(dur(2, 'd'))), 'X-010');
+  assert.equal(rx(op('convert', I('t1'), C('h2m'))), 'X-010');
+  assert.equal(rx(op('convert', I('i1'), C('h2m'))), 'X-010');
+  assert.deepEqual(vx(op('convert', P('q'), C('h2m')), IN(), PAR()), bec('q', 'parameter-not-enabled', 'parameter'));
+  assert.deepEqual(vx(op('convert', I('n1'), C('h2m')), IN({ n1: st('absent') })), bec('n1', 'absent'));
+  assert.equal(run(base({ o: op('convert', P('q'), C('h2m')) }, X), 'o', IN(), PAR(dur(2, 'h'))).steps, 3);
+  assert.equal(rx(op('convert', P('q'), C('h2m')), IN(), PAR(dur(1e308, 'h'))), 'X-013');
+});
+
+test('(3.4 a) convert: static refusals (X-015 kind, X-005 shape, X-004 undeclared)', () => {
+  assert.deepEqual(ids(refuseWith(base({ o: op('convert', I('n1'), C('tz')) }, X))), ['X-015']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('convert', I('n1'), I('n2')) }, X))), ['X-005']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('convert', I('n1'), C('zzz')) }, X))), ['X-004']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('convert', I('n1')) }, X))), ['X-003']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('convert', I('n1'), { ref: 'conversion', id: 'h2m' }, I('n2')) }, X))), ['X-003']);
+});
+
+test('(3.4 a) count: trues counted in unit 1; any unknown argument makes it unknown', () => {
+  const c3 = op('count', I('a'), I('b'), I('c'));
+  assert.deepEqual(vx(c3, IN()), num(3, '1'));
+  assert.deepEqual(vx(c3, IN({ b: bv(false), c: bv(false) })), num(1, '1'));
+  assert.deepEqual(vx(c3, IN({ a: bv(false), b: bv(false), c: bv(false) })), num(0, '1'));
+  assert.deepEqual(vx(c3, IN({ b: st('absent') })), bec('b', 'absent')); // a true is present, still unknown
+  assert.equal(vx(c3, IN({ a: st('unknown'), b: st('absent') })).because.length, 2);
+  assert.deepEqual(vx(op('count', I('a')), IN()), num(1, '1'));
+  assert.equal(rx(op('count', I('a'), I('t1'))), 'X-010');
+  assert.equal(rx(op('count', I('a'), I('n1'))), 'X-010');
+  assert.deepEqual(ids(refuseWith(base({ o: op('count') }, X))), ['X-003']);
+});
+
+test('(3.4 a) select, membership: a declared member of an enabled set; a disabled set is unknown', () => {
+  const sel = (m) => op('select', P('setp'), L(m));
+  assert.deepEqual(vx(sel('m1'), IN(), PAR(SET('m2', 'm1'))), { t: 'bool', v: true });
+  assert.deepEqual(vx(sel('m2'), IN(), PAR(SET('m1'))), { t: 'bool', v: false });
+  assert.deepEqual(vx(sel('m1'), IN(), PAR()), bec('setp', 'parameter-not-enabled', 'parameter'));
+  assert.equal(run(base({ o: sel('m1') }, X), 'o', IN(), PAR(SET('m1'))).steps, 3);
+  assert.deepEqual(ids(refuseWith(base({ o: sel('zz') }, X))), ['X-016']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('select', P('setp'), L('m1'), L('m2')) }, X))), ['X-016']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('select', P('setp')) }, X))), ['X-016']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('select', P('setp'), I('t1')) }, X))), ['X-016']);
+  mustPrep(base({ o: op('is-present', P('setp')) }, X));
+});
+
+test('(3.4 a) select, table row: width must match the output columns; an unknown cell makes the row unknown', () => {
+  const T2 = { ...X, outputs: TABLE2 };
+  assert.deepEqual(vx(op('select', L('a'), L('b')), IN(), PAR(), T2), { t: 'row', cells: ['a', 'b'] });
+  assert.deepEqual(vx(op('select', I('t1'), L('b')), IN(), PAR(), T2), { t: 'row', cells: ['x', 'b'] });
+  assert.deepEqual(vx(op('select', op('state-of', I('a')), op('state-of', I('b'))), IN({ b: st('absent') }), PAR(), T2), { t: 'row', cells: ['present', 'absent'] });
+  assert.deepEqual(vx(op('select', I('a'), L('b')), IN({ a: st('absent') }), PAR(), T2), { t: 'unknown', because: [{ kind: 'input', id: 'a', state: 'absent' }] });
+  assert.equal(rx(op('select', I('n1'), L('b')), IN(), PAR(), T2), 'X-010');
+  assert.equal(rx(op('select', I('a'), L('b')), IN(), PAR(), T2), 'X-010'); // booleans are not cells
+  assert.deepEqual(ids(refuseWith(base({ o: op('select', L('a')) }, T2))), ['X-016']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('select', L('a'), L('b'), L('c')) }, T2))), ['X-016']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('select', L('a'), P('setp')) }, T2))), ['X-016']);
+  assert.deepEqual(ids(refuseWith(base({ o: op('select', L('a'), L('b')) }, X))), ['X-016']); // output is not a table
+  assert.deepEqual(ids(refuseWith(base({ o: op('select', L('a'), L('b')) }, { ...X, outputs: [{ id: 'o', kind: 'table' }] }))), ['X-016']);
+});
+
+test('(3.4 a) bound set values: sorted, unique strings; sets only for parameters', () => {
+  const sel = op('select', P('setp'), L('m1'));
+  assert.equal(rx(sel, IN(), PAR(SET())), 'X-014');
+  assert.equal(rx(sel, IN(), PAR(SET('m1', 'm1'))), 'X-014');
+  assert.equal(rx(sel, IN(), PAR(SET('m1', 5))), 'X-014');
+  assert.equal(rx(sel, IN(), PAR({ setp: { enabled: true, value: { t: 'set', members: 'm1' } } })), 'X-014');
+  assert.equal(rx(T, IN({ a: { state: 'present', value: { t: 'set', members: ['m1'] } } })), 'X-014');
+  assert.equal(rx(T, IN({ a: { state: 'present', value: { t: 'row', cells: ['x'] } } })), 'X-014');
+  assert.deepEqual(vx(op('select', P('setp'), L('m2')), IN(), PAR(SET('m2', 'm1'))), { t: 'bool', v: true });
+  assert.deepEqual(ids(refuseWith(base({ o: P('setp') }, X))), ['X-005']); // a set is never a value
+});
+
+test('(3.4 c) the new operators keep the limits: steps counted, no partial value', () => {
+  const tree = op('time-diff', I('i1'), I('i2')); // 3 nodes
+  const mk = (n) => base({ o: tree }, { executionProfile: { maxSteps: n, maxDepth: 24, maxOutputBytes: 65536 } });
+  assert.equal(run(mk(3), 'o').ok, true);
+  const r = run(mk(2), 'o');
+  assert.equal(r.ok, false);
+  assert.equal(r.refusal.id, 'X-009');
+  assert.equal('value' in r, false);
+});
+
+// ---- the real packages, 0.1.1, hand-calculated ----
+const real = (f) => { const a = JSON.parse(readFileSync(new URL(f, ex), 'utf8')); return mustPrep(a); };
+const MIN = 60000;
+const BITE = 10 * MIN;
+const IV_IN = (over = {}) => ({ antivenomStatus: tv('given'), biteTime: iv(BITE), antivenomStartTime: iv(BITE + 185 * MIN), biteTimeCertainty: tv('recorded'), ...over });
+const IV_PAR = (over = {}) => ({ targetIntervalDuration: DISABLED, acceptedCertainty: DISABLED, edgeRule: DISABLED, populationScope: DISABLED, ...over });
+const target = (v, unit) => ({ targetIntervalDuration: { enabled: true, value: { t: 'number', v, unit } } });
+const edge = (v) => ({ edgeRule: { enabled: true, value: { t: 'text', v } } });
+const evalReal = (prepared, outputId, inputs, parameters) => { const r = evaluateOutput({ prepared, outputId, inputs, parameters }); assert.equal(r.ok, true, JSON.stringify(r)); return r.value; };
+
+test('(3.4 b) interval 0.1.1: bite to start in minutes, hand-calculated', () => {
+  const pk = real('snake-interval.analytics.0.1.1.json');
+  assert.deepEqual(evalReal(pk, 'interval', IV_IN(), IV_PAR()), num(185));
+  assert.deepEqual(evalReal(pk, 'interval', IV_IN({ antivenomStartTime: iv(BITE + 90000) }), IV_PAR()), num(1.5));
+  assert.deepEqual(evalReal(pk, 'interval', IV_IN({ antivenomStartTime: iv(BITE) }), IV_PAR()), num(0));
+  assert.deepEqual(evalReal(pk, 'interval', IV_IN({ antivenomStartTime: iv(BITE - MIN) }), IV_PAR()), { t: 'text', v: 'conflict' });
+  assert.deepEqual(evalReal(pk, 'interval', IV_IN({ biteTime: st('absent') }), IV_PAR()), { t: 'text', v: 'needs-data' });
+  assert.deepEqual(evalReal(pk, 'interval', IV_IN({ antivenomStatus: st('explicitly-negative') }), IV_PAR()), { t: 'text', v: 'not-applicable' });
+  assert.deepEqual(evalReal(pk, 'interval', IV_IN({ antivenomStatus: st('unknown') }), IV_PAR()), { t: 'text', v: 'indeterminate' });
+});
+
+test('(3.4 b) interval 0.1.1 comparison: target in hours or minutes, each edge rule, at and either side of the edge', () => {
+  const pk = real('snake-interval.analytics.0.1.1.json');
+  const at = (minutes) => IV_IN({ antivenomStartTime: iv(BITE + minutes * MIN) });
+  const cmp3 = (minutes, rule, tgt) => evalReal(pk, 'comparison', at(minutes), IV_PAR({ ...tgt, ...edge(rule) })).v;
+  for (const tgt of [target(3, 'h'), target(180, 'min')]) {
+    assert.equal(cmp3(179, 'inside', tgt), 'within-target');
+    assert.equal(cmp3(180, 'inside', tgt), 'within-target');
+    assert.equal(cmp3(181, 'inside', tgt), 'outside-target');
+    assert.equal(cmp3(179, 'outside', tgt), 'within-target');
+    assert.equal(cmp3(180, 'outside', tgt), 'outside-target');
+    assert.equal(cmp3(181, 'outside', tgt), 'outside-target');
+  }
+  assert.equal(cmp3(185, 'inside', target(3.5, 'h')), 'within-target'); // 3.5 h = 210 min
+  assert.deepEqual(evalReal(pk, 'comparison', at(180), IV_PAR(edge('inside'))), { t: 'text', v: 'parameter-not-enabled' });
+  assert.equal(evaluateOutput({ prepared: pk, outputId: 'comparison', inputs: at(180), parameters: IV_PAR({ ...target(3, 'd'), ...edge('inside') }) }).refusal.id, 'X-010');
+});
+
+const CP_PAR = (over = {}) => ({ expectedItems: { enabled: true, value: { t: 'set', members: ['clottingTestStatus', 'clottingTestStartTime', 'clottingResultReadTime', 'clottingResult'] } }, readTimeWindow: DISABLED, edgeRule: DISABLED, populationScope: DISABLED, ...over });
+const CP_IN = (over = {}) => ({ clottingTestStatus: tv('performed'), clottingTestStartTime: iv(BITE), clottingResultReadTime: iv(BITE + 60 * MIN), clottingResult: tv('r'), ...over });
+const items = (...m) => ({ expectedItems: { enabled: true, value: { t: 'set', members: m } } });
+
+test('(3.4 b) completeness 0.1.1: count, table row and statuses, hand-calculated', () => {
+  const pk = real('snake-completeness.analytics.0.1.1.json');
+  const D = 'documented';
+  assert.deepEqual(evalReal(pk, 'expectedDocumentedCount', CP_IN(), CP_PAR()), num(4, '1'));
+  assert.deepEqual(evalReal(pk, 'itemStates', CP_IN(), CP_PAR()), { t: 'row', cells: [D, D, D, D] });
+  assert.deepEqual(evalReal(pk, 'overallStatus', CP_IN(), CP_PAR()), { t: 'text', v: 'complete' });
+  // only two items expected
+  assert.deepEqual(evalReal(pk, 'expectedDocumentedCount', CP_IN(), CP_PAR(items('clottingResult', 'clottingTestStatus'))), num(2, '1'));
+  // result absent
+  assert.deepEqual(evalReal(pk, 'expectedDocumentedCount', CP_IN({ clottingResult: st('absent') }), CP_PAR()), num(3, '1'));
+  assert.deepEqual(evalReal(pk, 'itemStates', CP_IN({ clottingResult: st('absent') }), CP_PAR()), { t: 'row', cells: [D, D, D, 'not-documented'] });
+  assert.deepEqual(evalReal(pk, 'overallStatus', CP_IN({ clottingResult: st('absent') }), CP_PAR()), { t: 'text', v: 'incomplete' });
+  // result recorded as unknown
+  assert.deepEqual(evalReal(pk, 'itemStates', CP_IN({ clottingResult: st('unknown') }), CP_PAR()), { t: 'row', cells: [D, D, D, 'unknown'] });
+  assert.deepEqual(evalReal(pk, 'overallStatus', CP_IN({ clottingResult: st('unknown') }), CP_PAR()), { t: 'text', v: 'indeterminate' });
+  // test explicitly not done
+  assert.deepEqual(evalReal(pk, 'itemStates', CP_IN({ clottingTestStatus: st('explicitly-negative'), clottingTestStartTime: st('absent'), clottingResultReadTime: st('absent'), clottingResult: st('absent') }), CP_PAR()), { t: 'row', cells: ['explicitly-negative', 'not-applicable', 'not-applicable', 'not-applicable'] });
+  // two records disagree
+  assert.deepEqual(evalReal(pk, 'itemStates', CP_IN({ clottingResult: st('conflicting') }), CP_PAR()), { t: 'text', v: 'conflict' });
+  // expected items not enabled
+  assert.deepEqual(evalReal(pk, 'expectedDocumentedCount', CP_IN(), CP_PAR({ expectedItems: DISABLED })), { t: 'text', v: 'parameter-not-enabled' });
+  assert.deepEqual(evalReal(pk, 'overallStatus', CP_IN(), CP_PAR({ expectedItems: DISABLED })), { t: 'text', v: 'parameter-not-enabled' });
+});
+
+test('(3.4 b) completeness 0.1.1 readTimeInWindow: window in hours converted to minutes, each edge rule', () => {
+  const pk = real('snake-completeness.analytics.0.1.1.json');
+  const win = (v, unit) => ({ readTimeWindow: { enabled: true, value: { t: 'number', v, unit } } });
+  const at = (minutes) => CP_IN({ clottingResultReadTime: iv(BITE + minutes * MIN) });
+  const res = (minutes, rule, w) => evalReal(pk, 'readTimeInWindow', at(minutes), CP_PAR({ ...w, ...edge(rule) })).v;
+  for (const w of [win(1, 'h'), win(60, 'min')]) {
+    assert.equal(res(59, 'inside', w), 'in-time');
+    assert.equal(res(60, 'inside', w), 'in-time');
+    assert.equal(res(61, 'inside', w), 'not-in-time');
+    assert.equal(res(59, 'outside', w), 'in-time');
+    assert.equal(res(60, 'outside', w), 'not-in-time');
+  }
+  assert.equal(res(-1, 'inside', win(1, 'h')), 'conflict');
+  assert.equal(evalReal(pk, 'readTimeInWindow', CP_IN({ clottingResultReadTime: st('absent') }), CP_PAR({ ...win(1, 'h'), ...edge('inside') })).v, 'needs-data');
+});
+
+test('(3.4 b) the real packages are deterministic and leave their inputs alone', () => {
+  const pk = real('snake-interval.analytics.0.1.1.json');
+  const inputs = IV_IN(); const params = IV_PAR({ ...target(3, 'h'), ...edge('inside') });
+  const snap = JSON.stringify([inputs, params]);
+  const one = JSON.stringify(evaluateOutput({ prepared: pk, outputId: 'comparison', inputs, parameters: params }));
+  const two = JSON.stringify(evaluateOutput({ prepared: real('snake-interval.analytics.0.1.1.json'), outputId: 'comparison', inputs: clone(inputs), parameters: clone(params) }));
+  assert.equal(one, two);
+  assert.equal(JSON.stringify([inputs, params]), snap);
 });

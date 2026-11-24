@@ -86,8 +86,9 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 3.5 | chunk-3.5-run.md | `ccis-run.js`: planner, batch of several analytics on one context without mutating the source, result validation, immutable content-addressed run records with snapshot, rerun-from-record is byte-identical | DONE | 2026-11-24 | 1 module, 1 test | ccis-run.js, 15 tests pass in own file; 33 rerun byte-identical; 3 breakage checks seen failing. Full npm test NOT run (owner request). F-10. D-133 to D-135. Next: 3.6 chunk file. |
 | 3.6 | chunk-3.6-market.md | `ccis-market.js` + `market/` local test marketplace: publish (passing validator report and checksum), resolve, pin; lint refuses patient data | DONE | 2026-11-24 | 1 module, 1 script, 1 test | ccis-market.js, market-build.js, market/ (6 pkgs), 32 tests pass in own file; 3 breakage checks seen failing. Full npm test NOT run (owner request). D-137 to D-139. Next: 3.7 chunk file. |
 | 3.7 | chunk-3.7-cli.md | CLI over the market: import, compat (list compatible), run in market mode, show; demo `run` untouched | DONE | 2026-11-24 | 1 module edit, 1 test | ccis-cli-flow.js: 4 commands; 15 tests pass in own file; demo run byte-identical; 3 breakage checks seen failing. Full npm test NOT run (owner). D-141 to D-143, F-11. Next: 3.8 chunk file. |
-| 3.8 | (written when reached) | Browser app 1: import workspace, report, selectors, compatibility catalogue | TODO |  |  | Needs 3.7 (done). Chunk file first. |
-| 3.9 | (written when reached) | Browser app 2: multi-select run, results workspace, run record export | TODO |  |  | Needs 3.8. |
+| 3.8 | chunk-3.8-app-shell.md | Browser app 1: build pipeline (one hashed script), shell, market folder loader, import workspace and report | TODO |  |  | Chunk file written 2026-11-24 (docs only); awaiting your approval. Needs 3.7 (done). Narrowed: selectors and catalogue moved to 3.8a. |
+| 3.8a | (written when reached) | Browser app 1b: context and pathway selector, compatibility catalogue with explanations (including Needs data and Incompatible views) | TODO |  |  | Needs 3.8. Chunk file first. |
+| 3.9 | (written when reached) | Browser app 2: multi-select run, results workspace, run record export | TODO |  |  | Needs 3.8a. |
 | 3.10 | (written when reached) | Browser hardening: strict CSP, shared escaper, no inline handlers, jsdom plus one real-browser smoke test | TODO |  |  | Needs 3.9. |
 | 3.11 | (written when reached) | Slice acceptance and CCIS 0.1.0: end-to-end test, negative tests, freeze, limitations list | TODO |  |  | Needs 3.10. Ends with your review of the limitations list before Phase 4. |
 | 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | After 0.1.0. |
@@ -95,6 +96,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 ## ITEMS ONLY YOU CAN DO
+- Approve the 3.8 chunk file (`plan-chunks/chunk-3.8-app-shell.md`) by saying "do next" (defaults apply) or answer its five questions. Most important: question 1 adds `esbuild` as an exact-pinned dev dependency, and question 5 splits the plan's 3.8 into 3.8 and a new 3.8a.
 - Row 3.7 took the defaults for its five questions (D-141, D-142): `--market` selects market mode, parameters only from `--params`, `--run-needs-data` is the only F-10 answer, `import --out` writes the context to the named path, `show` never prints the snapshot. Say so if any should change.
 - `npm test` was NOT run for 3.7; only `node --test test/ccis-cli-flow.test.js` (15 pass). Run the full `npm test` once on your machine after you push.
 - Finding F-11 (D-143): `verifyRecord` does not cover `record.context`, so an altered byte there still verifies. Decide whether a new row fixes it (row 3.5 module). Browser row 3.9 will show the same verification.

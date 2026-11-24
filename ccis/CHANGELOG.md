@@ -10,6 +10,15 @@ Newest first. The standard follows semantic versioning (CCIS-REQ-012 in `SPEC.md
 - **Raised by:** task 1.4 (`plan-chunks/chunk-1.4-schemas-envelope-report.md`).
 - **Approved:** by the project owner on 2026-11-23, by approving that chunk file ("do next"). `ccis/SPEC.md` text is not edited; this entry is the amendment.
 
+## A-003 (proposed 2026-11-24, awaiting owner approval): where a package declares its own tests and its validation scope
+
+- **Requirements affected:** CCIS-REQ-088 (eight validator layers; layer 7 test verification and layer 8 governance); CCIS-REQ-089 (diagnostics must be demonstrable).
+- **Gap:** analytics packages and pathways have no member in which to declare their own test cases (inputs plus the expected result, tied to a fixture), so layer 7 has nothing to verify and no invalid example can be written for it. The element schema holds only `tests`, a list of references. The manifest has `status: validated` but no member for the version, population, setting and intended use the claim covers (core rule: "validated" always carries scope).
+- **Proposed change (words only, for the owner to approve or change):** (1) a package may declare `tests`: each names a fixture, the parameters it enables (test-only, marked as such) and the expected result by output id; (2) a manifest that has status `validated` or `conditionally-validated` must carry a `validation` member naming the exact package version, population, setting and intended use. Both are optional for status `draft`.
+- **Reason:** gate B-03 needs an invalid example, with expected diagnostics, for every layer, and layer 8 must check that a claim matches the exact version and scope.
+- **Raised by:** task 1.6 (`plan-chunks/chunk-1.6-invalid-examples.md`). Row `1.6b` builds the layer 7 example, and the layer 8 scope example, once this is decided; schema rows follow the decision.
+- **Approved:** not yet. `ccis/SPEC.md` text is not edited.
+
 ## A-002 (2026-11-23): kinds of result (gap G-04)
 
 - **Requirements affected:** CCIS-REQ-070 (outputs checked against a declared output contract); clarifies, does not change, CCIS-REQ-066.

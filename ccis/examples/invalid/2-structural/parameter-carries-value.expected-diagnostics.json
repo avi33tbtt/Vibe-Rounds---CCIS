@@ -1,0 +1,21 @@
+{
+  "case": "parameter-carries-value",
+  "layer": 2,
+  "layerName": "structural",
+  "base": "ccis/examples/snake/snake-interval.analytics.0.1.1.json",
+  "example": "ccis/examples/invalid/2-structural/parameter-carries-value.json",
+  "schema": "analytics",
+  "changedPaths": [
+    "/parameters/0/value"
+  ],
+  "defect": "A parameter carries a value member (D-022 forbids it); the schema rejects it.",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "ruleId": "CCIS-V2-001",
+      "path": "/parameters/0/value",
+      "message": "A parameter declares a member \"value\". Parameters arrive disabled and carry no value in a package.",
+      "hint": "Remove the member. The value is supplied locally at run time by a named clinician."
+    }
+  ]
+}

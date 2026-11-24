@@ -1,0 +1,766 @@
+{
+  "manifest": {
+    "id": "snake.bite-to-antivenom-interval",
+    "name": "Bite-to-anti-snake-venom interval",
+    "type": "analytics-package",
+    "version": "0.1.1",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft",
+    "references": [
+      {
+        "id": "snake.envenomation-timing",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "question": "For this case, how much time passed between the bite and the start of anti-snake-venom administration?",
+  "intendedUsers": [
+    "Local reviewers of care processes"
+  ],
+  "population": "People presenting with a suspected snake bite. Narrowing is for the local clinician to declare.",
+  "limitations": {
+    "statement": "Describes the record only. It does not say what care should have been given and is not decision support.",
+    "items": [
+      "An estimated bite time stays visible as an estimate.",
+      "The comparison is not produced until a local clinician enables a target and an edge rule."
+    ]
+  },
+  "context": [
+    {
+      "ref": {
+        "id": "snake.envenomation-timing",
+        "type": "contextual-element",
+        "range": "^0.1.0"
+      },
+      "fields": [
+        "biteTime",
+        "biteTimeCertainty",
+        "antivenomStatus",
+        "antivenomStartTime"
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "key": "biteTime",
+      "element": "snake.envenomation-timing",
+      "field": "biteTime",
+      "type": "datetime",
+      "onMissing": "needs-data"
+    },
+    {
+      "key": "biteTimeCertainty",
+      "element": "snake.envenomation-timing",
+      "field": "biteTimeCertainty",
+      "type": "code",
+      "onMissing": "needs-data"
+    },
+    {
+      "key": "antivenomStatus",
+      "element": "snake.envenomation-timing",
+      "field": "antivenomStatus",
+      "type": "code",
+      "onMissing": "indeterminate"
+    },
+    {
+      "key": "antivenomStartTime",
+      "element": "snake.envenomation-timing",
+      "field": "antivenomStartTime",
+      "type": "datetime",
+      "onMissing": "needs-data"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "targetIntervalDuration",
+      "label": "Target bite-to-anti-snake-venom interval",
+      "kind": "duration",
+      "units": [
+        "min",
+        "h"
+      ],
+      "allowedRange": {
+        "min": 0,
+        "max": 525600
+      },
+      "enabledByDefault": false,
+      "suppliedBy": "Local clinician (role, not yet named)",
+      "note": "The allowed range is a technical bound of the format. It is not a clinical value and not a suggestion."
+    },
+    {
+      "id": "acceptedCertainty",
+      "label": "Acceptable certainty of bite time",
+      "kind": "choice",
+      "allowedChoices": [
+        "accept",
+        "flag-only",
+        "needs-data"
+      ],
+      "enabledByDefault": false,
+      "suppliedBy": "Local clinician (role, not yet named)"
+    },
+    {
+      "id": "edgeRule",
+      "label": "Edge rule for boundaries",
+      "kind": "choice",
+      "allowedChoices": [
+        "inside",
+        "outside"
+      ],
+      "enabledByDefault": false,
+      "suppliedBy": "Local clinician (role, not yet named)"
+    },
+    {
+      "id": "populationScope",
+      "label": "Population scope",
+      "kind": "criteria",
+      "enabledByDefault": false,
+      "suppliedBy": "Local clinician (role, not yet named)",
+      "note": "No narrowing is assumed. Applying criteria is not expressible in the expression tree (see ccis/examples/snake/README.md)."
+    }
+  ],
+  "operatorSet": {
+    "name": "ccis-core-ops",
+    "version": "0.1.0"
+  },
+  "computation": [
+    {
+      "output": "interval",
+      "expr": {
+        "op": "if",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "op": "state-of",
+                "args": [
+                  {
+                    "ref": "input",
+                    "id": "antivenomStatus"
+                  }
+                ]
+              },
+              {
+                "literal": "explicitly-negative"
+              }
+            ]
+          },
+          {
+            "literal": "not-applicable"
+          },
+          {
+            "op": "if",
+            "args": [
+              {
+                "op": "not",
+                "args": [
+                  {
+                    "op": "is-present",
+                    "args": [
+                      {
+                        "ref": "input",
+                        "id": "antivenomStatus"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "literal": "indeterminate"
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "or",
+                    "args": [
+                      {
+                        "op": "not",
+                        "args": [
+                          {
+                            "op": "is-present",
+                            "args": [
+                              {
+                                "ref": "input",
+                                "id": "biteTime"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "op": "not",
+                        "args": [
+                          {
+                            "op": "is-present",
+                            "args": [
+                              {
+                                "ref": "input",
+                                "id": "antivenomStartTime"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "op": "not",
+                        "args": [
+                          {
+                            "op": "is-present",
+                            "args": [
+                              {
+                                "ref": "input",
+                                "id": "biteTimeCertainty"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "needs-data"
+                  },
+                  {
+                    "op": "if",
+                    "args": [
+                      {
+                        "op": "lt",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "antivenomStartTime"
+                          },
+                          {
+                            "ref": "input",
+                            "id": "biteTime"
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "conflict"
+                      },
+                      {
+                        "op": "if",
+                        "args": [
+                          {
+                            "op": "and",
+                            "args": [
+                              {
+                                "op": "eq",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "biteTimeCertainty"
+                                  },
+                                  {
+                                    "literal": "estimated"
+                                  }
+                                ]
+                              },
+                              {
+                                "op": "not",
+                                "args": [
+                                  {
+                                    "op": "is-present",
+                                    "args": [
+                                      {
+                                        "ref": "parameter",
+                                        "id": "acceptedCertainty"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "parameter-not-enabled"
+                          },
+                          {
+                            "op": "if",
+                            "args": [
+                              {
+                                "op": "and",
+                                "args": [
+                                  {
+                                    "op": "eq",
+                                    "args": [
+                                      {
+                                        "ref": "input",
+                                        "id": "biteTimeCertainty"
+                                      },
+                                      {
+                                        "literal": "estimated"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "op": "eq",
+                                    "args": [
+                                      {
+                                        "ref": "parameter",
+                                        "id": "acceptedCertainty"
+                                      },
+                                      {
+                                        "literal": "needs-data"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "needs-data"
+                              },
+                              {
+                                "op": "time-diff",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "biteTime"
+                                  },
+                                  {
+                                    "ref": "input",
+                                    "id": "antivenomStartTime"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "output": "comparison",
+      "expr": {
+        "op": "if",
+        "args": [
+          {
+            "op": "or",
+            "args": [
+              {
+                "op": "not",
+                "args": [
+                  {
+                    "op": "is-present",
+                    "args": [
+                      {
+                        "ref": "parameter",
+                        "id": "targetIntervalDuration"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "not",
+                "args": [
+                  {
+                    "op": "is-present",
+                    "args": [
+                      {
+                        "ref": "parameter",
+                        "id": "edgeRule"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "literal": "parameter-not-enabled"
+          },
+          {
+            "op": "if",
+            "args": [
+              {
+                "op": "eq",
+                "args": [
+                  {
+                    "op": "state-of",
+                    "args": [
+                      {
+                        "ref": "input",
+                        "id": "antivenomStatus"
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "explicitly-negative"
+                  }
+                ]
+              },
+              {
+                "literal": "not-applicable"
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "is-present",
+                        "args": [
+                          {
+                            "ref": "input",
+                            "id": "antivenomStatus"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "literal": "indeterminate"
+                  },
+                  {
+                    "op": "if",
+                    "args": [
+                      {
+                        "op": "or",
+                        "args": [
+                          {
+                            "op": "not",
+                            "args": [
+                              {
+                                "op": "is-present",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "biteTime"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "op": "not",
+                            "args": [
+                              {
+                                "op": "is-present",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "antivenomStartTime"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "op": "not",
+                            "args": [
+                              {
+                                "op": "is-present",
+                                "args": [
+                                  {
+                                    "ref": "input",
+                                    "id": "biteTimeCertainty"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "literal": "needs-data"
+                      },
+                      {
+                        "op": "if",
+                        "args": [
+                          {
+                            "op": "lt",
+                            "args": [
+                              {
+                                "ref": "input",
+                                "id": "antivenomStartTime"
+                              },
+                              {
+                                "ref": "input",
+                                "id": "biteTime"
+                              }
+                            ]
+                          },
+                          {
+                            "literal": "conflict"
+                          },
+                          {
+                            "op": "if",
+                            "args": [
+                              {
+                                "op": "and",
+                                "args": [
+                                  {
+                                    "op": "eq",
+                                    "args": [
+                                      {
+                                        "ref": "input",
+                                        "id": "biteTimeCertainty"
+                                      },
+                                      {
+                                        "literal": "estimated"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "op": "not",
+                                    "args": [
+                                      {
+                                        "op": "is-present",
+                                        "args": [
+                                          {
+                                            "ref": "parameter",
+                                            "id": "acceptedCertainty"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "literal": "parameter-not-enabled"
+                              },
+                              {
+                                "op": "if",
+                                "args": [
+                                  {
+                                    "op": "and",
+                                    "args": [
+                                      {
+                                        "op": "eq",
+                                        "args": [
+                                          {
+                                            "ref": "input",
+                                            "id": "biteTimeCertainty"
+                                          },
+                                          {
+                                            "literal": "estimated"
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "op": "eq",
+                                        "args": [
+                                          {
+                                            "ref": "parameter",
+                                            "id": "acceptedCertainty"
+                                          },
+                                          {
+                                            "literal": "needs-data"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "literal": "needs-data"
+                                  },
+                                  {
+                                    "op": "if",
+                                    "args": [
+                                      {
+                                        "op": "eq",
+                                        "args": [
+                                          {
+                                            "ref": "parameter",
+                                            "id": "edgeRule"
+                                          },
+                                          {
+                                            "literal": "inside"
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "op": "if",
+                                        "args": [
+                                          {
+                                            "op": "le",
+                                            "args": [
+                                              {
+                                                "op": "time-diff",
+                                                "args": [
+                                                  {
+                                                    "ref": "input",
+                                                    "id": "biteTime"
+                                                  },
+                                                  {
+                                                    "ref": "input",
+                                                    "id": "antivenomStartTime"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "op": "convert",
+                                                "args": [
+                                                  {
+                                                    "ref": "parameter",
+                                                    "id": "targetIntervalDuration"
+                                                  },
+                                                  {
+                                                    "ref": "conversion",
+                                                    "id": "hoursToMinutes"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "literal": "within-target"
+                                          },
+                                          {
+                                            "literal": "outside-target"
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "op": "if",
+                                        "args": [
+                                          {
+                                            "op": "lt",
+                                            "args": [
+                                              {
+                                                "op": "time-diff",
+                                                "args": [
+                                                  {
+                                                    "ref": "input",
+                                                    "id": "biteTime"
+                                                  },
+                                                  {
+                                                    "ref": "input",
+                                                    "id": "antivenomStartTime"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "op": "convert",
+                                                "args": [
+                                                  {
+                                                    "ref": "parameter",
+                                                    "id": "targetIntervalDuration"
+                                                  },
+                                                  {
+                                                    "ref": "conversion",
+                                                    "id": "hoursToMinutes"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "literal": "within-target"
+                                          },
+                                          {
+                                            "literal": "outside-target"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "interval",
+      "kind": "value",
+      "valueType": "time",
+      "unit": "min",
+      "states": [
+        "needs-data",
+        "indeterminate",
+        "not-applicable",
+        "conflict",
+        "parameter-not-enabled"
+      ],
+      "carries": [
+        "warnings",
+        "limitations",
+        "missingDataNotes",
+        "certainty"
+      ]
+    },
+    {
+      "id": "comparison",
+      "kind": "classification",
+      "labels": [
+        "within-target",
+        "outside-target"
+      ],
+      "states": [
+        "needs-data",
+        "indeterminate",
+        "not-applicable",
+        "conflict",
+        "parameter-not-enabled"
+      ],
+      "carries": [
+        "warnings",
+        "limitations",
+        "missingDataNotes"
+      ]
+    }
+  ],
+  "interpretation": {
+    "meaning": "The elapsed time between the documented bite time and the documented start of administration, with the certainty of the bite time. A missing value is never treated as zero. While the target is not enabled the comparison says so and gives no comparison value.",
+    "prohibited": [
+      "Do not read the interval as a statement about the quality or timeliness of care.",
+      "Do not use any output as a recommendation, alert or order."
+    ]
+  },
+  "executionProfile": {
+    "maxSteps": 1000,
+    "maxDepth": 24,
+    "maxOutputBytes": 65536
+  },
+  "evidence": {
+    "statement": "No evidence is claimed. None has been reviewed.",
+    "sources": []
+  },
+  "provenance": {
+    "origin": "Drafted for demonstration from docs/USE-CASE-SNAKE.md",
+    "basis": "Analytic A of the use-case dossier. Demonstration only. No clinical review has taken place and no clinician owner is named. Version 0.1.1 corrects findings F-1 (the comparison honours the certainty choice and the anti-snake-venom status and declares indeterminate) and declares the hours-to-minutes conversion for the target (row 1.5b). The 0.1.0 file is unchanged. The changes have had no clinical review."
+  },
+  "conversions": [
+    {
+      "id": "hoursToMinutes",
+      "version": "0.1.0",
+      "from": "h",
+      "to": "min",
+      "kind": "linear",
+      "factor": 60,
+      "x-note": "A definition of units (one hour is sixty minutes). It is not a clinical value and not a suggestion. Used only through the convert operator."
+    }
+  ],
+  "x-handler": "function () { /* placeholder, never runs */ }"
+}

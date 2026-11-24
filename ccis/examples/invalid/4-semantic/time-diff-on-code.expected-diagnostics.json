@@ -1,0 +1,21 @@
+{
+  "case": "time-diff-on-code",
+  "layer": 4,
+  "layerName": "semantic",
+  "base": "ccis/examples/snake/snake-interval.analytics.0.1.1.json",
+  "example": "ccis/examples/invalid/4-semantic/time-diff-on-code.json",
+  "schema": "analytics",
+  "changedPaths": [
+    "/computation/0/expr/args/2/args/2/args/2/args/2/args/2/args/2/args/1/id"
+  ],
+  "defect": "The second argument of a time-diff is a code input instead of a date-time. Passes the schemas.",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "ruleId": "CCIS-V4-001",
+      "path": "/computation/0/expr/args/2/args/2/args/2/args/2/args/2/args/2/args/1/id",
+      "message": "The time-diff operator needs two date-time arguments, but \"biteTimeCertainty\" is a code input.",
+      "hint": "Use a date-time input here, or remove the time-diff."
+    }
+  ]
+}

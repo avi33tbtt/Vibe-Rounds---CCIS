@@ -1,0 +1,21 @@
+{
+  "case": "input-field-missing",
+  "layer": 3,
+  "layerName": "reference-integrity",
+  "base": "ccis/examples/snake/snake-interval.analytics.0.1.1.json",
+  "example": "ccis/examples/invalid/3-reference-integrity/input-field-missing.json",
+  "schema": "analytics",
+  "changedPaths": [
+    "/inputs/3/field"
+  ],
+  "defect": "An input names an element field that does not exist (a one-letter slip). Passes the schemas.",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "ruleId": "CCIS-V3-001",
+      "path": "/inputs/3/field",
+      "message": "Input \"antivenomStartTime\" names field \"antivenomStartTim\", which element \"snake.envenomation-timing\" does not define.",
+      "hint": "Use a field key the element defines, or correct the element reference."
+    }
+  ]
+}

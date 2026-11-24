@@ -1,0 +1,21 @@
+{
+  "case": "extension-holds-code-text",
+  "layer": 6,
+  "layerName": "executable-safety",
+  "base": "ccis/examples/snake/snake-interval.analytics.0.1.1.json",
+  "example": "ccis/examples/invalid/6-executable-safety/extension-holds-code-text.json",
+  "schema": "analytics",
+  "changedPaths": [
+    "/x-handler"
+  ],
+  "defect": "An x- extension holds a harmless placeholder that looks like code. The schemas allow any x- member, so only layer 6 can refuse it. The text is never run.",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "ruleId": "CCIS-V6-001",
+      "path": "/x-handler",
+      "message": "The extension member \"x-handler\" holds text that looks like code. Packages are declarative data only.",
+      "hint": "Remove the member. Behaviour belongs in the whitelisted expression tree."
+    }
+  ]
+}

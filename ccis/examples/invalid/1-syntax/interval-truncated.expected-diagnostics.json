@@ -1,0 +1,22 @@
+{
+  "case": "interval-truncated",
+  "layer": 1,
+  "layerName": "syntax",
+  "base": "ccis/examples/snake/snake-interval.analytics.0.1.1.json",
+  "example": "ccis/examples/invalid/1-syntax/interval-truncated.json.txt",
+  "schema": "analytics",
+  "changedPaths": [],
+  "defect": "The final closing brace of the file is missing. Not valid JSON; stored as .json.txt so no tool opens it as JSON by accident.",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "ruleId": "CCIS-V1-001",
+      "path": {
+        "line": 764,
+        "column": 4
+      },
+      "message": "The file ends before the top-level object is closed, so it is not valid JSON.",
+      "hint": "Add the missing closing brace. Nothing after the break was read."
+    }
+  ]
+}

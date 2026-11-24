@@ -1,0 +1,28 @@
+{
+  "case": "transition-to-missing-stage",
+  "layer": 5,
+  "layerName": "graph-and-compatibility",
+  "base": "ccis/examples/snake/snake-documentation.pathway.json",
+  "example": "ccis/examples/invalid/5-graph-and-compatibility/transition-to-missing-stage.json",
+  "schema": "pathway",
+  "changedPaths": [
+    "/transitions/1/to"
+  ],
+  "defect": "One transition ends at a stage id that does not exist (a one-letter slip), which also leaves a real stage unreachable. Passes the schemas.",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "ruleId": "CCIS-V5-001",
+      "path": "/transitions/1/to",
+      "message": "The transition from \"clotting-documentation\" leads to stage \"antivenom-documentaton\", which does not exist.",
+      "hint": "Point the transition at an existing stage id."
+    },
+    {
+      "severity": "error",
+      "ruleId": "CCIS-V5-002",
+      "path": "/stages/2",
+      "message": "Stage \"antivenom-documentation\" cannot be reached from the first stage by any transition.",
+      "hint": "Add a transition that reaches the stage, or remove the stage."
+    }
+  ]
+}

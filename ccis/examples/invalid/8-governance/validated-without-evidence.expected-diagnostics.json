@@ -1,0 +1,21 @@
+{
+  "case": "validated-without-evidence",
+  "layer": 8,
+  "layerName": "governance",
+  "base": "ccis/examples/snake/snake-interval.analytics.0.1.1.json",
+  "example": "ccis/examples/invalid/8-governance/validated-without-evidence.json",
+  "schema": "analytics",
+  "changedPaths": [
+    "/manifest/status"
+  ],
+  "defect": "Status is set to validated while the artefact's own evidence says none is claimed. Passes the schemas. The missing place for a validation scope is proposed amendment A-003.",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "ruleId": "CCIS-V8-001",
+      "path": "/manifest/status",
+      "message": "Status \"validated\" is claimed, but the evidence statement says no evidence is claimed and no review has taken place.",
+      "hint": "Return the status to draft, or record the validation with its version, population, setting and intended use."
+    }
+  ]
+}

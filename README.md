@@ -104,6 +104,16 @@ node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects
 - **Units.** No implicit conversion: unlike types or units are X-010. `time-diff` is end minus start in minutes. `convert` expresses a value in the conversion's target unit (identity when already there); only `linear` conversions apply (X-015).
 - **Limits.** Steps per node visited, depth at prepare, output bytes of the canonical value. Refusal ids X-001 to X-016 are in `EXEC_REFUSALS` (X-002 is kept but can no longer be reached).
 
+### Binder and result mapper (row 3.4a)
+
+`ccis-bind.js` joins a 3.1 context, a prepared analytic and the package's output contract. It is pure (no file, clock, network, randomness or `eval`). `runAnalytic({ prepared, context, supplied, evaluationTime })` returns every output as a run result, or one refusal (ids B-001 to B-011 in `BIND_REFUSALS`) and no partial results.
+
+- **Records are found by concept, never by position.** No record is `absent`; more than one is `conflicting`, even if they agree. A time with no stated zone or an impossible date is unreadable: never a number, never zero (the analytic then reads it as not present, so it gives `needs-data`).
+- **Parameters arrive disabled.** `supplied` enables them (`{ id: { value } }`). A supplied id the package does not declare, a malformed value, or an enabled `criteria` parameter is refused. Storage of a clinician's values is not decided (D-112).
+- **Results are checked against the declared output.** An unknown result is `indeterminate` only if the output declares it; any other result the output does not declare refuses the whole analytic.
+- **Wording is a labelled table (`WORDING`, D-047),** keyed by analytic id. Other analytics get generic notes only. The omission rule (D-050) and finding F-6 (D-052) are unchanged.
+- **Oracle.** The 32 fixture cases plus the EMR export reproduce their expected files. Decision-node walking is row 3.4b.
+
 ## What is staged
 
 Shown, but not the real thing. Each is labelled in the viewer.

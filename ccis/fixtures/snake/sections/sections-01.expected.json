@@ -1,0 +1,61 @@
+{
+  "case": "sections-01",
+  "tests": "Envelope 0.2.0 with problems, allergies, orders and results. Hand-calculated: 2 references + 9 observations accepted (11), plus p1, r1 and res1 accepted (14); p2 entered-in-error rejected (1); a1 unclassified and res2 outside the applied element unmapped (2); total 17.",
+  "counts": {
+    "accepted": 14,
+    "rejected": 1,
+    "unmapped": 2,
+    "ambiguous": 0,
+    "total": 17
+  },
+  "context": {
+    "problems": [
+      "p1"
+    ],
+    "allergies": [],
+    "orders": [
+      "r1"
+    ],
+    "results": [
+      "res1"
+    ]
+  },
+  "records": [
+    {
+      "ref": "p1",
+      "recordKind": "problem",
+      "category": "accepted"
+    },
+    {
+      "ref": "p2",
+      "recordKind": "problem",
+      "category": "rejected",
+      "reasonCode": "excluded-by-policy"
+    },
+    {
+      "ref": "a1",
+      "recordKind": "allergy",
+      "category": "unmapped",
+      "reasonCode": "concept-unclassified"
+    },
+    {
+      "ref": "r1",
+      "recordKind": "order",
+      "category": "accepted",
+      "notes": [
+        "time-zone-unknown"
+      ]
+    },
+    {
+      "ref": "res1",
+      "recordKind": "result",
+      "category": "accepted"
+    },
+    {
+      "ref": "res2",
+      "recordKind": "result",
+      "category": "unmapped",
+      "reasonCode": "concept-not-in-applied-element"
+    }
+  ]
+}

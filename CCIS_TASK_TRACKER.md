@@ -31,6 +31,8 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 
 **Added 2026-11-23 (demo slice and roadmap coordination).** Rows DS0 to DS7 build a small, clearly labelled demo runner so the EMR and CCIS can be shown end to end (scope: `docs/DEMO-SLICE.md`). They use the `ccis-demo-` file prefix and are replaced by rows 2.x and 3.x, which stay `LOCKED`. The fixtures remain the regression oracle. Global build order across both repos: CCIS 1.5b -> EMR B5a, B5b -> DS1 to DS4 -> EMR DM1, DM2a, DM2b, DM3 -> DS5 to DS7 -> EMR DM4. Roadmap coordination: `docs/ROADMAP-COORDINATION.md`.
 
+**Phase 4 started 2026-11-25 (owner: "start phase 4").** Row 4.1 was split into 4.1 to 4.1c (rule 12). Phases 5 and 6 stay `LOCKED`.
+
 **Stage 2 started 2026-11-24 (owner: "start stage 2").** Phase 3 rows 3.1 to 3.11 are `TODO`, one chunk file at a time, in order. Phases 4 to 6 stay `LOCKED` until CCIS 0.1.0 (row 3.11).
 
 ---
@@ -73,13 +75,18 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 3.11.1 | chunk-3.11.1-removal-and-negatives.md | Slice acceptance 2: required-observation removal, version or input change gives a distinct record, negative tests | DONE | 2026-11-25 | 1 test (8 cases), 0 modules | ccis-accept-negative.test.js; 8 tests pass (new file only); 3 breakages seen failing. Default run skips a needs-data analytic (D-198). Next: 3.11a chunk file. |
 | 3.11a | chunk-3.11a-limitations-list.md | Limitations list for 0.1.0 (`docs/LIMITATIONS.md`), README table replaced, CHANGELOG candidate entry. Ends with your review before Phase 4 | DONE | 2026-11-25 | 1 doc (56 lines), 2 small edits | docs/LIMITATIONS.md (29 sourced LIM lines), README table replaced, CHANGELOG candidate entry. Docs only, no npm test. D-200. Next: you review, then say "approve limitations". |
 | 3.11b | (docs and one version line) | Freeze CCIS 0.1.0: `package.json` to 0.1.0, date the CHANGELOG entry, `npm test` and `npm run accept` once, give you `git tag v0.1.0` | DONE | 2026-11-25 | 1 small edit, docs | package.json 0.1.0; full npm test 845 (all pass but 2 F-6 TODO, 4 skipped); accept 6/6; stale test fixed (D-201). You run: git tag v0.1.0. Phase 4 unlocked. |
-| 4.1 to 4.5 | (written when reached) | GitHub distribution, authoring routes, second demo | LOCKED |  |  | 0.1.0 frozen (3.11b). Unlocks only when you say "start phase 4" (D-202). |
+| 4.1 | chunk-4.1-remote-loader.md | Distribution 1: pure remote market loader through an injected `fetchText` (no real network, no UI) | TODO |  | 1 module, 1 test | Phase 4 started 2026-11-25 ("start phase 4"). Chunk file written (docs only); awaiting your approval. D-203. |
+| 4.1a | (written when reached) | Distribution 2: `connect-src` for one build-time host, `--market-base` build option, rebuild `index.html` | TODO |  | 1 script edit, 1 test | Needs 4.1 and your answer on the marketplace host (plan question 4). |
+| 4.1b | (written when reached) | Distribution 3: browser fetch adapter (GET only, no credentials, no cache) and "Load from marketplace" view, not wired | TODO |  | 1 module, 1 test | Needs 4.1a. |
+| 4.1c | (written when reached) | Distribution 4: wire into the page; browser test that no request carries patient data; rebuild | TODO |  | 0 new modules, 1 test, small edits | Needs 4.1b. |
+| 4.2 to 4.5 | (written when reached) | Authoring SDK, governed LLM drafting, form authoring, second demo | LOCKED |  |  | One Phase 4 row group at a time: unlocks after 4.1c. |
 | 5.1 to 5.7 | (written when reached) | Templates, decision graphs, research-to-package, cohorts, access model | LOCKED |  |  | After Phase 4. 5.7 needs the D-002 server decision. |
 | 5.8 | chunk-5.8-cohort-context-graph.md | Cohort Context Graph and aggregate Cohort Explorer (synthetic ~30-subject cohort; derived in-memory projection; relationship-map UI). Source brief is over 5 KB: split into narrower chunk files (projection, fixture, map view, timeline, tests) when reached | LOCKED |  | split into 5+ rows when reached | Needs 5.5 and 5.6 (and 3.10 for UI). 5.7 before any shared or real use. Not 5.3 decision nodes. D-178. |
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)
+- **Marketplace host** (plan question 4): tell me the HTTPS address the market will be served from before row 4.1a (the CSP opens to that one host only).
 - **Tag 0.1.0:** after you pull and commit, run `git tag v0.1.0` then `git push origin v0.1.0`. Also run the full `npm test` once on your machine (LIM-22).
 - Row 3.10a added `puppeteer-core` 25.18.1 (D-194, you approved with "do next"). Run `npm ci` after you pull. Watch the first CI run: the browser test fails in CI if `ubuntu-latest` has no Chrome at a known path (set `CHROME_PATH` in `ci.yml` if so).
 - Row 3.8 took the defaults (D-146): `esbuild` 0.28.2 pinned, pure SHA-256 in the bundle only, `index.html` committed with `--check` in CI. Say so if any should change. Run `npm ci` after you pull (new dependency).

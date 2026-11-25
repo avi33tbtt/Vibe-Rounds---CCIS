@@ -4,11 +4,25 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
+const APP_FILE = join(ROOT, 'index.html');
 const VIEWER_FILE = join(ROOT, 'ccis-viewer.html');
 const PORT = Number.parseInt(process.env.PORT || '3000', 10);
 
+const ROUTES = new Map([
+  ['/', APP_FILE],
+  ['/index.html', APP_FILE],
+  ['/ccis-viewer.html', VIEWER_FILE],
+]);
+
 const server = createServer(async (req, res) => {
-  const pathname = new URL(req.url || '/', 'http://localhost').pathname;
+  let pathname;
+
+  try {
+    pathname = new URL(req.url || '/', 'http://localhost').pathname;
+  } catch {
+    res.writeHead(400);
+    return res.end('Bad Request');
+  }
 
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, { Allow: 'GET, HEAD' });
@@ -16,27 +30,56 @@ const server = createServer(async (req, res) => {
   }
 
   if (pathname === '/healthz') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ status: 'ok', service: 'ccis-web' }));
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'X-Content-Type-Options': 'nosniff',
+      'Cache-Control': 'no-store',
+    });
+    return res.end(req.method === 'HEAD' ? undefined : JSON.stringify({
+      status: 'ok',
+      service: 'ccis-web',
+    }));
   }
 
-  if (!['/', '/index.html', '/ccis-viewer.html'].includes(pathname)) {
-    res.writeHead(404);
+  const file = ROUTES.get(pathname);
+  if (!file) {
+    res.writeHead(404, {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Content-Type-Options': 'nosniff',
+    });
     return res.end('Not Found');
   }
 
   try {
-    const html = await readFile(VIEWER_FILE);
+    const html = await readFile(file);
     res.writeHead(200, {
       'Content-Type': 'text/html; charset=utf-8',
       'X-Content-Type-Options': 'nosniff',
-      'Cache-Control': 'no-store'
+      'Cache-Control': 'no-store',
     });
-    res.end(req.method === 'HEAD' ? undefined : html);
+    return res.end(req.method === 'HEAD' ? undefined : html);
   } catch (error) {
+    if (error && error.code === 'ENOENT') {
+      console.error(`Required page is missing: ${file}`);
+      res.writeHead(503, {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Content-Type-Options': 'nosniff',
+        'Cache-Control': 'no-store',
+      });
+      return res.end(
+        pathname === '/' || pathname === '/index.html'
+          ? 'CCIS app has not been built. Run: npm run build:app'
+          : 'Viewer temporarily unavailable'
+      );
+    }
+
     console.error(error);
-    res.writeHead(500);
-    res.end('Viewer temporarily unavailable');
+    res.writeHead(500, {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Content-Type-Options': 'nosniff',
+      'Cache-Control': 'no-store',
+    });
+    return res.end('Page temporarily unavailable');
   }
 });
 

@@ -7,9 +7,11 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test",
-    "build": "node scripts/build-validators.js",
-    "demo": "node ccis-cli.js"
+  "test": "node --test",
+  "build": "node scripts/build-validators.js",
+  "build:app": "node scripts/build-app.js",
+  "demo": "node ccis-cli.js",
+  "start": "node server.js"
   },
   "devDependencies": {
     "ajv": "8.18.0",

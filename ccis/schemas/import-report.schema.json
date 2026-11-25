@@ -155,7 +155,11 @@
             "enum": [
               "observation",
               "event",
-              "reference"
+              "reference",
+              "problem",
+              "allergy",
+              "order",
+              "result"
             ]
           },
           "category": {

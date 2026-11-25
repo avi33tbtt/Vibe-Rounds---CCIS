@@ -31,6 +31,7 @@ export const REJECTION_CODES = Object.freeze({
   'kind-mismatch': 'The kind of value differs from the type the field declares.',
   'unit-not-allowed': 'The unit is not one of the units the field permits; never converted or assumed.',
   'correction-target-missing': 'The record corrects an id that is not in the envelope.',
+  'concept-unclassified': 'The item has the reserved concept unclassified; kept out of the context and not guessed (unmapped).',
 });
 
 const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
@@ -99,12 +100,22 @@ function findExtensions(value, path, out) {
 function timeNotes(o) {
   const notes = [];
   if (isObj(o.recorded) && o.recorded.state === 'unknown') notes.push('recorded-time-unknown');
-  const zones = [o.effective, o.recorded, o.collected, o.kind === 'datetime' ? o.value : undefined];
+  const zones = [o.effective, o.recorded, o.collected, o.kind === 'datetime' ? o.value : undefined, isObj(o.period) ? o.period.start : undefined, isObj(o.period) ? o.period.end : undefined];
   if (zones.some((t) => isObj(t) && t.zone === 'unknown')) notes.push('time-zone-unknown');
   return notes;
 }
 
 const reject = (o, code, extra = {}) => ({ ref: o.id, recordKind: 'observation', category: 'rejected', reasons: [{ code, ...extra }] });
+
+// Problems, allergies and orders (envelope 0.2.0): no applied-element field exists for them, so the producer's
+// classified concept is taken as given; the reserved `unclassified` is never matched (unmapped).
+function judgeItem(o, recordKind, idsInEnvelope) {
+  if (o.status === 'entered-in-error') return { ref: o.id, recordKind, category: 'rejected', reasons: [{ code: 'excluded-by-policy', category: 'entered-in-error' }] };
+  if (o.concept.id === 'unclassified') return { ref: o.id, recordKind, category: 'unmapped', reasons: [{ code: 'concept-unclassified' }] };
+  if (o.correctionOf !== undefined && !idsInEnvelope.has(o.correctionOf)) return { ref: o.id, recordKind, category: 'rejected', reasons: [{ code: 'correction-target-missing' }] };
+  const notes = timeNotes(o);
+  return { ref: o.id, recordKind, category: 'accepted', ...(notes.length ? { notes } : {}) };
+}
 
 function judgeObservation(o, fieldOf, idsInEnvelope) {
   if (o.status === 'entered-in-error') return reject(o, 'excluded-by-policy', { category: 'entered-in-error' });
@@ -171,11 +182,14 @@ export function importEnvelope(envelope, options = {}) {
 
   // One record id may name one record (IMP-105 cannot hold otherwise). The reason names no id.
   const seen = new Set();
-  for (const rec of [...envelope.observations, ...envelope.events]) {
+  const SECTIONS = [['problems', 'problem'], ['allergies', 'allergy'], ['orders', 'order']];
+  const extra = [...SECTIONS.flatMap(([k]) => envelope[k] ?? []), ...(envelope.results ?? [])];
+  for (const rec of [...envelope.observations, ...envelope.events, ...extra]) {
     if (seen.has(rec.id)) return refuse('envelope refused: a record id is used more than once (IMP-105)', { header, appliedVersions, envelopeChecksum });
     seen.add(rec.id);
   }
   const obsIds = new Set(envelope.observations.map((o) => o.id));
+  const allIds = new Set([...obsIds, ...extra.map((o) => o.id)]);
 
   const records = refs.map((r) => ({ ref: r.id, recordKind: 'reference', category: 'accepted' }));
   const keepObs = [];
@@ -194,6 +208,20 @@ export function importEnvelope(envelope, options = {}) {
     }
   }
 
+  // Sections appear in the context only when the envelope has them, so 0.1.0 contexts are unchanged.
+  const sections = {};
+  for (const [key, kind] of SECTIONS) {
+    if (envelope[key] === undefined) continue;
+    const keep = [];
+    for (const it of envelope[key]) { const j = judgeItem(it, kind, allIds); records.push(j); if (j.category === 'accepted') keep.push(it); }
+    sections[key] = clone([...keep].sort(byId));
+  }
+  if (envelope.results !== undefined) {
+    const keep = [];
+    for (const r of envelope.results) { const j = { ...judgeObservation(r, fieldOf, allIds), recordKind: 'result' }; records.push(j); if (j.category === 'accepted') keep.push(r); }
+    sections.results = clone([...keep].sort(byId));
+  }
+
   const context = {
     contextForm: CONTEXT_FORM,
     envelope: clone({ version: envelope.envelope.version, exportedAt: envelope.envelope.exportedAt, producer: envelope.envelope.producer }),
@@ -202,6 +230,7 @@ export function importEnvelope(envelope, options = {}) {
     inclusions: clone(envelope.inclusions),
     observations: clone([...keepObs].sort(byId)),
     events: clone([...keepEvents].sort(byId)),
+    ...sections,
   };
   const ctxCanon = canonicalize(context);
   if (!ctxCanon.ok) throw new Error('defect: the importer built a context that cannot be put in canonical form');

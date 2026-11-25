@@ -12,37 +12,14 @@ import { mountResultsView } from '../ccis-app-results-view.js';
 import { mountExportView } from '../ccis-app-export-view.js';
 import { mountRunView } from '../ccis-app-run-view.js';
 import { mountSelectorView } from '../ccis-app-selector-view.js';
+import { HOSTILE, inert } from './hostile-kit.js';
 
-// HOSTILE: data. Adding a string needs no code change.
-const HOSTILE = [
-  '<img src=x onerror=1>',
-  '</p><script>alert(1)</script>',
-  '"><svg onload=1>',
-  'javascript:alert(1)',
-  '<a href="javascript:1">x</a>',
-  '<'.repeat(3000),
-];
-// COVERED: every view file must be named here. Market and import are row 3.10.1c.
+// COVERED: every view file must be named here. Market and import are swept in the files test (row 3.10.1c).
 const COVERED = {
   'ccis-app-catalogue-view.js': 'here', 'ccis-app-export-view.js': 'here', 'ccis-app-results-view.js': 'here',
   'ccis-app-run-view.js': 'here', 'ccis-app-selector-view.js': 'here',
-  'ccis-app-market-view.js': 'row 3.10.1c', 'ccis-app-import-view.js': 'row 3.10.1c',
+  'ccis-app-market-view.js': 'ccis-app-hostile-sweep-files.test.js', 'ccis-app-import-view.js': 'ccis-app-hostile-sweep-files.test.js',
 };
-const BAD_TAGS = 'script,style,iframe,img,svg,math,form,object,embed,link,base,a';
-// An option or input `value` is data, not a navigation target, so `javascript:` is checked in every other attribute (D-190).
-function inert(root, where) {
-  const found = { badElements: root.querySelectorAll(BAD_TAGS).length, on: 0, style: 0, urlAttr: 0, jsValue: 0 };
-  for (const el of root.querySelectorAll('*')) {
-    for (const a of el.attributes) {
-      const n = a.name.toLowerCase();
-      if (n.startsWith('on')) found.on++;
-      if (n === 'style') found.style++;
-      if (n === 'href' || n === 'src') found.urlAttr++;
-      if (n !== 'value' && /javascript:/i.test(a.value)) found.jsValue++;
-    }
-  }
-  assert.deepEqual(found, { badElements: 0, on: 0, style: 0, urlAttr: 0, jsValue: 0 }, `${where}: ${JSON.stringify(found)}`);
-}
 
 const idx = JSON.parse(readFileSync('market/index.json', 'utf8'));
 const market = { index: idx, files: Object.fromEntries(idx.entries.map((e) => [e.path, readFileSync(`market/${e.path}`, 'utf8')])) };

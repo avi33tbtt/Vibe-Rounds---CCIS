@@ -11,6 +11,7 @@ git clone https://github.com/avi33tbtt/Vibe-Rounds---CCIS
 cd Vibe-Rounds---CCIS
 npm ci
 npm test
+npm run accept   # the whole slice through the real command line, checked against the hand-calculated fixture
 npm run demo -- run --envelope ccis/fixtures/snake/emr-export/emr-demo-case.envelope.json --out demo-record.json --at 2026-11-24T12:00:00Z --demo-parameters
 ```
 

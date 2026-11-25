@@ -8,6 +8,7 @@
   },
   "scripts": {
   "test": "node --test",
+  "accept": "node scripts/accept.js",
   "build": "node scripts/build-validators.js",
   "build:app": "node scripts/build-app.js",
   "demo": "node ccis-cli.js",

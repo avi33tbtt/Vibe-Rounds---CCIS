@@ -49,7 +49,7 @@ test('CSP hashes match the one inline script and the one style', () => {
 
 test('CSP closes everything else and allows nothing unsafe', () => {
   const { csp } = parts();
-  for (const n of ['default-src', 'img-src', 'connect-src', 'object-src', 'base-uri', 'form-action']) {
+  for (const n of ['default-src', 'img-src', 'connect-src', 'object-src', 'base-uri', 'form-action', 'worker-src', 'media-src', 'manifest-src', 'child-src', 'script-src-attr', 'style-src-attr']) {
     assert.equal(directive(csp, n), `${n} 'none'`, n);
   }
   assert.ok(!/unsafe-inline|unsafe-eval|\*/.test(csp));

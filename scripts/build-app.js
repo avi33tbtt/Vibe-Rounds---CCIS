@@ -15,7 +15,7 @@ import { buildSync } from 'esbuild';
 const here = (p) => new URL(`../${p}`, import.meta.url);
 export const OUT = here('index.html');
 
-export const CSP_DIRECTIVES = ['default-src', 'img-src', 'connect-src', 'font-src', 'frame-src', 'object-src', 'base-uri', 'form-action'];
+export const CSP_DIRECTIVES = ['default-src', 'img-src', 'connect-src', 'font-src', 'frame-src', 'object-src', 'base-uri', 'form-action', 'worker-src', 'media-src', 'manifest-src', 'child-src'];
 const b64 = (text) => createHash('sha256').update(text, 'utf8').digest('base64');
 
 export function bundleScript() {
@@ -40,7 +40,7 @@ export function buildApp() {
   const script = bundleScript();
   const style = readFileSync(here('ccis-app.css'), 'utf8');
   const csp = `default-src 'none'; script-src 'sha256-${b64(script)}'; style-src 'sha256-${b64(style)}'; ` +
-    CSP_DIRECTIVES.slice(1).map((d) => `${d} 'none'`).join('; ');
+    CSP_DIRECTIVES.slice(1).map((d) => `${d} 'none'`).join('; ') + "; script-src-attr 'none'; style-src-attr 'none'";
   const template = readFileSync(here('ccis-app.template.html'), 'utf8');
   // Function replacers: the bundle holds "$&" and similar, which a string replacement would expand.
   return template.replace('{{CSP}}', () => csp).replace('{{STYLE}}', () => style).replace('{{SCRIPT}}', () => script);

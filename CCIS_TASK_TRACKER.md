@@ -68,7 +68,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 3.10.1a | chunk-3.10.1a-views-use-helper.md | Browser hardening 2b: the seven views use `ccis-app-dom.js` (mechanical edits), rebuild `index.html` | DONE | 2026-11-25 | 0 new modules, 0 tests, 7 small edits | 7 views on makeDom; 79 tests pass in 10 files, none edited; 1 breakage seen failing; index.html rebuilt (1.35 MB). Next: 3.10.1b chunk file. |
 | 3.10.1b | chunk-3.10.1b-hostile-sweep.md | Browser hardening 2c: jsdom hostile-string sweep over the five model-fed views (catalogue, results, export, run, selector) | DONE | 2026-11-25 | 0 modules, 1 test, 0 edits | ccis-app-hostile-sweep.test.js; 7 tests pass (new file only); 2 breakages seen failing. D-190. Next: 3.10.1c chunk file. |
 | 3.10.1c | chunk-3.10.1c-file-fed-sweep.md | Browser hardening 2d: hostile-string sweep over the two file-fed views (market, import; a refused envelope never quotes its input) | DONE | 2026-11-25 | 1 test helper, 1 test, 1 small edit | hostile-kit.js, sweep-files test (7 cases), small edit to the 3.10.1b test; 22 tests pass in 3 files; 2 breakages seen failing; no view changed. D-192. Next: 3.10a chunk file. |
-| 3.10a | chunk-3.10a-real-browser-smoke.md | One real-browser smoke test (adds one pinned dev dependency; owner approves first) | TODO |  | 1 test, 1 dependency | Chunk file written 2026-11-25 (D-193). Owner approves the chunk and the dependency (puppeteer-core) first. |
+| 3.10a | chunk-3.10a-real-browser-smoke.md | One real-browser smoke test (adds one pinned dev dependency; owner approves first) | DONE | 2026-11-25 | 1 test, 1 dependency | ccis-app-browser.test.js (4 cases, real Chrome); puppeteer-core 25.18.1 pinned; 11 tests pass in 2 files; 2 breakages seen failing (one substituted). D-194. Next: 3.11 chunk file. |
 | 3.11 | (written when reached) | Slice acceptance 1: one-command end-to-end test | TODO |  | 1 test, 1 script | Needs 3.10a. |
 | 3.11.1 | (written when reached) | Slice acceptance 2: required-observation removal, version or input change gives a distinct record, negative tests | TODO |  | 1 test | Needs 3.11. |
 | 3.11a | (written when reached) | Freeze CCIS 0.1.0, limitations list. Ends with your review before Phase 4 | TODO |  | docs only | Needs 3.11.1. |
@@ -79,6 +79,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)
+- Row 3.10a added `puppeteer-core` 25.18.1 (D-194, you approved with "do next"). Run `npm ci` after you pull. Watch the first CI run: the browser test fails in CI if `ubuntu-latest` has no Chrome at a known path (set `CHROME_PATH` in `ci.yml` if so).
 - Row 3.8 took the defaults (D-146): `esbuild` 0.28.2 pinned, pure SHA-256 in the bundle only, `index.html` committed with `--check` in CI. Say so if any should change. Run `npm ci` after you pull (new dependency).
 - Run the full `npm test` once on your machine. On a fresh clone at 3.8a it ran 664 tests: all pass except the two known F-6 TODO gaps.
 - New F-12 (D-162): with no context the pathway row reads "Compatible with limitations" while its packages need data; the view must show the package rows. Decide F-10, F-11 and D-112 (they affect rows 3.9 to 3.9b).

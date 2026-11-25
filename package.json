@@ -16,6 +16,7 @@
   "devDependencies": {
     "ajv": "8.18.0",
     "esbuild": "0.28.2",
-    "jsdom": "31.0.1"
+    "jsdom": "31.0.1",
+    "puppeteer-core": "25.18.1"
   }
 }

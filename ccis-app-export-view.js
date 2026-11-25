@@ -6,18 +6,14 @@
 // never reaches the DOM or onState (D-181). Not wired into the page yet.
 
 import { exportModel } from './ccis-app-export.js';
+import { makeDom } from './ccis-app-dom.js';
 
 const S_NONE = 'Nothing to export yet.';
 const S_NO_SAVE = 'Saving is not available here.';
 const S_FAILED = 'The file could not be saved.';
 
 export function mountExportView({ document, root, onState, save }) {
-  const el = (tag, content, cls) => {
-    const node = document.createElement(tag);
-    if (content !== undefined) node.textContent = content;
-    if (cls) node.className = cls;
-    return node;
-  };
+  const { el } = makeDom(document);
   const body = el('div');
   body.setAttribute('aria-live', 'polite');
   root.append(el('h2', 'Export'), body);

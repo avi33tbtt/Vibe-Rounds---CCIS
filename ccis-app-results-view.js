@@ -5,18 +5,14 @@
 // Not wired into the page yet (row 3.9a.2).
 
 import { resultsModel } from './ccis-app-results.js';
+import { makeDom } from './ccis-app-dom.js';
 
 const S_NONE = 'No run yet.';
 const ROW_CAP = 50;
 const NODE_CAP = 100;
 
 export function mountResultsView({ document, root, onState }) {
-  const el = (tag, content, cls) => {
-    const node = document.createElement(tag);
-    if (content !== undefined) node.textContent = content;
-    if (cls) node.className = cls;
-    return node;
-  };
+  const { el } = makeDom(document);
   const body = el('div');
   body.setAttribute('aria-live', 'polite');
   root.append(el('h2', 'Results'), body);

@@ -5,6 +5,7 @@
 // Not wired into the page yet (row 3.8c.2).
 
 import { selectorModel, selectOption, selectionView } from './ccis-app-selector.js';
+import { makeDom } from './ccis-app-dom.js';
 
 const S_LOAD = 'Load a market to choose a context and a pathway.';
 const S_NONE = 'Nothing is chosen.';
@@ -13,12 +14,7 @@ const S_NOT_RUN = 'Nothing has been run.';
 const EMPTY = () => ({ contextKey: null, pathwayKey: null });
 
 export function mountSelectorView({ document, root, onState }) {
-  const el = (tag, content, cls) => {
-    const node = document.createElement(tag);
-    if (content !== undefined) node.textContent = content;
-    if (cls) node.className = cls;
-    return node;
-  };
+  const { el, text } = makeDom(document);
   const choose = (what) => {
     const select = el('select');
     select.setAttribute('aria-label', `Choose a ${what}`);
@@ -32,7 +28,7 @@ export function mountSelectorView({ document, root, onState }) {
   clear.type = 'button';
   const line = el('p');
   line.setAttribute('aria-live', 'polite');
-  root.append(el('h2', 'Choose'), ctx.label, document.createTextNode(' '), pth.label, document.createTextNode(' '), clear, line);
+  root.append(el('h2', 'Choose'), ctx.label, text(' '), pth.label, text(' '), clear, line);
 
   let loaded = false;
   let applied = [];

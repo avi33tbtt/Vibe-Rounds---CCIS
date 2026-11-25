@@ -6,6 +6,7 @@
 
 import { catalogueModel } from './ccis-app-catalogue.js';
 import { OUTCOMES } from './ccis-compat.js';
+import { makeDom } from './ccis-app-dom.js';
 
 const S_NONE = 'No compatibility result yet.';
 const S_F12 = 'The pathway row does not check data. Packages marked Needs data cannot run without it.';
@@ -13,12 +14,7 @@ const OPEN = ['needs-data', 'incompatible', 'not-eligible', 'other'];
 const CAP = 50;
 
 export function mountCatalogueView({ document, root, onState }) {
-  const el = (tag, content, cls) => {
-    const node = document.createElement(tag);
-    if (content !== undefined) node.textContent = content;
-    if (cls) node.className = cls;
-    return node;
-  };
+  const { el } = makeDom(document);
   const body = el('div');
   body.setAttribute('aria-live', 'polite');
   root.append(el('h2', 'Compatibility'), body);

@@ -6,6 +6,7 @@
 
 import { importEnvelope } from './ccis-import.js';
 import { heldFromMarket, importReportView } from './ccis-app-import-report.js';
+import { makeDom } from './ccis-app-dom.js';
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const NONE = 'No envelope is loaded.';
@@ -15,12 +16,7 @@ const S_JSON = 'The file is not valid JSON.';
 const S_NOTE = 'Nothing was applied to any patient record. This is an import report, not a clinical result.';
 
 export function mountImportView({ document, root, getMarket, onState }) {
-  const el = (tag, content, cls) => {
-    const node = document.createElement(tag);
-    if (content !== undefined) node.textContent = content;
-    if (cls) node.className = cls;
-    return node;
-  };
+  const { el, text } = makeDom(document);
   const input = el('input');
   input.type = 'file';
   input.accept = '.json';
@@ -31,7 +27,7 @@ export function mountImportView({ document, root, getMarket, onState }) {
   result.setAttribute('aria-live', 'polite');
   const label = el('label', 'Envelope file (an export from the EMR Enhancer, on this device): ');
   label.append(input);
-  root.append(el('h2', 'Import'), label, document.createTextNode(' '), clear, result);
+  root.append(el('h2', 'Import'), label, text(' '), clear, result);
 
   let ticket = 0;
   let lastContext = null; // in this closure only; handed to the page through getContext, never put on window

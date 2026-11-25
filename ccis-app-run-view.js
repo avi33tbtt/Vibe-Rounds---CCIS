@@ -5,23 +5,20 @@
 // and its state holds booleans and counts, never an id, a time or a record. Elements are made with createElement and textContent
 // only (CSP, D-063): no inline handlers, no storage, no network. Not wired into the page yet (row 3.9.1a).
 
+import { makeDom } from './ccis-app-dom.js';
+
 const S_NOT_READY = 'Load a market, choose a pathway and import an envelope first.';
 const S_FAILED = 'The run failed. The record holds the reason and no results.';
 const S_DEFECT = 'The run could not be completed.';
 
 export function mountRunView({ document, root, onState, run, onRun }) {
-  const el = (tag, content, cls) => {
-    const node = document.createElement(tag);
-    if (content !== undefined) node.textContent = content;
-    if (cls) node.className = cls;
-    return node;
-  };
+  const { el, text } = makeDom(document);
   const list = el('div');
   const needs = el('input');
   needs.type = 'checkbox';
   needs.setAttribute('aria-label', 'Also run items that need data');
   const needsLabel = el('label');
-  needsLabel.append(needs, document.createTextNode(' Also run items that need data'));
+  needsLabel.append(needs, text(' Also run items that need data'));
   const time = el('input');
   time.type = 'text';
   time.setAttribute('aria-label', 'Evaluation time');
@@ -34,7 +31,7 @@ export function mountRunView({ document, root, onState, run, onRun }) {
   clear.type = 'button';
   const status = el('p');
   status.setAttribute('aria-live', 'polite');
-  root.append(el('h2', 'Run'), list, needsLabel, el('br'), timeLabel, document.createTextNode(' '), go, document.createTextNode(' '), clear, status);
+  root.append(el('h2', 'Run'), list, needsLabel, el('br'), timeLabel, text(' '), go, text(' '), clear, status);
 
   let ready = false;
   let boxes = []; // { id, box }
@@ -99,7 +96,7 @@ export function mountRunView({ document, root, onState, run, onRun }) {
         box.type = 'checkbox';
         box.checked = r.mayRun === true;
         const label = el('label');
-        label.append(box, document.createTextNode(` ${String(r.id)} ${String(r.version)} (${String(r.label)})`));
+        label.append(box, text(` ${String(r.id)} ${String(r.version)} (${String(r.label)})`));
         nodes.push(label, el('br'));
         boxes.push({ id: String(r.id), box });
       }

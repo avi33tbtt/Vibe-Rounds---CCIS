@@ -5,17 +5,13 @@
 // Each reply goes through `loadFromFiles` (ccis-app-market.js), which is all or nothing.
 
 import { loadFromFiles, marketView, refusalView } from './ccis-app-market.js';
+import { makeDom } from './ccis-app-dom.js';
 
 const READY = 'Ready. No market is loaded and nothing has been run.';
 const COLUMNS = [['id', 'ID'], ['type', 'Type'], ['version', 'Version'], ['status', 'Status'], ['checksumShort', 'Checksum'], ['validationSummary', 'Validation record'], ['warningCount', 'Warnings']];
 
 export function mountMarketView({ document, root, onState }) {
-  const el = (tag, content, cls) => {
-    const node = document.createElement(tag);
-    if (content !== undefined) node.textContent = content;
-    if (cls) node.className = cls;
-    return node;
-  };
+  const { el, text } = makeDom(document);
   const input = el('input');
   input.type = 'file';
   input.multiple = true;
@@ -27,7 +23,7 @@ export function mountMarketView({ document, root, onState }) {
   result.setAttribute('aria-live', 'polite');
   const label = el('label', 'Market folder (a copy of the market/ folder on this device): ');
   label.append(input);
-  root.append(el('h2', 'Market'), label, document.createTextNode(' '), clear, result);
+  root.append(el('h2', 'Market'), label, text(' '), clear, result);
 
   let ticket = 0;
   const report = (loaded, entries, refused, message, market = null) => onState({ loaded, entries, refused, message, market });

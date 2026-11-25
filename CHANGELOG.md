@@ -2,6 +2,12 @@
 
 Newest first. The standard follows semantic versioning (CCIS-REQ-012 in `SPEC.md`; the amendment rule below implements CCIS-REQ-019).
 
+## 0.1.0 (candidate, not yet frozen)
+
+- **Status:** the first release target (plan section 7, row 3.11). Gate C needs the owner's review of `docs/LIMITATIONS.md`.
+- **Contains:** the snake slice (one pathway, two analytics), the CLI, the browser page, `npm run accept` and the negative tests.
+- **Not yet done:** the version bump and the tag (row 3.11b, after the owner says "approve limitations").
+
 ## A-002 (2026-11-23): kinds of result (gap G-04)
 
 - **Requirements affected:** CCIS-REQ-070 (outputs checked against a declared output contract); clarifies, does not change, CCIS-REQ-066.

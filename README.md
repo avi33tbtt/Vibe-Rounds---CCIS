@@ -164,20 +164,9 @@ Shown, but not the real thing. Each is labelled in the viewer.
 
 ## Limitations
 
-What the demo runner does not do, and where the real thing is planned.
+Prototype. Synthetic data only. Not for clinical use.
 
-| Not done | Planned |
-|----------|---------|
-| The compiler. All eight validator layers and the validation record exist as a library and `validate` command, but the demo runner does not call them. A full UCUM check is not done (small built-in table). | Row 2.4 |
-| The demo loader still decides what runs: only the exact 0.1.0 package is held, and it refuses anything else. The importer (3.1) and compatibility resolver (3.2) exist as libraries but the demo does not call them yet. The EMR maps its own version 1 to 0.1.0 outside CCIS. | Rows 3.7 and 3.11 (switch) |
-| Executor: a whitelist interpreter for only the operators the two snake analytics and two nodes use. An unknown operator is refused. | Row 3.4 |
-| Run records: built and content-addressed, but no batch records and no integrity or signature fields (gaps G-03, G-05). | Rows 3.x |
-| One package only (snake envenomation, two analytics, two nodes). No marketplace, no templates, no research-to-package, no AI drafting. | Rows 3.x, 4.x, 5.x |
-| Browser viewer: a static page that reads a record file you choose. It cannot import, edit or share anything, and makes no network request. | Rows 3.x (browser app) |
-| FHIR Mode, governance, evaluation of clinical safety. | Rows 6.x |
-| Open findings in the use case: F-4, F-5 (tree behaviour against the dossier), F-6 (a not-collected expected item reads complete), F-7 (no node outcome for a performed test with an unknown result), F-8 (no estimate warning when an interval is needs-data for another reason). | New package version |
-
-Before any real data: clinical review and a named clinician owner, safety sign-off, security review, privacy assessment and licence checks.
+What 0.1.0 is not, with the source of every line, is in [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md). It is a candidate list until the owner approves it.
 
 ## Schemas (row 1.1)
 

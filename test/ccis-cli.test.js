@@ -138,6 +138,6 @@ test('main returns the exit code and reports through io', () => {
 test('npm script: package.json has a demo entry and no runtime dependencies', () => {
   const pkg = read(new URL('package.json', root));
   assert.equal(pkg.scripts.demo, 'node ccis-cli.js');
-  assert.deepEqual(Object.keys(pkg.devDependencies).sort(), ['ajv', 'esbuild', 'jsdom']);
+  assert.deepEqual(Object.keys(pkg.devDependencies).sort(), ['ajv', 'esbuild', 'jsdom', 'puppeteer-core']);
   assert.equal(pkg.dependencies, undefined);
 });

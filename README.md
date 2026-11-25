@@ -166,7 +166,7 @@ Shown, but not the real thing. Each is labelled in the viewer.
 
 Prototype. Synthetic data only. Not for clinical use.
 
-What 0.1.0 is not, with the source of every line, is in [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md). It is a candidate list until the owner approves it.
+What 0.1.0 is not, with the source of every line, is in [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md). The owner approved it on 2026-11-25 for 0.1.0.
 
 ## Schemas (row 1.1)
 

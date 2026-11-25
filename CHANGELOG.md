@@ -2,11 +2,11 @@
 
 Newest first. The standard follows semantic versioning (CCIS-REQ-012 in `SPEC.md`; the amendment rule below implements CCIS-REQ-019).
 
-## 0.1.0 (candidate, not yet frozen)
+## 0.1.0 (2026-11-25)
 
-- **Status:** the first release target (plan section 7, row 3.11). Gate C needs the owner's review of `docs/LIMITATIONS.md`.
+- **Status:** the first release target (plan section 7, row 3.11), frozen. Gate C passed: `npm run accept` 6/6, the negative tests pass, and the owner approved `docs/LIMITATIONS.md` on 2026-11-25 ("approve limitations").
 - **Contains:** the snake slice (one pathway, two analytics), the CLI, the browser page, `npm run accept` and the negative tests.
-- **Not yet done:** the version bump and the tag (row 3.11b, after the owner says "approve limitations").
+- **Version:** `package.json` is 0.1.0. The tag `v0.1.0` is made by the owner (`git tag v0.1.0`).
 
 ## A-002 (2026-11-23): kinds of result (gap G-04)
 

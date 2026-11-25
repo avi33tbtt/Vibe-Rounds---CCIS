@@ -3,6 +3,7 @@
 //   node scripts/build-app.js           writes index.html
 //   node scripts/build-app.js --check   rebuilds in memory and fails if index.html differs (writes nothing)
 //   --out <path> names another target file (used by the tests to check a tampered copy)
+//   --market-base <url> (row 4.1a, only with --out): a distribution page whose CSP allows requests to that one address
 //
 // One classic inline script (esbuild, not minified), `node:crypto` replaced by ccis-sha256.js in the bundle only,
 // the SHA-256 of the script and of the style written into the CSP. No network, no clock.
@@ -11,6 +12,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { buildSync } from 'esbuild';
+import { goodBase } from '../ccis-remote.js';
 
 const here = (p) => new URL(`../${p}`, import.meta.url);
 export const OUT = here('index.html');
@@ -36,19 +38,24 @@ export function bundleScript() {
   return text;
 }
 
-export function buildApp() {
+export function buildApp({ marketBase } = {}) {
+  // One acceptable address (goodBase), plain visible characters only: no wildcard, separator or space reaches the CSP.
+  if (marketBase !== undefined && !(goodBase(marketBase) && /^[A-Za-z0-9:/._~-]+$/.test(marketBase))) throw new Error('market base is not acceptable');
   const script = bundleScript();
   const style = readFileSync(here('ccis-app.css'), 'utf8');
   const csp = `default-src 'none'; script-src 'sha256-${b64(script)}'; style-src 'sha256-${b64(style)}'; ` +
-    CSP_DIRECTIVES.slice(1).map((d) => `${d} 'none'`).join('; ') + "; script-src-attr 'none'; style-src-attr 'none'";
+    CSP_DIRECTIVES.slice(1).map((d) => `${d} ${d === 'connect-src' && marketBase !== undefined ? marketBase : "'none'"}`).join('; ') + "; script-src-attr 'none'; style-src-attr 'none'";
   const template = readFileSync(here('ccis-app.template.html'), 'utf8');
   // Function replacers: the bundle holds "$&" and similar, which a string replacement would expand.
   return template.replace('{{CSP}}', () => csp).replace('{{STYLE}}', () => style).replace('{{SCRIPT}}', () => script);
 }
 
 export function main(argv = process.argv.slice(2)) {
-  const want = buildApp();
   const i = argv.indexOf('--out');
+  const b = argv.indexOf('--market-base');
+  if (b >= 0 && i < 0) { console.error('a distribution build needs --out'); return 1; }
+  let want;
+  try { want = buildApp(b >= 0 ? { marketBase: argv[b + 1] } : {}); } catch (e) { console.error(e.message); return 1; }
   const out = i >= 0 ? pathToFileURL(argv[i + 1]) : OUT;
   if (argv.includes('--check')) {
     let have = null;

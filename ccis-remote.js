@@ -28,7 +28,7 @@ const bytesOf = (t) => new TextEncoder().encode(t).length;
 // `limits` may only lower the defaults.
 const lower = (given, key) => (Number.isInteger(given?.[key]) && given[key] > 0 ? Math.min(given[key], DEFAULT_LIMITS[key]) : DEFAULT_LIMITS[key]);
 
-function goodBase(base) {
+export function goodBase(base) {
   if (typeof base !== 'string' || !base.startsWith('https://') || !base.endsWith('/')) return false;
   let u;
   try { u = new URL(base); } catch { return false; }

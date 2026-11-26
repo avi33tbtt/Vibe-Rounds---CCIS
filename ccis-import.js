@@ -107,7 +107,7 @@ function timeNotes(o) {
 
 const reject = (o, code, extra = {}) => ({ ref: o.id, recordKind: 'observation', category: 'rejected', reasons: [{ code, ...extra }] });
 
-// Problems, allergies and orders (envelope 0.2.0): no applied-element field exists for them, so the producer's
+// Problems, allergies, orders (envelope 0.2.0) and administrations (0.3.0): no applied-element field exists for them, so the producer's
 // classified concept is taken as given; the reserved `unclassified` is never matched (unmapped).
 function judgeItem(o, recordKind, idsInEnvelope) {
   if (o.status === 'entered-in-error') return { ref: o.id, recordKind, category: 'rejected', reasons: [{ code: 'excluded-by-policy', category: 'entered-in-error' }] };
@@ -182,7 +182,7 @@ export function importEnvelope(envelope, options = {}) {
 
   // One record id may name one record (IMP-105 cannot hold otherwise). The reason names no id.
   const seen = new Set();
-  const SECTIONS = [['problems', 'problem'], ['allergies', 'allergy'], ['orders', 'order']];
+  const SECTIONS = [['problems', 'problem'], ['allergies', 'allergy'], ['orders', 'order'], ['administrations', 'administration']];
   const extra = [...SECTIONS.flatMap(([k]) => envelope[k] ?? []), ...(envelope.results ?? [])];
   for (const rec of [...envelope.observations, ...envelope.events, ...extra]) {
     if (seen.has(rec.id)) return refuse('envelope refused: a record id is used more than once (IMP-105)', { header, appliedVersions, envelopeChecksum });

@@ -159,7 +159,8 @@
               "problem",
               "allergy",
               "order",
-              "result"
+              "result",
+              "administration"
             ]
           },
           "category": {

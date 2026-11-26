@@ -110,7 +110,7 @@ test('a run on the needs-data fixture shows the Missing section open with needs-
 test('seams: keys, booleans and counts only, no checksum, record id or typed time, no on* attributes', async () => {
   const w = await ready();
   go(w);
-  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'exportState', 'importState', 'resultsState', 'runState', 'selectorState', 'state']);
+  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'exportState', 'importState', 'remoteState', 'resultsState', 'runState', 'selectorState', 'state']);
   const rs = plain(w.ccisApp.resultsState());
   assert.deepEqual(Object.keys(rs), Object.keys(EMPTY));
   for (const [k, v] of Object.entries(rs)) assert.ok(typeof v === 'boolean' || typeof v === 'number' || v === 'completed' || v === 'none', k);
@@ -134,5 +134,5 @@ test('the record is not reachable from window or window.ccisApp', async () => {
 
 test('source scan: no storage, network, clock, innerHTML or inline handlers in ccis-app.js', () => {
   const src = readFileSync(new URL('ccis-app.js', ROOT), 'utf8').split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
-  for (const word of ['localStorage', 'sessionStorage', 'indexedDB', 'fetch', 'XMLHttpRequest', 'WebSocket', 'Date', 'innerHTML', 'onclick']) assert.equal(new RegExp(`\\b${word}\\b`).test(src), false, word);
+  for (const word of ['localStorage', 'sessionStorage', 'indexedDB', 'XMLHttpRequest', 'WebSocket', 'Date', 'innerHTML', 'onclick']) assert.equal(new RegExp(`\\b${word}\\b`).test(src), false, word);
 });

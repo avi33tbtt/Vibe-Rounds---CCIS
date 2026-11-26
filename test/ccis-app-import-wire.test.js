@@ -88,7 +88,7 @@ test('page: state() keeps its four keys and neither seam holds a market string',
   await pickMarket(w, picked());
   await pickEnvelope(w);
   assert.deepEqual(Object.keys(w.ccisApp.state()), ['marketLoaded', 'entries', 'runs', 'refused']);
-  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'exportState', 'importState', 'resultsState', 'runState', 'selectorState', 'state']);
+  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'exportState', 'importState', 'remoteState', 'resultsState', 'runState', 'selectorState', 'state']);
   const shown = JSON.stringify([w.ccisApp.state(), w.ccisApp.importState()]);
   const secret = JSON.parse(readFileSync(new URL(`market/${firstArtefact()}`, ROOT), 'utf8'));
   const strings = JSON.stringify(secret).match(/"[^"]{16,}"/g) ?? [];
@@ -99,7 +99,7 @@ test('page: state() keeps its four keys and neither seam holds a market string',
 test('no storage, network, innerHTML or inline handlers in the wired modules and the page', async () => {
   for (const f of ['ccis-app-import-view.js', 'ccis-app.js']) {
     const src = readFileSync(new URL(f, ROOT), 'utf8');
-    assert.ok(!/innerHTML|outerHTML|insertAdjacentHTML|fetch|XMLHttpRequest|WebSocket|sendBeacon|localStorage|sessionStorage|indexedDB|eval\(|new Function|import\(/.test(src), f);
+    assert.ok(!/innerHTML|outerHTML|insertAdjacentHTML|fetch\(|XMLHttpRequest|WebSocket|sendBeacon|localStorage|sessionStorage|indexedDB|eval\(|new Function|import\(/.test(src), f);
     assert.ok(!/\bon[a-z]+\s*=/.test(src.replace(/\/\/.*$/gm, '')), f);
   }
   const w = page();

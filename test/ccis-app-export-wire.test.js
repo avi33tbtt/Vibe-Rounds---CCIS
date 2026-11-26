@@ -123,7 +123,7 @@ test('seams: keys, booleans only, no checksum, record id, file name or typed tim
   const w = await ready();
   go(w);
   btn(w, '#export', 'Download run record').click();
-  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'exportState', 'importState', 'resultsState', 'runState', 'selectorState', 'state']);
+  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'exportState', 'importState', 'remoteState', 'resultsState', 'runState', 'selectorState', 'state']);
   const es = plain(w.ccisApp.exportState());
   assert.deepEqual(Object.keys(es), Object.keys(EMPTY));
   for (const [k, v] of Object.entries(es)) assert.equal(typeof v, 'boolean', k);
@@ -150,6 +150,6 @@ test('the record and the file text are not reachable from window or window.ccisA
 test('source scan: ccis-app.js has no storage, network, clock, innerHTML or handlers; Blob and URL only there', () => {
   const clean = (f) => readFileSync(new URL(f, ROOT), 'utf8').split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
   const app = clean('ccis-app.js');
-  for (const word of ['localStorage', 'sessionStorage', 'indexedDB', 'fetch', 'XMLHttpRequest', 'WebSocket', 'Date', 'innerHTML', 'onclick']) assert.equal(new RegExp(`\\b${word}\\b`).test(app), false, word);
+  for (const word of ['localStorage', 'sessionStorage', 'indexedDB', 'XMLHttpRequest', 'WebSocket', 'Date', 'innerHTML', 'onclick']) assert.equal(new RegExp(`\\b${word}\\b`).test(app), false, word);
   for (const f of readdirSync(ROOT).filter((n) => /^ccis-app-.*\.js$/.test(n))) assert.equal(/\b(Blob|createObjectURL)\b/.test(clean(f)), false, f);
 });

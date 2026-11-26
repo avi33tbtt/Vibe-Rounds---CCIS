@@ -4,6 +4,9 @@
 
 import { checksumOf } from './ccis-compile.js';
 import { mountMarketView } from './ccis-app-market-view.js';
+import { mountRemoteView } from './ccis-app-remote-view.js';
+import { goodBase } from './ccis-remote.js';
+import { makeFetchText } from './ccis-app-fetch.js';
 import { mountImportView } from './ccis-app-import-view.js';
 import { mountSelectorView } from './ccis-app-selector-view.js';
 import { mountCatalogueView } from './ccis-app-catalogue-view.js';
@@ -18,6 +21,7 @@ const imp = { imported: false, refused: false, accepted: 0, rejected: 0, unmappe
 const sel = { contextChosen: false, pathwayChosen: false, mismatch: false, ready: false };
 const cat = { shown: false, rows: 0, needsData: 0, incompatible: 0, other: 0 };
 const results = { shown: false, state: 'none', groups: 0, items: 0, trace: 0, missing: 0 };
+const remote = { available: false, loaded: false, refused: false, source: 'none' };
 const exported = { shown: false, verified: false, saved: false };
 const run = { ready: false, selected: 0, ran: false, failed: false, results: 0, skipped: 0, refused: false };
 let market = null;
@@ -134,27 +138,42 @@ if (importRoot) {
   });
 }
 
+// Row 4.1c: the marketplace address is read from this page's own CSP (D-220): `connect-src 'none'` means no address.
+const marketBaseFromCsp = () => {
+  const m = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+  const hit = m && /(?:^|;)\s*connect-src\s+([^;\s]+)/.exec(m.getAttribute('content') || '');
+  return hit && hit[1] !== "'none'" && goodBase(hit[1]) ? hit[1] : undefined;
+};
+let folderHandle = null;
+let remoteHandle = null;
+// One market is live at a time: whichever view loads, the other is cleared first (it makes no callback).
+const onMarket = (s, from) => {
+  if (s.loaded) (from === 'folder' ? remoteHandle : folderHandle)?.reset();
+  remote.loaded = s.loaded && from === 'remote';
+  remote.refused = s.refused && from === 'remote';
+  remote.source = s.loaded ? from : 'none';
+  market = s.market ?? null;
+  if (importView) importView.reset(); // a report never outlives the market it was checked against; the market message below wins
+  if (selectorView) selectorView.setMarket(market); // the selection never outlives its market
+  refreshCatalogue();
+  app.marketLoaded = s.loaded;
+  app.entries = s.entries;
+  app.refused = s.refused;
+  setStatus(s.message);
+};
 const root = document.getElementById('market');
-if (root) {
-  mountMarketView({
-    document,
-    root,
-    onState: (s) => {
-      market = s.market ?? null;
-      if (importView) importView.reset(); // a report never outlives the market it was checked against; the market message below wins
-      if (selectorView) selectorView.setMarket(market); // the selection never outlives its market
-      refreshCatalogue();
-      app.marketLoaded = s.loaded;
-      app.entries = s.entries;
-      app.refused = s.refused;
-      setStatus(s.message);
-    },
-  });
+if (root) folderHandle = mountMarketView({ document, root, onState: (s) => onMarket(s, 'folder') });
+const remoteRoot = document.getElementById('remote');
+if (remoteRoot) {
+  const base = marketBaseFromCsp();
+  remote.available = base !== undefined && typeof window.fetch === 'function';
+  remoteHandle = mountRemoteView({ document, root: remoteRoot, base, fetchText: remote.available ? makeFetchText(window.fetch.bind(window)) : undefined, onState: (s) => onMarket(s, 'remote') });
 }
 
 window.ccisApp = {
   state: () => ({ ...app }),
   importState: () => ({ ...imp }),
+  remoteState: () => ({ ...remote }),
   selectorState: () => ({ ...sel }),
   catalogueState: () => ({ ...cat }),
   runState: () => ({ ...run }),

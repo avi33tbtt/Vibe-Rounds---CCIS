@@ -17,7 +17,7 @@ export function mountRemoteView({ document, root, base, fetchText, onState }) {
   root.append(el('h2', 'Marketplace'));
   if (!goodBase(base) || typeof fetchText !== 'function') {
     root.append(el('p', 'No marketplace address is set in this build.'));
-    return;
+    return { reset() {} };
   }
   const load = el('button', 'Load from marketplace');
   load.type = 'button';
@@ -87,12 +87,16 @@ export function mountRemoteView({ document, root, base, fetchText, onState }) {
     else showRefusal(out.refusal);
   });
 
-  clear.addEventListener('click', () => {
+  const resetView = () => {
     ticket += 1;
     busy = false;
     load.disabled = false;
     status.textContent = '';
     result.replaceChildren();
+  };
+  clear.addEventListener('click', () => {
+    resetView();
     report(false, 0, false, READY);
   });
+  return { reset: resetView }; // row 4.1c: the page clears this view when the folder view loads (no onState call)
 }

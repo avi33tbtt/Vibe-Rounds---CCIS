@@ -81,10 +81,14 @@ export function mountMarketView({ document, root, onState }) {
     else showRefusal(outcome.refusal);
   });
 
-  clear.addEventListener('click', () => {
+  const resetView = () => {
     ticket += 1;
     input.value = '';
     result.replaceChildren();
+  };
+  clear.addEventListener('click', () => {
+    resetView();
     report(false, 0, false, READY);
   });
+  return { reset: resetView }; // row 4.1c: the page clears this view when the marketplace view loads (no onState call)
 }

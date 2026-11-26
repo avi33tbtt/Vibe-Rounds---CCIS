@@ -8,6 +8,14 @@ Newest first. The standard follows semantic versioning (CCIS-REQ-012 in `SPEC.md
 - **Contains:** the snake slice (one pathway, two analytics), the CLI, the browser page, `npm run accept` and the negative tests.
 - **Version:** `package.json` is 0.1.0. The tag `v0.1.0` is made by the owner (`git tag v0.1.0`).
 
+## A-005 (2026-11-26): envelope section administrations (0.3.0)
+
+- **Requirements affected:** CCIS-REQ-082 and CCIS-REQ-084 (clarified, not changed); CCIS-REQ-019 (the amendment rule applied).
+- **Change:** the context envelope gains one optional section, `administrations`. Each item has a classified concept id, an `outcome` (`given`, `held`, `refused`, `unknown`), status, source class, provenance, recorded time, and optionally an effective time, an `orderRef` and a `correctionOf`. It has no free-text member (no dose, reason, note, route or site). A section needs envelope version 0.3.0 or later; entered-in-error and `unclassified` entries are never kept; held and refused are never a dose; `orderRef` is carried as given and not checked. Accepted administrations are read into the context but not yet bound to analytics (D-229).
+- **Reason:** the EMR row R5h needs to export the medication administration record without free text.
+- **Raised by:** rows E2a, E2b and E2c (`plan-chunks/chunk-E2a-envelope-administrations-schema.md`, `chunk-E2b-envelope-administrations-importer.md`, `chunk-E2c-envelope-administrations-paperwork.md`).
+- **Approved:** by the project owner on 2026-11-26, by approving those chunk files ("do next"). `ccis/SPEC.md` text is not edited (D-214); the version numbers of the package, the standard and the importer are unchanged (D-215).
+
 ## A-004 (2026-11-26): envelope sections for the EMR (0.2.0)
 
 - **Requirements affected:** CCIS-REQ-082 and CCIS-REQ-084 (clarified, not changed); CCIS-REQ-019 (the amendment rule applied).

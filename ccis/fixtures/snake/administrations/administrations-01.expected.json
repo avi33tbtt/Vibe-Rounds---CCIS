@@ -1,0 +1,66 @@
+{
+  "case": "administrations-01",
+  "tests": "Envelope 0.3.0 with one order and five administrations. Hand-calculated: 2 references + 9 observations accepted (11), plus r1, m1, m2 and m5 accepted (15); m3 entered-in-error rejected (1); m4 unclassified unmapped (1); total 17.",
+  "counts": {
+    "accepted": 15,
+    "rejected": 1,
+    "unmapped": 1,
+    "ambiguous": 0,
+    "total": 17
+  },
+  "context": {
+    "orders": [
+      "r1"
+    ],
+    "administrations": [
+      "m1",
+      "m2",
+      "m5"
+    ]
+  },
+  "outcomes": {
+    "m1": "given",
+    "m2": "held",
+    "m5": "refused"
+  },
+  "records": [
+    {
+      "ref": "r1",
+      "recordKind": "order",
+      "category": "accepted",
+      "notes": [
+        "time-zone-unknown"
+      ]
+    },
+    {
+      "ref": "m1",
+      "recordKind": "administration",
+      "category": "accepted"
+    },
+    {
+      "ref": "m2",
+      "recordKind": "administration",
+      "category": "accepted"
+    },
+    {
+      "ref": "m3",
+      "recordKind": "administration",
+      "category": "rejected",
+      "reasonCode": "excluded-by-policy"
+    },
+    {
+      "ref": "m4",
+      "recordKind": "administration",
+      "category": "unmapped",
+      "reasonCode": "concept-unclassified"
+    },
+    {
+      "ref": "m5",
+      "recordKind": "administration",
+      "category": "accepted",
+      "notes": [
+        "time-zone-unknown"
+      ]
+    }
+  ]
+}

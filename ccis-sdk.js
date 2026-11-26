@@ -27,13 +27,13 @@ const token = (v) => typeof v === 'string' && /^\S+$/.test(v);
 const sentence = (v) => typeof v === 'string' && /^\S.*$/s.test(v);
 const at = (path, key) => (path ? `${path}.${key}` : key);
 
-// rules: { allowed: { member: check }, required: [members] }. `x-` members pass as JSON data. Returns a frozen copy.
+// rules: { allowed: { member: check }, required: [members], closed? }. `x-` members pass as JSON data unless `closed`. Returns a frozen copy.
 function shape(spec, rules, path) {
   if (!isPlain(spec)) throw new SdkError('S-003', path);
   const out = {};
   for (const key of Object.keys(spec).sort()) {
     const here = at(path, key);
-    if (key.startsWith('x-')) {
+    if (key.startsWith('x-') && !rules.closed) {
       const text = JSON.stringify(spec[key]);
       if (text === undefined) throw new SdkError('S-003', here);
       out[key] = JSON.parse(text);
@@ -47,6 +47,11 @@ function shape(spec, rules, path) {
   return Object.freeze(out);
 }
 const need = (ok, path) => { if (!ok) throw new SdkError('S-003', path); };
+// An array kept in the order given (never sorted); too short or not an array is an unacceptable value.
+const list = (v, path, min, item) => {
+  need(Array.isArray(v) && v.length >= min, path);
+  return Object.freeze(v.map((x, i) => item(x, at(path, i))));
+};
 
 const systemRef = (v, path) => {
   const r = shape(v, {
@@ -91,4 +96,34 @@ export function binding(spec) {
   if (b.mapping.status === 'unmapped') { if (carriesCode) throw new SdkError('S-004', ''); }
   else for (const k of ['codeSystem', 'code']) if (!(k in b)) throw new SdkError('S-002', k);
   return b;
+}
+
+export const OUTCOME_KINDS = Object.freeze(['answer', 'missing-data', 'conflicting', 'indeterminate']);
+export const INPUT_STATES = Object.freeze(['present', 'absent', 'unknown', 'not-collected', 'not-applicable', 'explicitly-negative', 'entered-in-error', 'conflicting']);
+const idText = (x, p) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*$/.test(x), p); return x; };
+const keyText = (x, p) => { need(typeof x === 'string' && /^[a-z][A-Za-z0-9]*$/.test(x), p); return x; };
+const artefactId = (x, p) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*$/.test(x), p); return x; };
+const textOf = (x, p) => { need(sentence(x), p); return x; };
+
+const nodeInput = (v, p) => shape(v, { allowed: { key: keyText, element: artefactId, field: keyText }, required: ['key', 'element', 'field'] }, p);
+const nodeWhen = (v, p) => shape(v, { closed: true, allowed: { input: keyText, is: (x, q) => { need(INPUT_STATES.includes(x), q); return x; } }, required: ['input', 'is'] }, p);
+const nodeNext = (v, p) => {
+  const n = shape(v, { closed: true, allowed: { stage: idText, end: (x, q) => { need(x === true, q); return x; } }, required: [] }, p);
+  if (('stage' in n) === ('end' in n)) throw new SdkError('S-004', p); // exactly one of the two
+  return n;
+};
+const nodeOutcome = (v, p) => shape(v, {
+  allowed: { id: idText, kind: (x, q) => { need(OUTCOME_KINDS.includes(x), q); return x; }, when: (x, q) => list(x, q, 1, nodeWhen), next: nodeNext, note: textOf },
+  required: ['id', 'kind', 'when', 'next'],
+}, p);
+
+// A question about the record with an outcome for every state. Whether each `when.input` names a declared input stays with the
+// validator (layer 3): the SDK adds no rule the file route lacks.
+export function decisionNode(spec) {
+  const n = shape(spec, {
+    allowed: { id: idText, question: textOf, inputs: (x, p) => list(x, p, 1, nodeInput), preconditions: (x, p) => list(x, p, 0, textOf), outcomes: (x, p) => list(x, p, 2, nodeOutcome) },
+    required: ['id', 'question', 'inputs', 'outcomes'],
+  }, '');
+  if (!n.outcomes.some((o) => o.kind === 'indeterminate')) throw new SdkError('S-004', 'outcomes');
+  return n;
 }

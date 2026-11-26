@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { binding, SdkError, MAPPING_STATUSES } from '../ccis-sdk.js';
+import { binding, decisionNode, SdkError, MAPPING_STATUSES, OUTCOME_KINDS, INPUT_STATES } from '../ccis-sdk.js';
 import { compareRoutes, canonicalize, checksumOf } from '../ccis-compile.js';
 import { validateArtefact } from '../ccis-validator.js';
 
@@ -76,6 +76,58 @@ test('errors never quote the refused value; the module is pure', () => {
   const e = refused(() => binding({ ...GOOD, code: `${HOSTILE} x` }));
   assert.equal(e.message.includes(HOSTILE) || e.path.includes(HOSTILE) || String(e.stack).split('\n')[0].includes(HOSTILE), false);
   assert.equal(refused(() => binding({ ...GOOD, [HOSTILE]: 1 })).message.includes(HOSTILE), false);
+  const src = readFileSync(new URL('../ccis-sdk.js', import.meta.url), 'utf8').replace(/\/\/.*$/gm, '');
+  for (const bad of ['node:', 'Date', 'Math.random', 'fetch', 'eval', 'Function(', 'import(', 'process', 'require(']) assert.equal(src.includes(bad), false, bad);
+});
+
+// ---- Row 4.2a: the decision-node builder ----
+const nodeDir = new URL('../ccis/examples/snake/', import.meta.url);
+const NODES = ['snake-node-antivenom.node.json', 'snake-node-clotting.node.json'].map((f) => readFileSync(new URL(f, nodeDir), 'utf8'));
+const nodeSchema = JSON.parse(readFileSync(new URL('../ccis/schemas/decision-node.schema.json', import.meta.url), 'utf8'));
+const N = () => JSON.parse(NODES[0]);
+
+test('4.2a: both node examples are identical on the code route, with the same validator verdict', () => {
+  for (const text of NODES) {
+    const r = compareRoutes([{ name: 'json', input: text }, { name: 'code', input: decisionNode(JSON.parse(text)) }]);
+    assert.equal(r.identical, true);
+    assert.equal(r.routes[0].checksum, r.routes[1].checksum);
+    assert.deepEqual(verdict(decisionNode(JSON.parse(text))), verdict(JSON.parse(text)));
+  }
+});
+
+test('4.2a: unknown members at any depth are S-001; x- passes on node, input and outcome but not in when or next', () => {
+  const at = (mut) => { const n = N(); mut(n); return refused(() => decisionNode(n)); };
+  assert.deepEqual([at((n) => { n.outcomes[1].colour = 1; }).code, at((n) => { n.outcomes[1].colour = 1; }).path], ['S-001', 'outcomes.1.colour']);
+  assert.equal(at((n) => { n.inputs[0].colour = 1; }).path, 'inputs.0.colour');
+  const ok = N(); ok['x-a'] = 1; ok.inputs[0]['x-b'] = 2; ok.outcomes[0]['x-c'] = 3;
+  assert.match(canonicalize(decisionNode(ok)).text, /"x-a":1/);
+  assert.equal(at((n) => { n.outcomes[0].when[0]['x-d'] = 1; }).path, 'outcomes.0.when.0.x-d');
+  assert.equal(at((n) => { n.outcomes[0].next['x-e'] = 1; }).code, 'S-001');
+});
+
+test('4.2a: S-002 missing outcomes; S-003 short lists and bad enums; S-004 combination rules; enums equal the schema', () => {
+  assert.deepEqual([...OUTCOME_KINDS], nodeSchema.$defs.outcome.properties.kind.enum);
+  assert.deepEqual([...INPUT_STATES], nodeSchema.$defs.outcome.properties.when.items.properties.is.enum);
+  const run = (mut) => { const n = N(); mut(n); return refused(() => decisionNode(n)); };
+  assert.deepEqual([run((n) => { delete n.outcomes; }).code, run((n) => { delete n.outcomes; }).path], ['S-002', 'outcomes']);
+  assert.equal(run((n) => { n.outcomes = n.outcomes.slice(0, 1); }).code, 'S-003');
+  assert.equal(run((n) => { n.inputs = []; }).code, 'S-003');
+  assert.equal(run((n) => { n.outcomes[0].kind = 'maybe'; }).code, 'S-003');
+  assert.equal(run((n) => { n.outcomes[0].when[0].is = 'maybe'; }).code, 'S-003');
+  assert.deepEqual([run((n) => { n.outcomes = n.outcomes.filter((o) => o.kind !== 'indeterminate'); }).code, run((n) => { n.outcomes = n.outcomes.filter((o) => o.kind !== 'indeterminate'); }).path], ['S-004', 'outcomes']);
+  assert.equal(run((n) => { n.outcomes[0].next = { stage: 'a', end: true }; }).code, 'S-004');
+  assert.equal(run((n) => { n.outcomes[0].next = {}; }).code, 'S-004');
+});
+
+test('4.2a: order is kept, nothing is invented, purity still holds', () => {
+  const n = N(); [n.outcomes[0], n.outcomes[1]] = [n.outcomes[1], n.outcomes[0]];
+  const r = compareRoutes([{ name: 'json', input: NODES[0] }, { name: 'code', input: decisionNode(n) }]);
+  assert.equal(r.identical, false);
+  assert.match(String(r.firstDifference.path), /outcomes/);
+  const small = { id: 'a', question: 'q', inputs: [{ key: 'k', element: 'e.f', field: 'f' }], outcomes: [{ id: 'x', kind: 'answer', when: [{ input: 'k', is: 'present' }], next: { end: true } }, { id: 'y', kind: 'indeterminate', when: [{ input: 'k', is: 'unknown' }], next: { stage: 'gap' } }] };
+  const b = decisionNode(small);
+  assert.equal('preconditions' in b || 'note' in b.outcomes[0], false);
+  assert.equal(Object.isFrozen(b.outcomes[0].when[0]) && Object.isFrozen(b.inputs), true);
   const src = readFileSync(new URL('../ccis-sdk.js', import.meta.url), 'utf8').replace(/\/\/.*$/gm, '');
   for (const bad of ['node:', 'Date', 'Math.random', 'fetch', 'eval', 'Function(', 'import(', 'process', 'require(']) assert.equal(src.includes(bad), false, bad);
 });

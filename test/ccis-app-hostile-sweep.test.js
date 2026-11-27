@@ -19,7 +19,7 @@ const COVERED = {
   'ccis-app-catalogue-view.js': 'here', 'ccis-app-export-view.js': 'here', 'ccis-app-results-view.js': 'here',
   'ccis-app-run-view.js': 'here', 'ccis-app-selector-view.js': 'here',
   'ccis-app-market-view.js': 'ccis-app-hostile-sweep-files.test.js', 'ccis-app-import-view.js': 'ccis-app-hostile-sweep-files.test.js',
-  'ccis-app-draft-view.js': 'ccis-app-draft-sweep.test.js', 'ccis-app-form-view.js': 'ccis-app-form-view.test.js',
+  'ccis-app-draft-view.js': 'ccis-app-draft-sweep.test.js', 'ccis-app-form-results-view.js': 'ccis-app-form-results-view.test.js', 'ccis-app-form-view.js': 'ccis-app-form-view.test.js',
   'ccis-app-remote-view.js': 'ccis-app-remote-view.test.js',
 };
 

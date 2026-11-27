@@ -145,6 +145,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | ECO-B1b | (Studio tracker) | Ecosystem row B1b: schema for the local `terminology-package` artefact (code system local, concepts, value sets); validator, validators and app bundle regenerated. | DONE | 2026-11-28 | 1 schema, 1 test | New test `ccis-terminology-package-schema.test.js` (8 cases). Package-level checks wait for B1f. Full npm test not run. |
 | ECO-B1f | (Studio tracker) | Ecosystem row B1f: validator layer 5 checks for a terminology package (duplicate keys, replacedBy, value-set members; CCIS-V5-017 to 021), new pure module; index.html rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New test `ccis-validator-terminology.test.js` (8 cases). Full npm test not run. |
 | ECO-B2 | (Studio tracker) | Ecosystem row B2: validator layer 5 checks for `concept` and `contexts` (CCIS-V5-022 to 025), new pure module; index.html rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New test `ccis-validator-concept.test.js` (8 cases). Full npm test not run. |
+| ECO-B2c | (Studio tracker) | Ecosystem row B2c: validator layer 5 check that a field concept exists in the terminology package named in manifest.references (CCIS-V5-026, 027), new pure module; index.html rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New test `ccis-validator-concept-package.test.js` (8 cases). Full npm test not run. |
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)

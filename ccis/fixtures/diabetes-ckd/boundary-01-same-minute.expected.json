@@ -1,0 +1,105 @@
+{
+  "case": "boundary-01-same-minute",
+  "class": "boundary",
+  "tests": "Both samples collected at the same instant: gap 0, order same-time.",
+  "parameters": "none",
+  "evaluationTime": "2026-03-02T12:00:00Z",
+  "x-analyticVersion": "0.1.3",
+  "results": [
+    {
+      "outputId": "sampleGap",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 0,
+        "unit": "min"
+      }
+    },
+    {
+      "outputId": "sampleOrder",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "label": "same-time"
+      }
+    },
+    {
+      "outputId": "sampleWithinWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "sampleWindow",
+        "edgeRule"
+      ]
+    },
+    {
+      "outputId": "documentedFactCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 4,
+        "unit": "1"
+      }
+    },
+    {
+      "outputId": "creatinineUmolL",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 100,
+        "unit": "umol/L"
+      }
+    },
+    {
+      "outputId": "glucoseMgdL",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 90,
+        "unit": "mg/dL"
+      }
+    }
+  ],
+  "workings": [
+    "sampleGap: 08:00 minus 08:00 = 0 min.",
+    "sampleOrder: neither time is earlier, so same-time (the tree gives same-time, a declared label).",
+    "documentedFactCount = 4; values unchanged; sampleWithinWindow parameter-not-enabled."
+  ],
+  "noValueOutputs": [
+    "sampleWithinWindow"
+  ],
+  "notSpecified": [
+    "Any threshold, target or judgement of a value: none exists in this analytic."
+  ]
+}

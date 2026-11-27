@@ -1,0 +1,25 @@
+{
+  "note": "Synthetic cases only. No parameter is enabled; no value is a clinical value or threshold.",
+  "cases": [
+    {
+      "case": "normal-01-targets",
+      "class": "normal",
+      "tests": "Both contexts complete; values already in the target units pass unchanged."
+    },
+    {
+      "case": "normal-02-converted",
+      "class": "normal",
+      "tests": "Both contexts complete; creatinine in mg/dL and glucose in mmol/L are converted by the declared factors."
+    },
+    {
+      "case": "boundary-01-same-minute",
+      "class": "boundary",
+      "tests": "Both samples collected at the same instant: gap 0, order same-time."
+    },
+    {
+      "case": "boundary-02-reversed",
+      "class": "boundary",
+      "tests": "Creatinine collected before HbA1c: negative gap, order creatinine-first."
+    }
+  ]
+}

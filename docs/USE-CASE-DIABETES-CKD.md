@@ -49,6 +49,9 @@ It only counts: a complete label needs an expected number or set, which is a loc
 Version 0.1.3 (row 4.5d.2) declares two unit conversions (creatinine mg/dL to umol/L, glucose mmol/L to mg/dL) and shows converted values. The factors are unit definitions with no reviewed clinical source (D-292); a value is shown, never judged.
 A value in an unexpected unit is refused, never guessed, and a missing value is `indeterminate` or `needs-data`, never zero.
 
+## 2e. Fixtures (`ccis/fixtures/diabetes-ckd/`)
+Row 4.5e adds four synthetic cases for 0.1.3 (two normal, two boundary) with hand-calculated results. The gap is signed (creatinine time minus HbA1c time), so a creatinine sample taken first gives a negative gap. Refusal, conflicting and out-of-scope cases follow in 4.5e.1.
+
 ## 3. Rows
 | Row | What it adds |
 |-----|--------------|

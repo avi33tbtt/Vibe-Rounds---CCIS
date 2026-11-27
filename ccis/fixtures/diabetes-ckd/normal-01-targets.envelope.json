@@ -1,0 +1,194 @@
+{
+  "envelope": {
+    "version": "0.1.0",
+    "exportedAt": "2026-03-02T12:00:00Z",
+    "producer": {
+      "system": "synthetic-emr",
+      "version": "0.1.0"
+    }
+  },
+  "inclusions": {
+    "identity": false,
+    "narrative": false,
+    "enteredInError": false
+  },
+  "case": {
+    "ref": "case-diabetes-ckd-normal-01-targets"
+  },
+  "applied": {
+    "elements": [
+      {
+        "id": "diabetes.glycaemia-documentation",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      {
+        "id": "ckd.kidney-function-documentation",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      }
+    ],
+    "pathways": []
+  },
+  "observations": [
+    {
+      "id": "o1",
+      "concept": {
+        "id": "diabetes.glycaemia-documentation.diabetes-type-statement",
+        "codes": []
+      },
+      "kind": "string",
+      "effective": {
+        "value": "2026-03-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-03-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": "synthetic diabetes statement"
+    },
+    {
+      "id": "o2",
+      "concept": {
+        "id": "diabetes.glycaemia-documentation.hba1c-result-time",
+        "codes": []
+      },
+      "kind": "datetime",
+      "effective": {
+        "value": "2026-03-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-03-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": {
+        "value": "2026-03-01T08:00:00Z",
+        "zone": "stated"
+      }
+    },
+    {
+      "id": "o3",
+      "concept": {
+        "id": "diabetes.glycaemia-documentation.glucose-value",
+        "codes": []
+      },
+      "kind": "quantity",
+      "effective": {
+        "value": "2026-03-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-03-01T08:00:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "unit": "mg/dL",
+      "value": 90
+    },
+    {
+      "id": "o4",
+      "concept": {
+        "id": "ckd.kidney-function-documentation.kidney-disease-statement",
+        "codes": []
+      },
+      "kind": "string",
+      "effective": {
+        "value": "2026-03-01T10:30:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-03-01T10:30:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": "synthetic kidney statement"
+    },
+    {
+      "id": "o5",
+      "concept": {
+        "id": "ckd.kidney-function-documentation.creatinine-result-time",
+        "codes": []
+      },
+      "kind": "datetime",
+      "effective": {
+        "value": "2026-03-01T10:30:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-03-01T10:30:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "value": {
+        "value": "2026-03-01T10:30:00Z",
+        "zone": "stated"
+      }
+    },
+    {
+      "id": "o6",
+      "concept": {
+        "id": "ckd.kidney-function-documentation.creatinine-value",
+        "codes": []
+      },
+      "kind": "quantity",
+      "effective": {
+        "value": "2026-03-01T10:30:00Z",
+        "zone": "stated"
+      },
+      "recorded": {
+        "value": "2026-03-01T10:30:00Z",
+        "zone": "stated"
+      },
+      "status": "final",
+      "sourceClass": "clinician-entered",
+      "provenance": {
+        "roleClass": "synthetic-clinical-system",
+        "origin": "synthetic-source",
+        "verified": false,
+        "corrected": false
+      },
+      "unit": "umol/L",
+      "value": 100
+    }
+  ],
+  "events": []
+}

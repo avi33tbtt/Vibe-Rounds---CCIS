@@ -20,6 +20,20 @@ The first demo (snake envenomation, `docs/USE-CASE-SNAKE.md`) has one context. T
 
 Every field keeps the six epistemic states apart (absent, unknown, not collected, not applicable, explicitly negative, entered in error).
 
+## 2b. Facts of the kidney context (element `ckd.kidney-function-documentation`)
+| Id | Field | What is recorded |
+|----|-------|------------------|
+| K1 | `kidneyDiseaseStatement` | The condition as the record words it. Never classified or graded. |
+| K2 | `diagnosisDate` | The date chronic kidney disease was recorded as diagnosed. |
+| K3 | `creatinineValue` | A creatinine value with its unit (`umol/L` or `mg/dL`). No conversion, no judgement. |
+| K4 | `creatinineResultTime` | When the sample was collected. |
+| K5 | `egfrValue` | An eGFR value as reported (`mL/min/1.73m2`). Never calculated here. |
+| K6 | `egfrResultTime` | When the sample was collected. |
+| K7 | `egfrMethodStatement` | The method as the result states it. No formula named as a rule. |
+| K8 | `kidneyFollowUpDocumented` | Only that a follow-up arrangement is written down, never what it is. |
+
+Two near-collisions are deliberate for row 4.5c: K2 shares its key with D2 but means a different diagnosis, and K8 reads like D8 but is a different fact; neither may be merged by label (REQ-024).
+
 ## 3. Rows
 | Row | What it adds |
 |-----|--------------|

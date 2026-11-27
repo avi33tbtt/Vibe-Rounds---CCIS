@@ -1,0 +1,253 @@
+{
+  "fields": [
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "constraints": [
+        "The words the record uses. The standard does not classify or grade the condition."
+      ],
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "key": "kidneyDiseaseStatement",
+      "label": "Kidney disease as written in the record",
+      "sourceClasses": [
+        "patient-reported",
+        "clinician-entered",
+        "imported"
+      ],
+      "type": "string"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "constraints": [
+        "Meaning here: the date chronic kidney disease was recorded as diagnosed. It is not the date diabetes was diagnosed, even though the key is the same in the diabetes element. Often only a year is known; an estimate must stay visible as an estimate."
+      ],
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "key": "diagnosisDate",
+      "label": "Date chronic kidney disease was recorded as diagnosed",
+      "sourceClasses": [
+        "patient-reported",
+        "clinician-entered",
+        "imported"
+      ],
+      "timeSemantics": "event-time",
+      "type": "date"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "constraints": [
+        "The value and its unit travel together. No conversion is done here and no value is judged."
+      ],
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "key": "creatinineValue",
+      "label": "Creatinine value with its unit",
+      "sourceClasses": [
+        "patient-reported",
+        "clinician-entered",
+        "imported"
+      ],
+      "type": "quantity",
+      "units": [
+        "umol/L",
+        "mg/dL"
+      ]
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "constraints": [
+        "When the sample was collected, not when the result was filed."
+      ],
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "key": "creatinineResultTime",
+      "label": "Creatinine sample collection time",
+      "sourceClasses": [
+        "patient-reported",
+        "clinician-entered",
+        "imported"
+      ],
+      "timeSemantics": "collection-time",
+      "type": "datetime"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "constraints": [
+        "The value as the result reports it, with its unit. It is never calculated or checked here and no value is judged."
+      ],
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "key": "egfrValue",
+      "label": "eGFR value as reported",
+      "sourceClasses": [
+        "patient-reported",
+        "clinician-entered",
+        "imported"
+      ],
+      "type": "quantity",
+      "units": [
+        "mL/min/1.73m2"
+      ]
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "constraints": [
+        "When the sample behind the reported value was collected."
+      ],
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "key": "egfrResultTime",
+      "label": "eGFR sample collection time",
+      "sourceClasses": [
+        "patient-reported",
+        "clinician-entered",
+        "imported"
+      ],
+      "timeSemantics": "collection-time",
+      "type": "datetime"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "constraints": [
+        "The method exactly as the result words it. No method is named as a rule here and none is checked."
+      ],
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "key": "egfrMethodStatement",
+      "label": "eGFR method as the result states it",
+      "sourceClasses": [
+        "patient-reported",
+        "clinician-entered",
+        "imported"
+      ],
+      "type": "string"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "constraints": [
+        "Meaning here: only that a follow-up arrangement for kidney care is written down, never what it is. It is not the diabetes treatment-plan field and the two are not merged by label."
+      ],
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "explicitly-negative",
+        "entered-in-error"
+      ],
+      "key": "kidneyFollowUpDocumented",
+      "label": "Kidney follow-up arrangement written down",
+      "sourceClasses": [
+        "patient-reported",
+        "clinician-entered",
+        "imported"
+      ],
+      "type": "boolean"
+    }
+  ],
+  "intent": {
+    "exclusions": [
+      "Diagnosis, classification, targets and treatment choice.",
+      "Any drug, dose or amount of anything given."
+    ],
+    "population": "People recorded as having chronic kidney disease. No narrower scope is assumed.",
+    "purpose": "Record what was documented about kidney function tests, and when, so that documentation can be described for local review.",
+    "rationale": "Documentation and timing questions can be asked without any clinical number, so the second demonstration needs no threshold.",
+    "setting": "Any care setting that follows people with chronic kidney disease. Narrowing is for the local clinician to declare."
+  },
+  "manifest": {
+    "id": "ckd.kidney-function-documentation",
+    "name": "Chronic kidney disease: kidney function documentation",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft",
+    "type": "contextual-element",
+    "version": "0.1.0"
+  },
+  "provenance": {
+    "basis": "None. No clinical source and no clinical review.",
+    "origin": "Synthetic demonstration written for the second demo (row 4.5b)."
+  },
+  "relationships": [
+    {
+      "from": "creatinineResultTime",
+      "kind": "refines",
+      "to": "creatinineValue"
+    },
+    {
+      "from": "egfrResultTime",
+      "kind": "refines",
+      "to": "egfrValue"
+    }
+  ]
+}

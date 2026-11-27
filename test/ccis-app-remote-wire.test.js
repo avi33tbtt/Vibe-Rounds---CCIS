@@ -124,8 +124,8 @@ test('seams: remoteState is listed, holds no address, and no on* attribute exist
 
 test('source scan of ccis-app.js: no fetch call of its own, timer, storage or innerHTML', () => {
   const src = readFileSync(new URL('ccis-app.js', ROOT), 'utf8').replace(/\/\/.*$/gm, '');
-  // The only mentions of fetch: the adapter import and the injected window.fetch handed to it (D-231). No call of its own.
-  const rest = src.replace("from './ccis-app-fetch.js'", '').replace("typeof window.fetch === 'function'", '').replace('window.fetch.bind(window)', '');
+  // The only mentions of fetch: the adapter import and the injected window.fetch handed to each adapter (D-231, D-255). No call of its own.
+  const rest = src.replace("from './ccis-app-fetch.js'", '').replaceAll("typeof window.fetch === 'function'", '').replaceAll('window.fetch.bind(window)', '');
   assert.equal(/fetch\s*\(/.test(rest), false);
   assert.equal(/fetch\b/.test(rest), false, 'fetch appears only in the three expected places');
   for (const bad of ['setTimeout', 'setInterval', 'localStorage', 'sessionStorage', 'innerHTML', 'XMLHttpRequest', 'eval(']) assert.equal(src.includes(bad), false, bad);

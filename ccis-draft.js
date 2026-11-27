@@ -28,6 +28,7 @@ export class DraftError extends Error {
   }
 }
 const BUILDERS = { 'contextual-element': element, pathway, 'analytics-package': analytics };
+export const DRAFT_TYPES = Object.freeze(Object.keys(BUILDERS));
 const plain = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const text = (max) => (v) => typeof v === 'string' && /^\S/.test(v) && v.length <= max;
 const closed = (v, checks, path, code) => {

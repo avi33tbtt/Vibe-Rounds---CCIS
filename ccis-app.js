@@ -15,6 +15,11 @@ import { mountResultsView } from './ccis-app-results-view.js';
 import { mountExportView } from './ccis-app-export-view.js';
 import { runForPage } from './ccis-app-run.js';
 import { compatibilityFor, catalogueModel } from './ccis-app-catalogue.js';
+import { mountDraftView } from './ccis-app-draft-view.js';
+import { draftForPage } from './ccis-app-draft.js';
+import { makeAiClient } from './ccis-app-ai.js';
+import { DRAFT_TYPES } from './ccis-draft.js';
+import { SOURCE_KINDS } from './ccis-sdk-analytics.js';
 
 const app = { marketLoaded: false, entries: 0, runs: 0, refused: false };
 const imp = { imported: false, refused: false, accepted: 0, rejected: 0, unmapped: 0, ambiguous: 0 };
@@ -23,6 +28,7 @@ const cat = { shown: false, rows: 0, needsData: 0, incompatible: 0, other: 0 };
 const results = { shown: false, state: 'none', groups: 0, items: 0, trace: 0, missing: 0 };
 const remote = { available: false, loaded: false, refused: false, source: 'none' };
 const exported = { shown: false, verified: false, saved: false };
+const drafted = { enabled: false, hasKey: false, ready: false, drafted: false, refused: false, rows: 0 };
 const run = { ready: false, selected: 0, ran: false, failed: false, results: 0, skipped: 0, refused: false };
 let market = null;
 let exportView = null;
@@ -170,6 +176,21 @@ if (remoteRoot) {
   remoteHandle = mountRemoteView({ document, root: remoteRoot, base, fetchText: remote.available ? makeFetchText(window.fetch.bind(window)) : undefined, onState: (s) => onMarket(s, 'remote') });
 }
 
+// Row 4.3b.2: the AI draft view. Off by default. The key passes through this closure only and is never kept; the page keeps no draft.
+// In the committed page the CSP blocks the request (connect-src 'none'); only a build with --ai-origin can reach the model.
+const draftRoot = document.getElementById('draft');
+if (draftRoot) {
+  const client = typeof window.fetch === 'function' ? makeAiClient(window.fetch.bind(window)) : undefined;
+  mountDraftView({
+    document,
+    root: draftRoot,
+    onState: (s) => { for (const k of Object.keys(drafted)) drafted[k] = s[k]; },
+    types: DRAFT_TYPES,
+    kinds: SOURCE_KINDS,
+    draft: (a) => draftForPage({ ...a, client }),
+  });
+}
+
 window.ccisApp = {
   state: () => ({ ...app }),
   importState: () => ({ ...imp }),
@@ -179,5 +200,6 @@ window.ccisApp = {
   runState: () => ({ ...run }),
   resultsState: () => ({ ...results }),
   exportState: () => ({ ...exported }),
+  draftState: () => ({ ...drafted }),
   checksumOf,
 };

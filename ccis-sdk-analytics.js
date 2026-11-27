@@ -3,7 +3,7 @@
 //
 // Plain, frozen members exactly as the file holds them. Pure; nothing is invented. A parameter has no value, default or suggested
 // member (CCIS-REQ-029): one is refused. A key clash, an input whose element is not in `context` and an unused parameter stay with the validator.
-import { shape, need, list, keyText, textOf, artefactId, semver, SdkError } from './ccis-sdk.js';
+import { shape, need, list, keyText, textOf, artefactId, semver, manifest, withPath, SdkError } from './ccis-sdk.js';
 import { FIELD_TYPES } from './ccis-sdk-element.js';
 import { elementRange } from './ccis-sdk-pathway.js';
 
@@ -128,3 +128,21 @@ export const tests = (v, p = '') => list(v, p, 1, (x, q) => shape(x, {
   },
   required: ['id', 'fixture', 'enables', 'expect'],
 }, q));
+
+// Row 4.2d.3: the whole analytics package. Cross-references (input to context, output to computation, unused parameters,
+// duplicate keys, unknown ref ids, test fixtures) stay with the validator. Nothing is defaulted.
+export const operatorSet = (v, p = '') => closed({ name: (x, q) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*$/.test(x), q); return x; }, version: semver })(v, p);
+const members = (build, min) => (v, p) => list(v, p, min, withPath(build));
+export function analytics(spec) {
+  return shape(spec, {
+    allowed: {
+      manifest: withPath((x) => manifest(x, { type: 'analytics-package' })), question: textOf, population: textOf,
+      intendedUsers: (v, p) => list(v, p, 1, textOf),
+      limitations: closed({ statement: textOf, items: (v, p) => list(v, p, 0, textOf) }),
+      context: members(contextEntry, 1), inputs: members(analyticsInput, 1), parameters: members(parameter, 0), conversions: members(conversion, 0),
+      operatorSet, computation, outputs, interpretation, executionProfile, tests, evidence, provenance,
+    },
+    required: ['manifest', 'question', 'intendedUsers', 'population', 'limitations', 'context', 'inputs', 'parameters', 'operatorSet',
+      'computation', 'outputs', 'interpretation', 'executionProfile', 'evidence', 'provenance'],
+  }, '');
+}

@@ -85,8 +85,17 @@ node ccis-cli.js validate ccis/examples/invalid/7-test-verification/test-expects
 
 - Canonical form `ccis-canonical-json/1`: sorted member names, array order kept, no whitespace, `x-` members covered. The checksum is `sha256:` and 64 hex characters, and is never stored inside the artefact. It shows the bytes are the same bytes; it says nothing about who published them or whether they are clinically safe.
 - The text route refuses duplicate member names, unsafe numbers and invalid Unicode, which `JSON.parse` would hide.
-- **The equivalence harness (`compareRoutes`) is proven here on three stand-ins for one route** (the committed text, an in-memory copy and a re-formatted copy). The code SDK (row 4.2), the form editor (4.4) and FHIR Mode (6.1) are not built; they plug into the same harness.
+- **The equivalence harness (`compareRoutes`) is proven here on three stand-ins for one route** (the committed text, an in-memory copy and a re-formatted copy). The code SDK (rows 4.2 to 4.2d, see "Authoring in code (SDK)" below) is proved on the snake examples; the form editor (4.4) and FHIR Mode (6.1) are not built and plug into the same harness.
 - **Limits:** array order is significant, so two routes that list the same items in a different order give different bytes. A lone decision node or terminology binding has no manifest and is refused (C-008). One artefact is compiled at a time; a bundle of pinned artefacts and the check of a pin at use come with rows 3.x. No signing.
+
+### Authoring in code (SDK)
+
+Rows 4.2 to 4.2d.3 add a code route for writing artefacts. Every builder takes a plain object, checks it, and returns the same plain, frozen JSON the file route holds. Pure: no file, network, clock or randomness. Prototype; synthetic data only.
+
+- **Builders by artefact.** `ccis-sdk.js`: terminology `binding`, `decisionNode`, `manifest`, `reference`. `ccis-sdk-element.js`: `field`, `element`. `ccis-sdk-pathway.js`: `pathway`. `ccis-sdk-analytics.js`: the member builders (`analyticsInput`, `parameter`, `conversion`, `contextEntry`, `expr` with `input`, `param`, `conv`, `lit`, `op`, `computation`, `outputs`, `interpretation`, `executionProfile`, `tests`, `evidence`, `provenance`, `operatorSet`) and the whole `analytics(spec)`.
+- **Two routes, one artefact.** Feed the file text and the builder result to `compareRoutes`: the four snake analytics files, the snake element and the snake pathway come out with the same bytes, the same checksum and the same validator verdict.
+- **Refusals.** `SdkError` carries a code and a path, never a value: `S-001` a member is not part of the artefact, `S-002` a required member is missing, `S-003` a wrong type or unacceptable value, `S-004` the members together break a rule.
+- **Limits.** Nothing is defaulted. An expression cannot hold a number literal, and a parameter cannot hold a value (CCIS-REQ-029). Cross-references (an input naming no context element, an unused parameter, a duplicate key, a test fixture that does not exist) are checked only by the validator, not by the builders. The `tests` builder is proved on a hand-written spec because no snake example has `tests` (D-243).
 
 ### Import (row 3.1)
 

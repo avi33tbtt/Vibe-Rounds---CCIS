@@ -19,7 +19,7 @@ const COVERED = {
   'ccis-app-catalogue-view.js': 'here', 'ccis-app-export-view.js': 'here', 'ccis-app-results-view.js': 'here',
   'ccis-app-run-view.js': 'here', 'ccis-app-selector-view.js': 'here',
   'ccis-app-market-view.js': 'ccis-app-hostile-sweep-files.test.js', 'ccis-app-import-view.js': 'ccis-app-hostile-sweep-files.test.js',
-  'ccis-app-draft-view.js': 'ccis-app-draft-view.test.js',
+  'ccis-app-draft-view.js': 'ccis-app-draft-sweep.test.js',
 };
 
 const idx = JSON.parse(readFileSync('market/index.json', 'utf8'));

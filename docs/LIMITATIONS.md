@@ -45,6 +45,7 @@ Each line names where it comes from. A line with no source is not here.
 - **LIM-21** Fixture findings stay open in the packages: F-4, F-5 (tree behaviour against the dossier), F-6 (a not-collected expected item reads complete), F-7, F-8. (D-043, D-052, D-069)
 - **LIM-22** At the freeze (row 3.11b) the full `npm test` ran 845 tests: all passed except the two known F-6 TODO gaps (4 skipped). You have not yet run it on your own machine. (D-201; tracker owner list)
 - **LIM-23** The browser smoke test needs Chrome; CI may need `CHROME_PATH` set. `index.html` is 1.35 MB. (row 3.10a; row 3.9b.2)
+- **LIM-30** AI drafting (row 4.3): you paste your own model key into the page. It sits in a password field until the click, then is cleared, but a browser extension or a hostile page script could read it, so use a key with a small spending limit. A draft's source trace names the source and citation only, not the passage span, and a refusal may quote a member path taken from the model reply. (D-257)
 
 ## Decisions only you can make
 

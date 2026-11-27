@@ -155,6 +155,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | ECO-B6a | (Studio tracker) | Ecosystem row B6a: pathway `contexts` validator rows CCIS-V5-044 to 047 in a new pure module, wired at layer 5; index.html rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New test `ccis-validator-contexts.test.js` (8 cases). Full npm test not run. |
 | ECO-B7 | (Studio tracker) | Ecosystem row B7: new pure `ccis-compose.js` with `conflictReport` (shared-concept matching by code, owner, users, unit, status, blockers); index.html not rebuilt (no app import yet). | DONE | 2026-11-28 | 1 module, 1 test | New test `ccis-compose-conflicts.test.js` (8 cases). Full npm test not run. |
 | ECO-B8 | (Studio tracker) | Ecosystem row B8: new pure `ccis-compose-group.js` with `composeGroup` (composed element group from owner choices; blockers, revisions list, canonical bytes); index.html not rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New test `ccis-compose-group.test.js` (8 cases). Full npm test not run. |
+| ECO-B8a | (Studio tracker) | Ecosystem row B8a: new pure `ccis-compose-pathway.js` with `composePathway` (composed pathway from the group and source pathways: references, elements, merged entryForm, contexts; canonical bytes); index.html not rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New test `ccis-compose-pathway.test.js` (8 cases). Full npm test not run. |
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)

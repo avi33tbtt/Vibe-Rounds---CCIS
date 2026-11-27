@@ -151,6 +151,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | ECO-B3a | (Studio tracker) | Ecosystem row B3a: element-group validator rows CCIS-V5-030 (owner not a listed field), 031 (same-concept without owner; warning at 0.1.0, error from 0.2.0) and 032 (concept key format); index.html rebuilt. | DONE | 2026-11-28 | 1 module edit, 1 test | New test `ccis-validator-group-owner.test.js` (8 cases); one assertion in `ccis-diabetes-ckd-group.test.js` now ignores warnings. Full npm test not run. |
 | ECO-B4 | (Studio tracker) | Ecosystem row B4: element-group validator rows CCIS-V5-033 (duplicate member), 034 (duplicate shared-concept code) and 035 (concept names fewer than two different members); index.html rebuilt. | DONE | 2026-11-28 | 1 module edit, 1 test | New test `ccis-validator-group-duplicates.test.js` (8 cases). Full npm test not run. |
 | ECO-B5 | (Studio tracker) | Ecosystem row B5: pathway schema gains optional `entryForm` (sections, element and section items, row groups) and `contexts`; validators and index.html regenerated. | DONE | 2026-11-28 | 1 schema edit, 1 test | New test `ccis-pathway-entryform-schema.test.js` (8 cases). Full npm test not run. |
+| ECO-B6 | (Studio tracker) | Ecosystem row B6: pathway `entryForm` validator rules CCIS-V5-036 to 043 in a new pure module, wired at layer 5; index.html rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New test `ccis-validator-entryform.test.js` (8 cases). Full npm test not run. |
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)

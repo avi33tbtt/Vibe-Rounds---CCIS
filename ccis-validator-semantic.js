@@ -45,7 +45,7 @@ export const SUPPORTED_OPERATOR_SET = { name: 'ccis-core-ops', majors: [0] };
 
 const NON_VALUE_STATES = new Set(['needs-data', 'indeterminate', 'not-applicable', 'conflict', 'parameter-not-enabled']);
 // Arity: exact number, or a minimum written as { min }.
-const ARITY = {
+export const ARITY = {
   and: { min: 2 }, or: { min: 2 }, not: 1, 'is-present': 1, 'state-of': 1,
   eq: 2, ne: 2, lt: 2, le: 2, gt: 2, ge: 2, add: 2, sub: 2, 'time-diff': 2, convert: 2, if: 3,
   count: { min: 1 }, select: { min: 1 },

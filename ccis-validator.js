@@ -24,11 +24,12 @@
 import {
   manifest as vManifest, element as vElement, terminologyBinding as vBinding, decisionNode as vNode,
   pathway as vPathway, analytics as vAnalytics, executionManifest as vExecution, contextEnvelope as vEnvelope,
-  importReport as vReport, validationRecord as vRecord, runResult as vResult, runRecord as vRun, elementGroup as vElementGroup, terminologyPackage as vTerminology,
+  importReport as vReport, validationRecord as vRecord, runResult as vResult, runRecord as vRun, elementGroup as vElementGroup, terminologyPackage as vTerminology, rulePack as vRulePack,
 } from './ccis/validators/ccis-validators.js';
 import { semanticLayer, graphLayer, SEMANTIC_RULES } from './ccis-validator-semantic.js';
 import { groupChecks, GROUP_RULES } from './ccis-validator-group.js';
 import { entryFormChecks, ENTRYFORM_RULES } from './ccis-validator-entryform.js';
+import { rulePackSemantic, RULEPACK_RULES } from './ccis-validator-rulepack.js';
 import { contextsChecks, CONTEXTS_RULES } from './ccis-validator-contexts.js';
 import { ownerChecks, OWNER_RULES } from './ccis-validator-owner.js';
 import { terminologyChecks, TERMINOLOGY_RULES } from './ccis-validator-terminology.js';
@@ -60,6 +61,7 @@ export const RULES = [
   ...GROUP_RULES,
   ...ENTRYFORM_RULES,
   ...CONTEXTS_RULES,
+  ...RULEPACK_RULES,
   ...OWNER_RULES,
   ...TERMINOLOGY_RULES,
   ...CONCEPT_RULES,
@@ -297,10 +299,10 @@ function layer1(input) {
 const SCHEMAS = {
   manifest: vManifest, element: vElement, terminologyBinding: vBinding, decisionNode: vNode, pathway: vPathway,
   analytics: vAnalytics, executionManifest: vExecution, contextEnvelope: vEnvelope, importReport: vReport,
-  validationRecord: vRecord, runResult: vResult, runRecord: vRun, elementGroup: vElementGroup, terminologyPackage: vTerminology,
+  validationRecord: vRecord, runResult: vResult, runRecord: vRun, elementGroup: vElementGroup, terminologyPackage: vTerminology, rulePack: vRulePack,
 };
 
-const TYPE_TO_SCHEMA = { 'contextual-element': 'element', 'element-group': 'elementGroup', pathway: 'pathway', 'analytics-package': 'analytics', 'terminology-package': 'terminologyPackage' };
+const TYPE_TO_SCHEMA = { 'contextual-element': 'element', 'element-group': 'elementGroup', pathway: 'pathway', 'analytics-package': 'analytics', 'terminology-package': 'terminologyPackage', 'rule-pack': 'rulePack' };
 const TYPES_WITHOUT_SCHEMA = ['test-validation-package'];
 
 // What the artefact is, from its own manifest type or its shape. Decision nodes and bindings have no manifest.
@@ -416,6 +418,7 @@ const arr = (x) => (Array.isArray(x) ? x : []);
 function collectRefs(doc, kind) {
   const out = [];
   if (kind === 'analytics-package') arr(doc.context).forEach((c, i) => isObj(c) && out.push([`/context/${i}/ref`, c.ref]));
+  if (kind === 'rule-pack') arr(doc.scope?.pathways).forEach((r, i) => out.push([`/scope/pathways/${i}`, r]));
   if (kind === 'element-group') arr(doc.members).forEach((m, i) => isObj(m) && out.push([`/members/${i}/element`, m.element]));
   if (kind === 'pathway') {
     arr(doc.elements).forEach((r, i) => out.push([`/elements/${i}`, r]));
@@ -596,7 +599,7 @@ export function validateArtefact(input, options = {}) {
   if (layers['reference-integrity'].outcome !== 'passed') {
     skip('semantic', stopped('reference-integrity'));
   } else {
-    mark('semantic', semanticLayer(first.doc, kind));
+    mark('semantic', kind === 'rule-pack' ? rulePackSemantic(first.doc) : semanticLayer(first.doc, kind));
   }
   if (layers.semantic.outcome !== 'passed') {
     skip('graph-and-compatibility', stopped('semantic'));

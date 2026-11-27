@@ -185,8 +185,8 @@ test('layer 2: unknown member, missing member, wrong value, unknown kind, and a 
   assert.deepEqual(r.diagnostics.map((d) => [d.ruleId, d.path]), [['CCIS-V2-005', '']]);
   assert.equal(r.layers['reference-integrity'].outcome, 'not-run');
 
-  const group = { manifest: { ...clone(e.manifest), id: 'snake.group', type: 'element-group' } };
-  r = run(group);
+  const pkgDoc = { manifest: { ...clone(e.manifest), id: 'snake.tvp', type: 'test-validation-package' } };
+  r = run(pkgDoc);
   assert.deepEqual(r.diagnostics.map((d) => [d.severity, d.ruleId]), [['warning', 'CCIS-V2-006']]);
   assert.equal(r.outcome, 'no-errors-so-far');
   assert.equal(r.layers.structural.outcome, 'passed');
@@ -392,5 +392,5 @@ test('the library has no dynamic code, file access, network, clock or randomness
   const src = text(new URL('../ccis-validator.js', import.meta.url));
   const forbidden = [/\beval\b/, /\bFunction\b/, /\bimport\s*\(/, /\brequire\s*\(/, /node:/, /\bfs\b/, /\bDate\b/, /Math\.random/, /performance\.now/, /\bfetch\b/, /\bprocess\b/, /XMLHttpRequest/, /WebSocket/, /localStorage/];
   for (const re of forbidden) assert.equal(re.test(src), false, String(re));
-  assert.deepEqual([...src.matchAll(/^import .* from '([^']+)';$|^\} from '([^']+)';$/gm)].map((m) => m[1] ?? m[2]), ['./ccis/validators/ccis-validators.js', './ccis-validator-semantic.js', './ccis-validator-governance.js']);
+  assert.deepEqual([...src.matchAll(/^import .* from '([^']+)';$|^\} from '([^']+)';$/gm)].map((m) => m[1] ?? m[2]), ['./ccis/validators/ccis-validators.js', './ccis-validator-semantic.js', './ccis-validator-group.js', './ccis-validator-entryform.js', './ccis-validator-rulepack.js', './ccis-validator-rulepack-checks.js', './ccis-validator-contexts.js', './ccis-validator-owner.js', './ccis-validator-terminology.js', './ccis-validator-concept.js', './ccis-validator-concept-package.js', './ccis-concept-owners.js', './ccis-validator-governance.js']);
 });

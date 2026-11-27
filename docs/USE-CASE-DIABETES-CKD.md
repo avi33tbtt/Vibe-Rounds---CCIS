@@ -68,3 +68,6 @@ Row 4.5f adds three more cases to the same folder: the kidney context not applie
 
 ## 4. Not in scope
 Diagnosis, classification, targets, treatment choice, any drug or dose, and any interpretation of a value. Every parameter that could act as a threshold stays disabled until a named local clinician owns it.
+
+## 2g. Market folder (`market-diabetes-ckd/`)
+Built by `node scripts/market-build.js --set diabetes-ckd` (check with `--check`). Six entries: the two elements and the four sample-gap analytics versions (0.1.0 to 0.1.3), all draft. The group file is not published: the market accepts only elements, analytics packages and pathways. The snake `market/` is unchanged.

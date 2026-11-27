@@ -24,12 +24,13 @@
 import { canonicalize, checksumOf } from './ccis-compile.js';
 
 export const ENGINE = Object.freeze({ name: 'ccis-exec', version: '0.1.0' });
-export const OPERATOR_SET = Object.freeze({ name: 'ccis-core-ops', version: '0.1.0' });
+export const OPERATOR_SET = Object.freeze({ name: 'ccis-core-ops', version: '0.2.0' });
 export const RUNTIME_LIMIT_FIELDS = Object.freeze(['maxSteps', 'maxDepth', 'maxOutputBytes']);
 export const UNKNOWN_KIND = Object.freeze(['input', 'parameter']);
 
-// The 18 operators the analytics schema allows (D-006). Since row 3.4 this engine version implements all 18.
-export const WHITELIST_OPS = Object.freeze(['and', 'or', 'not', 'is-present', 'state-of', 'eq', 'ne', 'lt', 'le', 'gt', 'ge', 'add', 'sub', 'time-diff', 'convert', 'if', 'count', 'select']);
+// The 21 operators the analytics schema allows (D-006; min, max and coalesce added in ECO-B9, ED-39). This engine version implements all 21.
+export const WHITELIST_OPS = Object.freeze(['and', 'or', 'not', 'is-present', 'state-of', 'eq', 'ne', 'lt', 'le', 'gt', 'ge', 'add', 'sub', 'time-diff', 'convert', 'if', 'count', 'select', 'min', 'max', 'coalesce']);
+export const NEW_OPS = Object.freeze(['min', 'max', 'coalesce']); // operator set 0.2.0 and later
 export const IMPLEMENTED_OPS = Object.freeze([...WHITELIST_OPS]);
 
 const HARD_MAX_DEPTH = 256; // protects the JavaScript stack whatever a package asks for
@@ -37,6 +38,7 @@ const ARITY = new Map([
   ['and', [1, Infinity]], ['or', [1, Infinity]], ['not', [1, 1]], ['is-present', [1, 1]], ['state-of', [1, 1]],
   ['eq', [2, 2]], ['ne', [2, 2]], ['lt', [2, 2]], ['le', [2, 2]], ['gt', [2, 2]], ['ge', [2, 2]], ['if', [3, 3]],
   ['add', [2, Infinity]], ['sub', [2, 2]], ['time-diff', [2, 2]], ['convert', [2, 2]], ['count', [1, Infinity]], ['select', [1, Infinity]],
+  ['min', [2, Infinity]], ['max', [2, Infinity]], ['coalesce', [2, Infinity]],
 ]);
 const WHITELIST = new Set(WHITELIST_OPS);
 const IMPLEMENTED = new Set(IMPLEMENTED_OPS);
@@ -59,6 +61,8 @@ export const EXEC_REFUSALS = Object.freeze([
   ['X-014', 'A bound input or parameter is malformed or missing.'],
   ['X-015', 'A conversion of a kind this engine does not apply in convert is used.'],
   ['X-016', 'A select is not a valid membership test or table row for its output.'],
+  ['X-017', 'An operator needs a newer operator-set version than the package declares.'],
+  ['X-018', 'A coalesce has a literal argument, which could turn an unknown into a value.'],
 ].map(([id, meaning]) => Object.freeze({ id, meaning })));
 const MEANING = new Map(EXEC_REFUSALS.map((r) => [r.id, r.meaning]));
 const refusalOf = (id) => ({ id, meaning: MEANING.get(id) });
@@ -71,6 +75,7 @@ const fail = (id) => { throw new Refusal(id); };
 const isObj = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
 const isInt = (x) => Number.isInteger(x) && x >= 1;
 const major = (v) => (typeof v === 'string' && /^\d+\.\d+\.\d+$/.test(v) ? Number(v.split('.')[0]) : null);
+const minor = (v) => (typeof v === 'string' && /^\d+\.\d+\.\d+$/.test(v) ? Number(v.split('.')[1]) : null);
 const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
 function deepFreeze(x) {
@@ -152,6 +157,7 @@ export function prepareAnalytic({ analytic, checksum, runtime } = {}) {
     if (typeof e.op !== 'string' || !Array.isArray(e.args)) { add('X-012', output, path); return; }
     if (!WHITELIST.has(e.op)) { add('X-001', output, path); return; }
     used.add(e.op);
+    if (NEW_OPS.includes(e.op) && isObj(os) && major(os.version) === major(OPERATOR_SET.version) && minor(os.version) < 2) add('X-017', output, path);
     if (!IMPLEMENTED.has(e.op)) add('X-002', output, path, { op: e.op });
     else {
       const [lo, hi] = ARITY.get(e.op);
@@ -174,6 +180,8 @@ export function prepareAnalytic({ analytic, checksum, runtime } = {}) {
           const decl = outputDecl.get(output);
           if (!decl || decl.kind !== 'table' || !Array.isArray(decl.columns) || e.args.length !== decl.columns.length || e.args.some(isSet)) add('X-016', output, path);
         }
+      } else if (e.op === 'coalesce') {
+        e.args.forEach((a, i) => { if (isObj(a) && Object.hasOwn(a, 'literal')) add('X-018', output, `${path}.args[${i}]`); });
       } else if (e.op === 'is-present' || e.op === 'state-of') {
         const a = e.args[0];
         const okRef = isObj(a) && Object.hasOwn(a, 'ref') && (e.op === 'state-of' ? a.ref === 'input' : a.ref === 'input' || a.ref === 'parameter');
@@ -358,6 +366,11 @@ export function evaluateOutput({ prepared, outputId, inputs, parameters } = {}) 
         if (vals.some((v) => v.t !== 'text' && v.t !== 'unknown')) fail('X-010');
         return unk.length ? mergeBecause(unk) : { t: 'row', cells: vals.map((v) => v.v) };
       }
+      if (op === 'coalesce') {
+        const known = vals.filter((v) => v.t !== 'unknown');
+        if (known.some((v) => v.t !== known[0].t || (v.t === 'number' && v.unit !== known[0].unit))) fail('X-010');
+        return known.length ? known[0] : mergeBecause(unk);
+      }
       if (unk.length) return mergeBecause(unk);
       if (op === 'time-diff') {
         if (vals[0].t !== 'instant' || vals[1].t !== 'instant') fail('X-010');
@@ -368,6 +381,10 @@ export function evaluateOutput({ prepared, outputId, inputs, parameters } = {}) 
         const v = op === 'add' ? vals.reduce((n, x) => n + x.v, 0) : vals[0].v - vals[1].v;
         if (!Number.isFinite(v)) fail('X-013');
         return { t: 'number', v, unit: vals[0].unit };
+      }
+      if (op === 'min' || op === 'max') {
+        if (vals.some((v) => v.t !== 'number' || v.unit !== vals[0].unit)) fail('X-010');
+        return { t: 'number', v: Math[op](...vals.map((x) => x.v)), unit: vals[0].unit };
       }
       return bool(compareKnown(op, vals[0], vals[1]));
     };

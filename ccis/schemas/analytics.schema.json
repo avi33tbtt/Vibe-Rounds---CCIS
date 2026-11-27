@@ -254,7 +254,7 @@
           "additionalProperties": false,
           "required": ["op", "args"],
           "properties": {
-            "op": { "enum": ["and", "or", "not", "is-present", "state-of", "eq", "ne", "lt", "le", "gt", "ge", "add", "sub", "time-diff", "convert", "if", "count", "select"] },
+            "op": { "enum": ["and", "or", "not", "is-present", "state-of", "eq", "ne", "lt", "le", "gt", "ge", "add", "sub", "time-diff", "convert", "if", "count", "select", "min", "max", "coalesce"] },
             "args": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/expr" } }
           }
         },

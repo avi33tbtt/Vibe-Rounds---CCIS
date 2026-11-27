@@ -45,15 +45,15 @@ const refusalOf = (expr, inputs, parameters) => { const r = run(base({ o: expr }
 
 // ---------------------------------------------------------------------------------------------
 test('catalogue and constants', () => {
-  assert.deepEqual(EXEC_REFUSALS.map((r) => r.id), Array.from({ length: 16 }, (_, i) => `X-${String(i + 1).padStart(3, '0')}`));
+  assert.deepEqual(EXEC_REFUSALS.map((r) => r.id), Array.from({ length: 18 }, (_, i) => `X-${String(i + 1).padStart(3, '0')}`));
   assert.ok(EXEC_REFUSALS.every((r) => r.meaning.endsWith('.') && Object.isFrozen(r)));
-  assert.equal(WHITELIST_OPS.length, 18);
-  assert.equal(IMPLEMENTED_OPS.length, 18); // row 3.4: every whitelisted operator is implemented
+  assert.equal(WHITELIST_OPS.length, 21);
+  assert.equal(IMPLEMENTED_OPS.length, 21); // row 3.4: every whitelisted operator is implemented
   assert.deepEqual([...IMPLEMENTED_OPS], [...WHITELIST_OPS]);
   // X-002 stays in the catalogue for a future whitelist growth, but cannot be reached now.
   assert.ok(EXEC_REFUSALS.some((r) => r.id === 'X-002'));
   assert.deepEqual(ENGINE, { name: 'ccis-exec', version: '0.1.0' });
-  assert.deepEqual(OPERATOR_SET, { name: 'ccis-core-ops', version: '0.1.0' });
+  assert.deepEqual(OPERATOR_SET, { name: 'ccis-core-ops', version: '0.2.0' });
   assert.deepEqual(RUNTIME_LIMIT_FIELDS, ['maxSteps', 'maxDepth', 'maxOutputBytes']);
 });
 

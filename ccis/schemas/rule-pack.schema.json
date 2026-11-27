@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ccis.invalid/schemas/rule-pack.schema.json",
+  "title": "CCIS rule pack (part 1)",
+  "description": "Manifest, class, scope, inputs and parameters of a rule pack (B10). Shape only. Holds no number, default, threshold or band. Rules, messages and tests are B11. Prototype. Synthetic data only. Not for clinical use.",
+  "type": "object",
+  "additionalProperties": false,
+  "patternProperties": { "^x-": {} },
+  "required": ["manifest", "class", "scope", "inputs", "parameters", "sourceNote"],
+  "properties": {
+    "manifest": {
+      "allOf": [
+        { "$ref": "https://ccis.invalid/schemas/manifest.schema.json" },
+        { "type": "object", "properties": { "type": { "const": "rule-pack" } } }
+      ]
+    },
+    "class": { "enum": ["data-quality", "clinical-prompt"] },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^x-": {} },
+      "required": ["pathways"],
+      "properties": {
+        "pathways": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/reference" },
+              { "type": "object", "properties": { "type": { "const": "pathway" } } }
+            ]
+          }
+        }
+      }
+    },
+    "inputs": {
+      "description": "Read by concept, never by label. The element id only narrows.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "patternProperties": { "^x-": {} },
+        "required": ["id", "concept", "read"],
+        "properties": {
+          "id": { "$ref": "#/$defs/key" },
+          "concept": { "$ref": "#/$defs/conceptKey" },
+          "element": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/artefactId" },
+          "read": { "enum": ["latest", "all", "count"] }
+        }
+      }
+    },
+    "parameters": {
+      "description": "Declared, never valued. No value, default or range (ED-40).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "patternProperties": { "^x-": {} },
+        "required": ["id", "label", "kind", "enabledByDefault", "suppliedBy"],
+        "properties": {
+          "id": { "$ref": "#/$defs/key" },
+          "label": { "$ref": "#/$defs/text" },
+          "kind": { "enum": ["interval", "count"] },
+          "units": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^\\S+$" } },
+          "enabledByDefault": { "const": false },
+          "suppliedBy": { "$ref": "#/$defs/text" }
+        }
+      }
+    },
+    "sourceNote": { "$ref": "#/$defs/text" }
+  },
+  "$defs": {
+    "text": { "type": "string", "pattern": "^\\S.*$" },
+    "key": { "type": "string", "pattern": "^[a-z][A-Za-z0-9]*$" },
+    "conceptKey": { "type": "string", "pattern": "^[a-z0-9][A-Za-z0-9._-]*$" }
+  }
+}

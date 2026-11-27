@@ -87,7 +87,7 @@
       "pattern": "^[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*$"
     },
     "artefactType": {
-      "enum": ["contextual-element", "element-group", "pathway", "analytics-package", "terminology-package", "test-validation-package"]
+      "enum": ["contextual-element", "element-group", "pathway", "analytics-package", "terminology-package", "test-validation-package", "rule-pack"]
     },
     "reference": {
       "description": "A named artefact at an exact version or a range. Never an embedded copy (CCIS-REQ-014).",

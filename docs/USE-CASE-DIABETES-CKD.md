@@ -46,6 +46,9 @@ Why not "how recent is a result": the operator whitelist has no evaluation-time 
 Version 0.1.2 (row 4.5d.1a) adds `documentedFactCount`: how many of four listed facts (the statement and the collection time, in each context) are recorded. A missing kidney context reads `indeterminate`, never a low count.
 It only counts: a complete label needs an expected number or set, which is a local clinician's choice, so nothing here reads as complete.
 
+Version 0.1.3 (row 4.5d.2) declares two unit conversions (creatinine mg/dL to umol/L, glucose mmol/L to mg/dL) and shows converted values. The factors are unit definitions with no reviewed clinical source (D-292); a value is shown, never judged.
+A value in an unexpected unit is refused, never guessed, and a missing value is `indeterminate` or `needs-data`, never zero.
+
 ## 3. Rows
 | Row | What it adds |
 |-----|--------------|

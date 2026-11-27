@@ -136,6 +136,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 5.1 to 5.7 | (written when reached) | Templates, decision graphs, research-to-package, cohorts, access model | LOCKED |  |  | After Phase 4. 5.7 needs the D-002 server decision. |
 | 5.8 | chunk-5.8-cohort-context-graph.md | Cohort Context Graph and aggregate Cohort Explorer (synthetic ~30-subject cohort; derived in-memory projection; relationship-map UI). Source brief is over 5 KB: split into narrower chunk files (projection, fixture, map view, timeline, tests) when reached | LOCKED |  | split into 5+ rows when reached | Needs 5.5 and 5.6 (and 3.10 for UI). 5.7 before any shared or real use. Not 5.3 decision nodes. D-178. |
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
+| ECO-B0 | (Studio tracker) | Ecosystem row B0: base for standard 0.2.0 is commit 57d89cd. | DONE | 2026-11-27 | none | Marked done on owner instruction. No v0.1.0 tag existed on the remote at the time; full npm test not run by Claude. |
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)

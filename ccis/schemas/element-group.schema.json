@@ -75,7 +75,8 @@
         ],
         "properties": {
           "concept": {
-            "$ref": "#/$defs/key"
+            "description": "The shared concept: a camelCase key or a local concept code (ED-9). The strict local key format is checked by the validator, not here.",
+            "$ref": "#/$defs/conceptKey"
           },
           "meaning": {
             "description": "The meaning in words. Identification is by meaning, never by label (CCIS-REQ-024).",
@@ -110,6 +111,26 @@
               "same-concept",
               "related-not-merged"
             ]
+          },
+          "owner": {
+            "description": "Which listed field owns this concept (ED-12). Optional here; whether it is required and whether it is one of the listed fields is checked by the validator (B3a).",
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+              "^x-": {}
+            },
+            "required": [
+              "element",
+              "field"
+            ],
+            "properties": {
+              "element": {
+                "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/artefactId"
+              },
+              "field": {
+                "$ref": "#/$defs/key"
+              }
+            }
           }
         }
       }
@@ -194,6 +215,10 @@
           "$ref": "#/$defs/text"
         }
       }
+    },
+    "conceptKey": {
+      "type": "string",
+      "pattern": "^[a-z0-9][A-Za-z0-9._-]*$"
     }
   }
 }

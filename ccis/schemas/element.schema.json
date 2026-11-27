@@ -113,6 +113,17 @@
             "mapping": { "type": "object", "required": ["status"], "properties": { "status": { "const": "mapped" } } }
           }
         },
+        "ownedBy": {
+          "description": "For a field that uses a concept it does not own: the owner element id and field key (ED-12). Whether the owner exists and agrees on type and unit is checked by the validator, not here. An owner field has a concept and no ownedBy.",
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": { "^x-": {} },
+          "required": ["element", "key"],
+          "properties": {
+            "element": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/artefactId" },
+            "key": { "$ref": "#/$defs/key" }
+          }
+        },
         "contexts": {
           "description": "Context tags for this field. Which tags are known is checked by the validator (B2), not here.",
           "type": "array",
@@ -133,6 +144,7 @@
         },
         "constraints": { "type": "array", "items": { "$ref": "#/$defs/text" } }
       },
+      "dependentRequired": { "ownedBy": ["concept"] },
       "allOf": [
         { "if": { "properties": { "type": { "enum": ["quantity", "integer"] } }, "required": ["type"] }, "then": { "required": ["units"] } },
         { "if": { "properties": { "type": { "enum": ["date", "datetime"] } }, "required": ["type"] }, "then": { "required": ["timeSemantics"] } },

@@ -5,7 +5,7 @@
 
 export const ALLOWED_TAGS = Object.freeze([
   'a', 'br', 'button', 'details', 'div', 'h2', 'h3', 'h4', 'input', 'label', 'li', 'option', 'p', 'select', 'span', 'strong',
-  'summary', 'table', 'tbody', 'td', 'th', 'thead', 'tr', 'ul',
+  'summary', 'table', 'tbody', 'td', 'textarea', 'th', 'thead', 'tr', 'ul',
 ]);
 export const refuseNames = Object.freeze({ tag: 'dom-tag-refused', cls: 'dom-class-refused' });
 

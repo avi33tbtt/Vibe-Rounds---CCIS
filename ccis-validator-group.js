@@ -10,13 +10,21 @@ export const GROUP_RULES = [
   { ruleId: 'CCIS-V5-011', layer: 5, severity: 'error', summary: 'A same-concept entry lists fields whose type or units differ (REQ-024).' },
   { ruleId: 'CCIS-V5-012', layer: 5, severity: 'error', summary: 'Two members define the same field key and no shared concept declares what the overlap is (REQ-023).' },
   { ruleId: 'CCIS-V5-013', layer: 5, severity: 'error', summary: 'The same field of the same member appears in more than one shared concept.' },
+  { ruleId: 'CCIS-V5-030', layer: 5, severity: 'error', summary: 'The owner of a shared concept is not one of the fields the concept lists.' },
+  { ruleId: 'CCIS-V5-031', layer: 5, severity: 'error', summary: 'A same-concept entry has no owner (error from standard 0.2.0, warning at 0.1.0).' },
+  { ruleId: 'CCIS-V5-032', layer: 5, severity: 'error', summary: 'A shared concept code follows neither the legacy camelCase key nor the local key format.' },
 ];
+const LEGACY_KEY = /^[a-z][A-Za-z0-9]*$/;
+const LOCAL_KEY = /^[a-z0-9][a-z0-9._-]{0,63}$/;
+const major = (v) => { const m = /^(\d+)\.(\d+)/.exec(typeof v === 'string' ? v : ''); return m ? [Number(m[1]), Number(m[2])] : [0, 1]; };
 
 const fieldsOf = (el) => [...arr(el.fields), ...arr(el.modules).flatMap((m) => (isObj(m) ? arr(m.fields) : []))].filter((f) => isObj(f) && typeof f.key === 'string');
 const shape = (f) => JSON.stringify([f.type, [...arr(f.units)].sort()]);
 
 export function groupChecks(doc, ctx) {
   const out = [];
+  const [maj, min] = major(isObj(doc.manifest) && isObj(doc.manifest.standard) ? doc.manifest.standard.version : null);
+  const strict = maj > 0 || min >= 2;
   const members = new Map(); // member element id -> { fields: Map(key -> field) } or null when not resolved
   arr(doc.members).forEach((m) => {
     const ref = isObj(m) ? m.element : null;
@@ -28,6 +36,16 @@ export function groupChecks(doc, ctx) {
   const use = new Map();
   arr(doc.sharedConcepts).forEach((c, i) => {
     if (!isObj(c)) return;
+    if (typeof c.concept === 'string' && !LEGACY_KEY.test(c.concept) && !LOCAL_KEY.test(c.concept)) {
+      out.push(diag('error', 'CCIS-V5-032', `/sharedConcepts/${i}/concept`, `The shared concept code at position ${i} follows neither the legacy key format nor the local key format.`, 'Use lowercase letters, digits, dot, underscore or hyphen; start with a letter or digit; at most 64 characters.'));
+    }
+    if (isObj(c.owner)) {
+      if (!arr(c.fields).some((f) => isObj(f) && f.element === c.owner.element && f.field === c.owner.field)) {
+        out.push(diag('error', 'CCIS-V5-030', `/sharedConcepts/${i}/owner`, `The owner of the shared concept \"${c.concept}\" (${c.owner.element}, ${c.owner.field}) is not one of its listed fields.`, 'Name an element and field that the concept lists.'));
+      }
+    } else if (c.resolution === 'same-concept') {
+      out.push(diag(strict ? 'error' : 'warning', 'CCIS-V5-031', `/sharedConcepts/${i}`, `The same-concept entry \"${c.concept}\" has no owner.`, 'Name the one element and field that owns the concept.'));
+    }
     const found = [];
     arr(c.fields).forEach((f, j) => {
       if (!isObj(f)) return;

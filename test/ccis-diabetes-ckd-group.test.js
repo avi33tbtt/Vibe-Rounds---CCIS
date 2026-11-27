@@ -57,7 +57,7 @@ test('4.5c.2: removing the diagnosisDates concept leaves an undeclared overlap',
 
 test('4.5c.2: flipping a concept to same-concept passes the validator but changes the checksum', () => {
   const g = mutate((x) => { x.sharedConcepts[0].resolution = 'same-concept'; });
-  assert.deepEqual(run(g).diagnostics, []);
+  assert.deepEqual(run(g).diagnostics.filter((d) => d.severity === 'error'), []);
   assert.notEqual(checksumOf(canonicalize(g).text), PINNED);
   assert.match(doc.sharedConcepts[0].meaning, /different|never one value/);
 });

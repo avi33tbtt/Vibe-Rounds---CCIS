@@ -127,3 +127,41 @@ export function decisionNode(spec) {
   if (!n.outcomes.some((o) => o.kind === 'indeterminate')) throw new SdkError('S-004', 'outcomes');
   return n;
 }
+
+export const ARTEFACT_TYPES = Object.freeze(['contextual-element', 'element-group', 'pathway', 'analytics-package', 'terminology-package', 'test-validation-package']);
+export const MANIFEST_STATUSES = Object.freeze(['draft', 'submitted', 'in-review', 'reviewed', 'validated', 'conditionally-validated', 'deprecated', 'withdrawn', 'rejected']);
+const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
+const RANGE = /^(?:[~^]|[<>]=?)?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?: [<>]=?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))*$/;
+const semver = (x, p) => { need(typeof x === 'string' && SEMVER.test(x), p); return x; };
+const range = (x, p) => { need(typeof x === 'string' && RANGE.test(x), p); return x; };
+const typeOf = (x, p) => { need(ARTEFACT_TYPES.includes(x), p); return x; };
+const named = (member, check) => (v, p) => shape(v, { allowed: { [member]: check }, required: [member] }, p);
+
+// A named artefact at an exact version or a range, never an embedded copy.
+export function reference(spec) { return referenceAt(spec, ''); }
+const referenceAt = (v, p) => {
+  const r = shape(v, { allowed: { id: artefactId, type: typeOf, version: semver, range }, required: ['id', 'type'] }, p);
+  if (('version' in r) === ('range' in r)) throw new SdkError('S-004', p); // exactly one of the two
+  return r;
+};
+const validationScope = (v, p) => shape(v, {
+  allowed: { version: semver, population: textOf, setting: textOf, intendedUse: textOf },
+  required: ['version', 'population', 'setting', 'intendedUse'],
+}, p);
+const requiresOf = (v, p) => shape(v, { allowed: { engine: range, fhir: range }, required: [] }, p);
+const extName = (x, p) => { need(typeof x === 'string' && /^x-[a-z0-9][a-z0-9-]*$/.test(x), p); return x; };
+
+// Identity, versions, references and status of one artefact. `{ type }` (used by the element, pathway and analytics builders) pins the type.
+export function manifest(spec, { type } = {}) {
+  const m = shape(spec, {
+    allowed: {
+      id: artefactId, name: textOf, type: typeOf, version: semver, status: (x, p) => { need(MANIFEST_STATUSES.includes(x), p); return x; },
+      publisher: named('name', textOf), standard: named('version', semver), requires: requiresOf,
+      references: (x, p) => list(x, p, 0, referenceAt), validation: validationScope, mandatoryExtensions: (x, p) => list(x, p, 0, extName),
+    },
+    required: ['id', 'name', 'type', 'version', 'publisher', 'standard', 'status'],
+  }, '');
+  if (type !== undefined && m.type !== type) throw new SdkError('S-003', 'type');
+  if ((m.status === 'validated' || m.status === 'conditionally-validated') && !('validation' in m)) throw new SdkError('S-004', '');
+  return m;
+}

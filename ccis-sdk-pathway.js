@@ -10,7 +10,7 @@ export const REQUIREMENTS = Object.freeze(['required', 'optional']);
 const oneOf = (set) => (x, p) => { need(set.includes(x), p); return x; };
 const texts = (min) => (v, p) => list(v, p, min, textOf);
 const pinned = (type) => (v, p) => { const r = referenceAt(v, p); need(r.type === type, `${p}.type`); return r; };
-const element = (v, p) => {
+export const elementRange = (v, p) => {
   const r = pinned('contextual-element')(v, p);
   if (!('range' in r)) throw new SdkError('S-004', p); // a pathway names elements by range
   return r;
@@ -29,7 +29,7 @@ export function pathway(spec) {
   return shape(spec, {
     allowed: {
       manifest: withPath((x) => manifest(x, { type: 'pathway' })), scope: textOf, intendedUse: textOf, exclusions: texts(0),
-      elements: (v, p) => list(v, p, 1, element), stages: (v, p) => list(v, p, 1, stage),
+      elements: (v, p) => list(v, p, 1, elementRange), stages: (v, p) => list(v, p, 1, stage),
       nodes: (v, p) => list(v, p, 0, withPath(decisionNode)), transitions: (v, p) => list(v, p, 0, transition),
       timing: (v, p) => list(v, p, 0, timing), analytics: (v, p) => list(v, p, 0, analytic),
     },

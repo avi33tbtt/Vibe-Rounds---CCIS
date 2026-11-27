@@ -105,7 +105,7 @@ export const OUTCOME_KINDS = Object.freeze(['answer', 'missing-data', 'conflicti
 export const INPUT_STATES = Object.freeze(['present', 'absent', 'unknown', 'not-collected', 'not-applicable', 'explicitly-negative', 'entered-in-error', 'conflicting']);
 export const idText = (x, p) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*$/.test(x), p); return x; };
 export const keyText = (x, p) => { need(typeof x === 'string' && /^[a-z][A-Za-z0-9]*$/.test(x), p); return x; };
-const artefactId = (x, p) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*$/.test(x), p); return x; };
+export const artefactId = (x, p) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*$/.test(x), p); return x; };
 export const textOf = (x, p) => { need(sentence(x), p); return x; };
 
 const nodeInput = (v, p) => shape(v, { allowed: { key: keyText, element: artefactId, field: keyText }, required: ['key', 'element', 'field'] }, p);
@@ -135,7 +135,7 @@ export const ARTEFACT_TYPES = Object.freeze(['contextual-element', 'element-grou
 export const MANIFEST_STATUSES = Object.freeze(['draft', 'submitted', 'in-review', 'reviewed', 'validated', 'conditionally-validated', 'deprecated', 'withdrawn', 'rejected']);
 const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 const RANGE = /^(?:[~^]|[<>]=?)?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?: [<>]=?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))*$/;
-const semver = (x, p) => { need(typeof x === 'string' && SEMVER.test(x), p); return x; };
+export const semver = (x, p) => { need(typeof x === 'string' && SEMVER.test(x), p); return x; };
 const range = (x, p) => { need(typeof x === 'string' && RANGE.test(x), p); return x; };
 const typeOf = (x, p) => { need(ARTEFACT_TYPES.includes(x), p); return x; };
 const named = (member, check) => (v, p) => shape(v, { allowed: { [member]: check }, required: [member] }, p);

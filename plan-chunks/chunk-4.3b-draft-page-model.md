@@ -1,0 +1,26 @@
+# Chunk 4.3b: governed AI drafting, part 3: the pure page model (written 2026-11-27, docs only; build after owner approval)
+
+_Phase 4. Needs 4.3, 4.3a (done). The old 4.3b (the whole UI) is too big: it is split into this model, a view (4.3b.1), the wiring (4.3b.2) and the sweeps and limitations (4.3b.3). New pure module `ccis-app-draft.js`, in the style of `ccis-app-run.js`: `draftForPage(...)` runs the whole path once (request gate, model call, accept gate) and returns `{ ok: true, draft } | { ok: false, sentence }`, and `draftModel(draft)` turns an accepted draft into rows for the view. **No DOM, no global, no storage, no timer.** The model client is injected (`makeAiClient(fetch)` from 4.3a is built by the page later), so the tests use a fake client. Refusals are fixed sentences that never echo input, a key, a reply or an address._
+
+**Core rules:** attach `01-core.md`. Rule 12: 1 module of at most 90 lines, a NEW test `test/ccis-app-draft.test.js` (at most 8 cases).
+
+**Read only (4 files):** `ccis-app-run.js` lines 1-14 (the `forPage` convention and header); `ccis-draft.js` lines 10-25 and 55-60 (`DRAFT_REFUSALS`, `DraftError`, the `acceptDraft` return); `ccis-app-ai.js` lines 20-28 (`AI_REFUSALS`, `AiError`); `test/ccis-app-ai.test.js` lines 6-14 (fake reply helpers to copy).
+
+## Build: `ccis-app-draft.js`
+1. `export const DRAFT_SENTENCES`: one fixed sentence per code, keyed by the code, covering `AI-001` to `AI-006` and `AIC-001` to `AIC-004`, in plain words (for example `AI-001`: "AI drafting is off. Switch it on to ask for a draft."; `AIC-002`: "The model request failed. Check the key, and that this page was built to allow the connection."; `AI-005`: "The draft was refused: a member has no source and no stated assumption."). A test checks that every code of both refusal tables has a sentence, and that no sentence contains a key, a path or a value.
+2. `export async function draftForPage({ enabled, key, model, request, client })`: `request` is the author's `{ artefactType, standardVersion, instruction, sources, terminology }` (no `enabled` inside); the function adds `enabled` itself from its own argument, so the switch is one place. Steps: `draftRequest` (a `DraftError` becomes its sentence); `client.draftWithModel({ payload, model, key })` (an `AiError` becomes its sentence; a `client` that is not an object with that function is `{ ok: false, sentence }` with a fixed sentence); `acceptDraft(reply, { artefactType: payload.artefactType, sources: payload.sources })` (a `DraftError` becomes its sentence; keep its `code` and `path` in the result as `{ ok: false, sentence, code, path }` so the view can point at the member, never a value). Any other thrown error becomes one fixed unexpected-error sentence (no message). Returns `{ ok: true, draft }` where `draft` is the frozen `acceptDraft` result. The `key` is never copied into any result.
+3. `export function draftModel(draft)` returns a frozen `{ label, status, sourceClass, headline, rows, notes }`: `label`, `status` and `sourceClass` copied from the draft; `headline` a fixed sentence ("Draft only. A human must review it. It is not published or validated."); `rows`: one per top-level member of `draft.artefact` except `manifest`, in file order, `{ member, basis }` where `basis` is `Assumption: <note>` when the member is an assumption and otherwise `Source: <source id>` (the trace is not kept by `acceptDraft`, so the function takes `draft.trace` too: **change nothing in `ccis-draft.js`; the page model passes the reply trace through `draftForPage` and keeps it as `draft.trace` beside the frozen draft**); `notes`: the count of members and of assumptions as words. Text only, no HTML.
+
+## Test: `test/ccis-app-draft.test.js` (at most 8 cases, fake client)
+1. a good run (snake interval analytics as the fake reply, every member traced) returns `ok: true`; the fake client saw exactly the five payload members, the key and the model once;
+2. switch off (`enabled` absent, `false`, `'true'`) is the `AI-001` sentence and the client is never called;
+3. each client refusal (`AIC-001` to `AIC-004`, raised by a fake client) becomes its own sentence; an unexpected throw becomes the fixed unexpected sentence without its message;
+4. a reply that breaks a rule: `status: 'validated'` is the `AI-004` sentence; a member with no trace is the `AI-005` sentence with `code` and `path`; a literal number is the `AI-006` sentence;
+5. every code of `DRAFT_REFUSALS` and `AI_REFUSALS` has a sentence in `DRAFT_SENTENCES`; none holds the test key or a path;
+6. the key never appears in any result, sentence or the draft (JSON search);
+7. `draftModel` gives the label, `status: 'draft'`, `sourceClass: 'AI-proposed'`, the fixed headline, one row per non-manifest member in file order with `Source:` or `Assumption:`, and is frozen;
+8. purity scan of `ccis-app-draft.js` (no `fetch(`, storage, timer, `eval`, `Function`, `document`, `window`).
+
+**Done when:** `node --test test/ccis-app-draft.test.js` passes. Two breakages each seen failing, then restored: (a) skip the `enabled` check; (b) copy the key into a refusal result.
+
+**Size guard:** 1 module (90 lines), 1 test, tracker and DECISIONS only. If `acceptDraft` must change to keep the trace, STOP and report (the model keeps the trace itself).

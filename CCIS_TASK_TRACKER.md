@@ -164,6 +164,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | ECO-B12b | (Studio tracker) | Ecosystem row B12b: refresh two stale pins in `ccis-validator.test.js` (the V2-006 no-schema case and the import list). | DONE | 2026-11-28 | 2 test edits | Test only; 23 tests pass in the file, 259 in `ccis-validator-*`; 1 breakage check seen. |
 | ECO-B13p | (Studio tracker) | Ecosystem row B13p: refresh the rule-pack test fixture so its comparison is a time difference against a parameter (allowed under ED-44). | DONE | 2026-11-28 | 1 test line | Test only; 16 tests in rulepack and rulepack-checks pass. No breakage check possible. |
 | ECO-B13 | (Studio tracker) | Ecosystem row B13: rule-pack validator layer 6 shape: a `data-quality` pack allows only field-to-field comparisons, time difference against a parameter and state tests (CCIS-V6-003). index.html rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New `ccis-validator-rulepack-shape.js` and test (8 cases); 102 tests in 6 files pass; 3 breakage checks seen. ED-44 used. |
+| ECO-B13a | (Studio tracker) | Ecosystem row B13a: rule-pack validator layer 7: each rule needs fires, does-not-fire and not-evaluated test cases, a parameter rule also a disabled case; fixture names checked (CCIS-V7-006, 007). index.html rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New `ccis-validator-rulepack-cases.js` and test (8 cases); 126 tests in related files pass; 3 breakage checks seen. ED-45 used. |
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)

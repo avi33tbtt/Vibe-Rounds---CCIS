@@ -19,11 +19,16 @@ const base = () => ({
   provenance: { origin: 'Synthetic', basis: 'Synthetic' },
   sourceNote: 'Synthetic note.',
 });
+const complete = (d) => {
+  const en = [{ parameter: 'window', testOnly: true }];
+  d.tests.push({ id: 't2', rule: 'dqOne', fixture: 'synthetic-2', synthetic: true, enables: en, expect: 'fires' }, { id: 't3', rule: 'dqOne', fixture: 'synthetic-3', synthetic: true, enables: en, expect: 'does-not-fire' }, { id: 't4', rule: 'dqOne', fixture: 'synthetic-4', synthetic: true, enables: [], expect: 'not-evaluated' });
+  return d;
+};
 const mutate = (fn) => { const d = base(); fn(d); return d; };
 const rows = (d) => rulePackSemantic(d).map((x) => [x.ruleId, x.path]);
 
 test('1 a valid pack passes all eight layers through validateArtefact', () => {
-  const r = validateArtefact(JSON.stringify(base()), { known: [pw] });
+  const r = validateArtefact(JSON.stringify(complete(base())), { known: [pw] });
   assert.equal(r.outcome, 'no-errors-so-far', JSON.stringify(r.diagnostics));
   assert.deepEqual(Object.values(r.layers).map((l) => l.outcome), Array(8).fill('passed'));
 });
@@ -60,7 +65,7 @@ test('7 V4-018 is a warning for an unused input or parameter and does not fail t
   const d = mutate((x) => { x.inputs.push({ id: 'spare', concept: 'glucose', read: 'latest' }); x.parameters.push({ id: 'spareP', label: 'Spare', kind: 'count', enabledByDefault: false, suppliedBy: 'Local clinician' }); });
   const r = rulePackSemantic(d);
   assert.deepEqual(r.map((x) => [x.ruleId, x.severity, x.path]), [['CCIS-V4-018', 'warning', '/inputs/1'], ['CCIS-V4-018', 'warning', '/parameters/1']]);
-  assert.equal(validateArtefact(JSON.stringify(d), { known: [pw] }).outcome, 'no-errors-so-far');
+  assert.equal(validateArtefact(JSON.stringify(complete(d)), { known: [pw] }).outcome, 'no-errors-so-far');
 });
 
 test('8 an unknown scope pathway gives layer 3 error V3-004; all seven new ids are in RULES', () => {

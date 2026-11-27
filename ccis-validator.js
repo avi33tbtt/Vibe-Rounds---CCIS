@@ -24,7 +24,7 @@
 import {
   manifest as vManifest, element as vElement, terminologyBinding as vBinding, decisionNode as vNode,
   pathway as vPathway, analytics as vAnalytics, executionManifest as vExecution, contextEnvelope as vEnvelope,
-  importReport as vReport, validationRecord as vRecord, runResult as vResult, runRecord as vRun, elementGroup as vElementGroup,
+  importReport as vReport, validationRecord as vRecord, runResult as vResult, runRecord as vRun, elementGroup as vElementGroup, terminologyPackage as vTerminology,
 } from './ccis/validators/ccis-validators.js';
 import { semanticLayer, graphLayer, SEMANTIC_RULES } from './ccis-validator-semantic.js';
 import { groupChecks, GROUP_RULES } from './ccis-validator-group.js';
@@ -285,11 +285,11 @@ function layer1(input) {
 const SCHEMAS = {
   manifest: vManifest, element: vElement, terminologyBinding: vBinding, decisionNode: vNode, pathway: vPathway,
   analytics: vAnalytics, executionManifest: vExecution, contextEnvelope: vEnvelope, importReport: vReport,
-  validationRecord: vRecord, runResult: vResult, runRecord: vRun, elementGroup: vElementGroup,
+  validationRecord: vRecord, runResult: vResult, runRecord: vRun, elementGroup: vElementGroup, terminologyPackage: vTerminology,
 };
 
-const TYPE_TO_SCHEMA = { 'contextual-element': 'element', 'element-group': 'elementGroup', pathway: 'pathway', 'analytics-package': 'analytics' };
-const TYPES_WITHOUT_SCHEMA = ['terminology-package', 'test-validation-package'];
+const TYPE_TO_SCHEMA = { 'contextual-element': 'element', 'element-group': 'elementGroup', pathway: 'pathway', 'analytics-package': 'analytics', 'terminology-package': 'terminologyPackage' };
+const TYPES_WITHOUT_SCHEMA = ['test-validation-package'];
 
 // What the artefact is, from its own manifest type or its shape. Decision nodes and bindings have no manifest.
 function identify(doc) {

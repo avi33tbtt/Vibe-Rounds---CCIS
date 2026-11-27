@@ -142,6 +142,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | ECO-B1a | (Studio tracker) | Ecosystem row B1a: optional `ownedBy` (owner element id and field key) on an element field; requires `concept`; schema and regenerated validators. | DONE | 2026-11-28 | 1 schema edit, 1 test | New test `ccis-element-owned-by-schema.test.js` (8 cases); owner checks wait for B1e. Full npm test not run. |
 | ECO-B1d | (Studio tracker) | Ecosystem row B1d: SDK field builder accepts `ownedBy` (element id and field key) with the schema's rules; requires `concept`. | DONE | 2026-11-28 | 1 module edit, 1 test | New test `ccis-sdk-field-owned-by.test.js` (7 cases); JSON and code routes identical and refuse the same inputs. Owner checks wait for B1e. |
 | ECO-B1e | (Studio tracker) | Ecosystem row B1e: validator layer 5 owner checks for a field with ownedBy (CCIS-V5-014 to 016), new pure module; index.html rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New test ccis-validator-owner.test.js (8 cases). Full npm test not run. |
+| ECO-B1b | (Studio tracker) | Ecosystem row B1b: schema for the local `terminology-package` artefact (code system local, concepts, value sets); validator, validators and app bundle regenerated. | DONE | 2026-11-28 | 1 schema, 1 test | New test `ccis-terminology-package-schema.test.js` (8 cases). Package-level checks wait for B1f. Full npm test not run. |
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)

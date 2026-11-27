@@ -43,6 +43,9 @@ It reads one fact from each context, the HbA1c and the creatinine collection tim
 Version 0.1.1 (row 4.5d.1) adds `sampleWithinWindow`: were the two recorded collection times within a window a local clinician supplies. The window and the edge rule are disabled parameters with no value, so the output reads `parameter-not-enabled`; the 0.1.0 file is unchanged.
 Why not "how recent is a result": the operator whitelist has no evaluation-time reference (finding F-13, D-287), so recency is asked between the two recorded times, not against now.
 
+Version 0.1.2 (row 4.5d.1a) adds `documentedFactCount`: how many of four listed facts (the statement and the collection time, in each context) are recorded. A missing kidney context reads `indeterminate`, never a low count.
+It only counts: a complete label needs an expected number or set, which is a local clinician's choice, so nothing here reads as complete.
+
 ## 3. Rows
 | Row | What it adds |
 |-----|--------------|

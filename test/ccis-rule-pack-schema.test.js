@@ -11,6 +11,9 @@ const base = () => ({
   scope: { pathways: [{ id: 'demo.pathway', type: 'pathway', range: '>=0.1.0' }] },
   inputs: [{ id: 'crea', concept: 'creatinine', read: 'count' }],
   parameters: [{ id: 'window', label: 'Window', kind: 'interval', units: ['day'], enabledByDefault: false, suppliedBy: 'Local clinician' }],
+  rules: [{ id: 'dqMissing', kind: 'missing', severity: 'info', when: { op: 'eq', args: [{ ref: 'input', id: 'crea' }, { literal: 'needs-data' }] }, message: { template: 'No record found.' } }],
+  tests: [{ id: 't1', rule: 'dqMissing', fixture: 'synthetic-case-1', synthetic: true, enables: [], expect: 'fires' }],
+  provenance: { origin: 'Synthetic test', basis: 'Synthetic test' },
   sourceNote: 'Synthetic note about an information gap.',
 });
 const ok = (d) => rulePack(d) === true;
@@ -21,7 +24,7 @@ test('1 a minimal valid pack passes', () => {
 });
 
 test('2 each required member missing is refused', () => {
-  for (const k of ['manifest', 'class', 'scope', 'inputs', 'parameters', 'sourceNote']) assert.equal(ok(mutate((d) => { delete d[k]; })), false, k);
+  for (const k of ['manifest', 'class', 'scope', 'inputs', 'parameters', 'rules', 'tests', 'provenance', 'sourceNote']) assert.equal(ok(mutate((d) => { delete d[k]; })), false, k);
 });
 
 test('3 wrong manifest type or class is refused', () => {
@@ -30,10 +33,9 @@ test('3 wrong manifest type or class is refused', () => {
   assert.equal(ok(mutate((d) => { d.class = 'clinical-prompt'; })), true);
 });
 
-test('4 unknown member refused, x- accepted, rules refused until B11', () => {
+test('4 unknown member refused, x- accepted', () => {
   assert.equal(ok(mutate((d) => { d.extra = 1; })), false);
   assert.equal(ok(mutate((d) => { d['x-note'] = 1; })), true);
-  assert.equal(ok(mutate((d) => { d.rules = []; })), false);
 });
 
 test('5 bad inputs and scope are refused', () => {

@@ -2,7 +2,7 @@
 //
 // Returns a plain, frozen field exactly as the file holds it. Pure; nothing is invented (no default epistemic states, source
 // classes, cardinality or label). `min` greater than `max` stays with the validator: the SDK adds no rule the file route lacks.
-import { shape, need, list, keyText, textOf, binding, manifest, referenceAt, SdkError } from './ccis-sdk.js';
+import { shape, need, list, keyText, textOf, binding, manifest, referenceAt, withPath, SdkError } from './ccis-sdk.js';
 
 export const FIELD_TYPES = Object.freeze(['quantity', 'integer', 'boolean', 'code', 'string', 'date', 'datetime']);
 export const EPISTEMIC_STATES = Object.freeze(['absent', 'unknown', 'not-collected', 'not-applicable', 'explicitly-negative', 'entered-in-error']);
@@ -19,9 +19,6 @@ const cardinality = (v, p) => shape(v, {
 const precision = (v, p) => shape(v, { closed: true, allowed: { decimals: (x, q) => int(x, q, 0) }, required: ['decimals'] }, p);
 const unit = (x, p) => { need(typeof x === 'string' && /^\S+$/.test(x), p); return x; };
 const enums = (set) => (v, p) => list(v, p, 1, oneOf(set));
-
-// A nested builder reports paths from its own root; the parent prefixes its own.
-const withPath = (build) => (v, p) => { try { return build(v); } catch (e) { if (e instanceof SdkError) throw new SdkError(e.code, e.path ? `${p}.${e.path}` : p); throw e; } };
 
 // One field of a contextual element.
 export function field(spec) {

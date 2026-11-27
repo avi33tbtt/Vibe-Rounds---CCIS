@@ -80,6 +80,9 @@ const mapping = (v, path) => {
   return m;
 };
 
+// A nested builder reports paths from its own root; the parent prefixes its own.
+export const withPath = (build) => (v, p) => { try { return build(v); } catch (e) { if (e instanceof SdkError) throw new SdkError(e.code, e.path ? `${p}.${e.path}` : p); throw e; } };
+
 // A binding ties a concept to a code by code-system reference, never by label. An unmapped binding carries no code or system.
 export function binding(spec) {
   const b = shape(spec, {
@@ -100,7 +103,7 @@ export function binding(spec) {
 
 export const OUTCOME_KINDS = Object.freeze(['answer', 'missing-data', 'conflicting', 'indeterminate']);
 export const INPUT_STATES = Object.freeze(['present', 'absent', 'unknown', 'not-collected', 'not-applicable', 'explicitly-negative', 'entered-in-error', 'conflicting']);
-const idText = (x, p) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*$/.test(x), p); return x; };
+export const idText = (x, p) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*$/.test(x), p); return x; };
 export const keyText = (x, p) => { need(typeof x === 'string' && /^[a-z][A-Za-z0-9]*$/.test(x), p); return x; };
 const artefactId = (x, p) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*$/.test(x), p); return x; };
 export const textOf = (x, p) => { need(sentence(x), p); return x; };

@@ -137,6 +137,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | 5.8 | chunk-5.8-cohort-context-graph.md | Cohort Context Graph and aggregate Cohort Explorer (synthetic ~30-subject cohort; derived in-memory projection; relationship-map UI). Source brief is over 5 KB: split into narrower chunk files (projection, fixture, map view, timeline, tests) when reached | LOCKED |  | split into 5+ rows when reached | Needs 5.5 and 5.6 (and 3.10 for UI). 5.7 before any shared or real use. Not 5.3 decision nodes. D-178. |
 | 6.1 to 6.4 | (written when reached) | FHIR Mode, governance, evaluation, cohort package contract | LOCKED |  |  | Last. |
 | ECO-B0 | (Studio tracker) | Ecosystem row B0: base for standard 0.2.0 is commit 57d89cd. | DONE | 2026-11-27 | none | Marked done on owner instruction. No v0.1.0 tag existed on the remote at the time; full npm test not run by Claude. |
+| ECO-B1 | (Studio tracker) | Ecosystem row B1: optional `concept` (local binding) and `contexts` on an element field; schema and regenerated validators. | DONE | 2026-11-27 | 1 schema edit, 1 test | New test `ccis-element-concept-schema.test.js` (8 cases). Key format and known tags are B2. SDK field builder is B1c. |
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)

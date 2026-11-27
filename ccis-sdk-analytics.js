@@ -86,3 +86,45 @@ export const op = (name, ...args) => expr({ op: name, args });
 export const computation = (v, p = '') => list(v, p, 1, (x, q) => shape(x, {
   closed: true, allowed: { output: keyText, expr: (e, r) => exprAt(e, r, 1) }, required: ['output', 'expr'],
 }, q));
+
+// Row 4.2d.2: outputs and the closing members. No default is ever added (no carries, limits or unit).
+export const OUTPUT_KINDS = Object.freeze(['value', 'classification', 'table']);
+export const VALUE_TYPES = Object.freeze(['quantity', 'time', 'integer']);
+export const CARRIES = Object.freeze(['warnings', 'limitations', 'missingDataNotes', 'certainty']);
+export const SOURCE_KINDS = Object.freeze(['guideline', 'publication', 'local-protocol', 'expert-opinion']);
+const ruleAt = (ok, p) => { if (!ok) throw new SdkError('S-004', p); };
+const closed = (allowed, required) => (v, p) => shape(v, { closed: true, allowed, required: required || Object.keys(allowed) }, p);
+const whole = (x, p) => { need(Number.isInteger(x) && x >= 1, p); return x; };
+const flag = (x, p) => { need(x === true, p); return x; };
+
+export const outputs = (v, p = '') => list(v, p, 1, (x, q) => {
+  const o = shape(x, {
+    allowed: {
+      id: keyText, kind: oneOf(OUTPUT_KINDS), valueType: oneOf(VALUE_TYPES), unit: token, labels: (a, r) => list(a, r, 2, textOf),
+      columns: (a, r) => list(a, r, 1, closed({ key: keyText, label: textOf })), states: (a, r) => list(a, r, 1, oneOf(NON_VALUE_STATES)),
+      carries: (a, r) => list(a, r, 0, oneOf(CARRIES)),
+    },
+    required: ['id', 'kind', 'states', 'carries'],
+  }, q);
+  ruleAt(['warnings', 'limitations', 'missingDataNotes'].every((c) => o.carries.includes(c)), `${q}.carries`);
+  const needs = { value: ['valueType', 'unit'], classification: ['labels'], table: ['columns'] };
+  for (const k of needs[o.kind]) if (!(k in o)) throw new SdkError('S-002', `${q}.${k}`);
+  for (const k of ['valueType', 'unit', 'labels', 'columns']) ruleAt(!(k in o) || needs[o.kind].includes(k), `${q}.${k}`);
+  return o;
+});
+export const interpretation = (v, p = '') => closed({ meaning: textOf, prohibited: (a, r) => list(a, r, 1, textOf) })(v, p);
+export const executionProfile = (v, p = '') => closed({ maxSteps: whole, maxDepth: whole, maxOutputBytes: whole })(v, p);
+export const evidence = (v, p = '') => closed({ statement: textOf, sources: (a, r) => list(a, r, 0, closed({ kind: oneOf(SOURCE_KINDS), citation: textOf })) })(v, p);
+export const provenance = (v, p = '') => closed({ origin: textOf, basis: textOf })(v, p);
+export const tests = (v, p = '') => list(v, p, 1, (x, q) => shape(x, {
+  allowed: {
+    id: keyText, fixture: (f, r) => { need(typeof f === 'string' && /^[a-z0-9][a-z0-9-]*$/.test(f), r); return f; },
+    enables: (a, r) => list(a, r, 0, closed({ parameter: keyText, testOnly: flag })),
+    expect: (a, r) => list(a, r, 1, (e, s) => {
+      const m = shape(e, { allowed: { output: keyText, state: oneOf(NON_VALUE_STATES), label: textOf, matchesFixture: flag }, required: ['output'], closed: true }, s);
+      ruleAt(['state', 'label', 'matchesFixture'].filter((k) => k in m).length === 1, s);
+      return m;
+    }),
+  },
+  required: ['id', 'fixture', 'enables', 'expect'],
+}, q));

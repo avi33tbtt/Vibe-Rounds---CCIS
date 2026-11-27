@@ -139,7 +139,7 @@ const named = (member, check) => (v, p) => shape(v, { allowed: { [member]: check
 
 // A named artefact at an exact version or a range, never an embedded copy.
 export function reference(spec) { return referenceAt(spec, ''); }
-const referenceAt = (v, p) => {
+export const referenceAt = (v, p) => {
   const r = shape(v, { allowed: { id: artefactId, type: typeOf, version: semver, range }, required: ['id', 'type'] }, p);
   if (('version' in r) === ('range' in r)) throw new SdkError('S-004', p); // exactly one of the two
   return r;

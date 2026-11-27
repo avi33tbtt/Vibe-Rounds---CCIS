@@ -1,0 +1,82 @@
+{
+  "intent": {
+    "exclusions": [
+      "Diagnosis, classification, targets and treatment choice.",
+      "Any drug, dose or amount of anything given."
+    ],
+    "population": "People recorded as having diabetes, chronic kidney disease, or both. No narrower scope is assumed.",
+    "purpose": "Compose the diabetes and kidney documentation elements so that both can be described together, while each shared or similar field keeps its own meaning.",
+    "rationale": "The kidney element is optional so that a missing kidney context is reported as indeterminate, never as false or normal.",
+    "setting": "Any care setting that follows people with both conditions. Narrowing is for the local clinician to declare."
+  },
+  "manifest": {
+    "id": "diabetes-ckd.group",
+    "name": "Diabetes and chronic kidney disease: element group",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft",
+    "type": "element-group",
+    "version": "0.1.0"
+  },
+  "members": [
+    {
+      "element": {
+        "id": "diabetes.glycaemia-documentation",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      "required": true
+    },
+    {
+      "element": {
+        "id": "ckd.kidney-function-documentation",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      "required": false
+    }
+  ],
+  "provenance": {
+    "basis": "None. No clinical source and no clinical review.",
+    "origin": "Synthetic demonstration written for the second demo (row 4.5c.2)."
+  },
+  "sharedConcepts": [
+    {
+      "concept": "diagnosisDates",
+      "fields": [
+        {
+          "element": "diabetes.glycaemia-documentation",
+          "field": "diagnosisDate"
+        },
+        {
+          "element": "ckd.kidney-function-documentation",
+          "field": "diagnosisDate"
+        }
+      ],
+      "meaning": "Two different dates. One is when diabetes was recorded as diagnosed, the other when chronic kidney disease was. They share a key and are never one value.",
+      "resolution": "related-not-merged"
+    },
+    {
+      "concept": "plannedFollowUp",
+      "fields": [
+        {
+          "element": "diabetes.glycaemia-documentation",
+          "field": "treatmentPlanDocumented"
+        },
+        {
+          "element": "ckd.kidney-function-documentation",
+          "field": "kidneyFollowUpDocumented"
+        }
+      ],
+      "meaning": "Both only record that an arrangement is written down. One is a diabetes treatment plan, the other a kidney follow-up arrangement. They are different facts with different owners and are never combined.",
+      "resolution": "related-not-merged"
+    }
+  ],
+  "versionPolicy": {
+    "conflict": "refuse"
+  }
+}

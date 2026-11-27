@@ -34,6 +34,9 @@ Every field keeps the six epistemic states apart (absent, unknown, not collected
 
 Two near-collisions are deliberate for row 4.5c: K2 shares its key with D2 but means a different diagnosis, and K8 reads like D8 but is a different fact; neither may be merged by label (REQ-024).
 
+## 2c. The group (`diabetes-ckd.group.json`)
+The group lists both elements at exact version `0.1.0`. The diabetes element is mandatory and the kidney element optional, so a missing kidney context can later be reported as indeterminate (row 4.5f). It declares two shared concepts and both are `related-not-merged`: the two `diagnosisDate` fields (different dates that share a key) and the two follow-up fields (different facts that read alike). No pair is `same-concept`, because the demo has no two fields that mean the same thing. Every key that both elements define must be listed by a concept; the validator refuses an undeclared overlap (CCIS-V5-012). Unit conversion for glucose and creatinine is still left to row 4.5d.
+
 ## 3. Rows
 | Row | What it adds |
 |-----|--------------|

@@ -30,6 +30,7 @@ import { semanticLayer, graphLayer, SEMANTIC_RULES } from './ccis-validator-sema
 import { groupChecks, GROUP_RULES } from './ccis-validator-group.js';
 import { ownerChecks, OWNER_RULES } from './ccis-validator-owner.js';
 import { terminologyChecks, TERMINOLOGY_RULES } from './ccis-validator-terminology.js';
+import { conceptChecks, CONCEPT_RULES } from './ccis-validator-concept.js';
 import { executableSafetyLayer, testVerificationLayer, governanceLayer, GOVERNANCE_RULES } from './ccis-validator-governance.js';
 
 export const LAYER_NAMES = [
@@ -55,6 +56,7 @@ export const RULES = [
   ...GROUP_RULES,
   ...OWNER_RULES,
   ...TERMINOLOGY_RULES,
+  ...CONCEPT_RULES,
   ...GOVERNANCE_RULES,
 ];
 
@@ -593,7 +595,7 @@ export function validateArtefact(input, options = {}) {
   } else {
     const index = indexKnown(options.known);
     const ctx = { resolve: (ref) => resolve(index, ref) };
-    mark('graph-and-compatibility', [...graphLayer(first.doc, kind, ctx), ...(kind === 'element-group' ? groupChecks(first.doc, ctx) : []), ...(kind === 'contextual-element' ? ownerChecks(first.doc, ctx) : []), ...(kind === 'terminology-package' ? terminologyChecks(first.doc) : [])]);
+    mark('graph-and-compatibility', [...graphLayer(first.doc, kind, ctx), ...(kind === 'element-group' ? groupChecks(first.doc, ctx) : []), ...(kind === 'contextual-element' ? ownerChecks(first.doc, ctx) : []), ...(kind === 'contextual-element' ? conceptChecks(first.doc) : []), ...(kind === 'terminology-package' ? terminologyChecks(first.doc) : [])]);
   }
   // Layers 6 to 8 (row 2.3). Each runs only if the one before passed (fail closed). `options.fixtures` is a list of fixture case names.
   const chain = [

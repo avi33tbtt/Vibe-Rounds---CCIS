@@ -31,6 +31,7 @@ import { groupChecks, GROUP_RULES } from './ccis-validator-group.js';
 import { entryFormChecks, ENTRYFORM_RULES } from './ccis-validator-entryform.js';
 import { rulePackSemantic, RULEPACK_RULES } from './ccis-validator-rulepack.js';
 import { rulePackChecks, RULEPACK_CHECK_RULES } from './ccis-validator-rulepack-checks.js';
+import { rulePackShape, RULEPACK_SHAPE_RULES } from './ccis-validator-rulepack-shape.js';
 import { contextsChecks, CONTEXTS_RULES } from './ccis-validator-contexts.js';
 import { ownerChecks, OWNER_RULES } from './ccis-validator-owner.js';
 import { terminologyChecks, TERMINOLOGY_RULES } from './ccis-validator-terminology.js';
@@ -64,6 +65,7 @@ export const RULES = [
   ...CONTEXTS_RULES,
   ...RULEPACK_RULES,
   ...RULEPACK_CHECK_RULES,
+  ...RULEPACK_SHAPE_RULES,
   ...OWNER_RULES,
   ...TERMINOLOGY_RULES,
   ...CONCEPT_RULES,
@@ -612,7 +614,7 @@ export function validateArtefact(input, options = {}) {
   }
   // Layers 6 to 8 (row 2.3). Each runs only if the one before passed (fail closed). `options.fixtures` is a list of fixture case names.
   const chain = [
-    ['executable-safety', 'graph-and-compatibility', () => executableSafetyLayer(first.doc)],
+    ['executable-safety', 'graph-and-compatibility', () => [...executableSafetyLayer(first.doc), ...(kind === 'rule-pack' ? rulePackShape(first.doc) : [])]],
     ['test-verification', 'executable-safety', () => testVerificationLayer(first.doc, kind, { fixtures: options.fixtures })],
     ['governance', 'test-verification', () => governanceLayer(first.doc)],
   ];

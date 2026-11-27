@@ -163,6 +163,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | ECO-B12a | (Studio tracker) | Ecosystem row B12a: rule-pack validator layer 5: condition limits (depth 8, 40 nodes), input concept present in the referenced element, message placeholders, markup and instruction-word lint (CCIS-V5-048 to 053). index.html rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New `ccis-validator-rulepack-checks.js` and test (8 cases); 56 tests in 7 files pass; 3 breakage checks seen. ED-43 used. |
 | ECO-B12b | (Studio tracker) | Ecosystem row B12b: refresh two stale pins in `ccis-validator.test.js` (the V2-006 no-schema case and the import list). | DONE | 2026-11-28 | 2 test edits | Test only; 23 tests pass in the file, 259 in `ccis-validator-*`; 1 breakage check seen. |
 | ECO-B13p | (Studio tracker) | Ecosystem row B13p: refresh the rule-pack test fixture so its comparison is a time difference against a parameter (allowed under ED-44). | DONE | 2026-11-28 | 1 test line | Test only; 16 tests in rulepack and rulepack-checks pass. No breakage check possible. |
+| ECO-B13 | (Studio tracker) | Ecosystem row B13: rule-pack validator layer 6 shape: a `data-quality` pack allows only field-to-field comparisons, time difference against a parameter and state tests (CCIS-V6-003). index.html rebuilt. | DONE | 2026-11-28 | 1 module, 1 test | New `ccis-validator-rulepack-shape.js` and test (8 cases); 102 tests in 6 files pass; 3 breakage checks seen. ED-44 used. |
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)

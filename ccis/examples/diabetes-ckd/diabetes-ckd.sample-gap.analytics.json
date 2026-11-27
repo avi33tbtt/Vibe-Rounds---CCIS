@@ -1,0 +1,291 @@
+{
+  "computation": [
+    {
+      "expr": {
+        "args": [
+          {
+            "args": [
+              {
+                "args": [
+                  {
+                    "id": "hba1cCollected",
+                    "ref": "input"
+                  }
+                ],
+                "op": "is-present"
+              }
+            ],
+            "op": "not"
+          },
+          {
+            "literal": "needs-data"
+          },
+          {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "id": "creatinineCollected",
+                        "ref": "input"
+                      }
+                    ],
+                    "op": "is-present"
+                  }
+                ],
+                "op": "not"
+              },
+              {
+                "literal": "indeterminate"
+              },
+              {
+                "args": [
+                  {
+                    "id": "hba1cCollected",
+                    "ref": "input"
+                  },
+                  {
+                    "id": "creatinineCollected",
+                    "ref": "input"
+                  }
+                ],
+                "op": "time-diff"
+              }
+            ],
+            "op": "if"
+          }
+        ],
+        "op": "if"
+      },
+      "output": "sampleGap"
+    },
+    {
+      "expr": {
+        "args": [
+          {
+            "args": [
+              {
+                "args": [
+                  {
+                    "id": "hba1cCollected",
+                    "ref": "input"
+                  }
+                ],
+                "op": "is-present"
+              }
+            ],
+            "op": "not"
+          },
+          {
+            "literal": "needs-data"
+          },
+          {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "id": "creatinineCollected",
+                        "ref": "input"
+                      }
+                    ],
+                    "op": "is-present"
+                  }
+                ],
+                "op": "not"
+              },
+              {
+                "literal": "indeterminate"
+              },
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "id": "hba1cCollected",
+                        "ref": "input"
+                      },
+                      {
+                        "id": "creatinineCollected",
+                        "ref": "input"
+                      }
+                    ],
+                    "op": "lt"
+                  },
+                  {
+                    "literal": "hba1c-first"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "id": "creatinineCollected",
+                            "ref": "input"
+                          },
+                          {
+                            "id": "hba1cCollected",
+                            "ref": "input"
+                          }
+                        ],
+                        "op": "lt"
+                      },
+                      {
+                        "literal": "creatinine-first"
+                      },
+                      {
+                        "literal": "same-time"
+                      }
+                    ],
+                    "op": "if"
+                  }
+                ],
+                "op": "if"
+              }
+            ],
+            "op": "if"
+          }
+        ],
+        "op": "if"
+      },
+      "output": "sampleOrder"
+    }
+  ],
+  "context": [
+    {
+      "fields": [
+        "hba1cResultTime"
+      ],
+      "ref": {
+        "id": "diabetes.glycaemia-documentation",
+        "range": "^0.1.0",
+        "type": "contextual-element"
+      }
+    },
+    {
+      "fields": [
+        "creatinineResultTime"
+      ],
+      "ref": {
+        "id": "ckd.kidney-function-documentation",
+        "range": "^0.1.0",
+        "type": "contextual-element"
+      }
+    }
+  ],
+  "evidence": {
+    "sources": [],
+    "statement": "No evidence is claimed. None has been reviewed."
+  },
+  "executionProfile": {
+    "maxDepth": 24,
+    "maxOutputBytes": 65536,
+    "maxSteps": 1000
+  },
+  "inputs": [
+    {
+      "element": "diabetes.glycaemia-documentation",
+      "field": "hba1cResultTime",
+      "key": "hba1cCollected",
+      "onMissing": "needs-data",
+      "type": "datetime"
+    },
+    {
+      "element": "ckd.kidney-function-documentation",
+      "field": "creatinineResultTime",
+      "key": "creatinineCollected",
+      "onMissing": "indeterminate",
+      "type": "datetime"
+    }
+  ],
+  "intendedUsers": [
+    "Local reviewers of care processes"
+  ],
+  "interpretation": {
+    "meaning": "The signed time in minutes from the recorded HbA1c collection time to the recorded creatinine collection time (positive when creatinine was collected later), and which was collected first. A missing time is never treated as zero.",
+    "prohibited": [
+      "Do not read the gap as a statement about the quality or timeliness of care.",
+      "Do not use any output as a recommendation, alert or order."
+    ]
+  },
+  "limitations": {
+    "items": [
+      "A missing diabetes collection time gives needs-data; a missing kidney collection time gives indeterminate, because the kidney context is optional in the group and its absence must never read as normal.",
+      "It reads the recorded collection times only; no evaluation time is used."
+    ],
+    "statement": "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+  },
+  "manifest": {
+    "id": "diabetes-ckd.sample-gap",
+    "name": "Diabetes and CKD: sample collection gap",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "references": [
+      {
+        "id": "diabetes.glycaemia-documentation",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      {
+        "id": "ckd.kidney-function-documentation",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      }
+    ],
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft",
+    "type": "analytics-package",
+    "version": "0.1.0"
+  },
+  "operatorSet": {
+    "name": "ccis-core-ops",
+    "version": "0.1.0"
+  },
+  "outputs": [
+    {
+      "carries": [
+        "warnings",
+        "limitations",
+        "missingDataNotes"
+      ],
+      "id": "sampleGap",
+      "kind": "value",
+      "states": [
+        "needs-data",
+        "indeterminate"
+      ],
+      "unit": "min",
+      "valueType": "time"
+    },
+    {
+      "carries": [
+        "warnings",
+        "limitations",
+        "missingDataNotes"
+      ],
+      "id": "sampleOrder",
+      "kind": "classification",
+      "labels": [
+        "hba1c-first",
+        "creatinine-first",
+        "same-time"
+      ],
+      "states": [
+        "needs-data",
+        "indeterminate"
+      ]
+    }
+  ],
+  "parameters": [],
+  "population": "People recorded as having diabetes, chronic kidney disease, or both. Narrowing is for the local clinician to declare.",
+  "provenance": {
+    "basis": "None. No clinical source and no clinical review.",
+    "origin": "Synthetic demonstration written for the second demo (row 4.5d)."
+  },
+  "question": "For this case, how far apart were the HbA1c sample and the creatinine sample recorded as collected, and which came first?"
+}

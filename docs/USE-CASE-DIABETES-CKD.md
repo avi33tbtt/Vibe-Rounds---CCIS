@@ -37,6 +37,9 @@ Two near-collisions are deliberate for row 4.5c: K2 shares its key with D2 but m
 ## 2c. The group (`diabetes-ckd.group.json`)
 The group lists both elements at exact version `0.1.0`. The diabetes element is mandatory and the kidney element optional, so a missing kidney context can later be reported as indeterminate (row 4.5f). It declares two shared concepts and both are `related-not-merged`: the two `diagnosisDate` fields (different dates that share a key) and the two follow-up fields (different facts that read alike). No pair is `same-concept`, because the demo has no two fields that mean the same thing. Every key that both elements define must be listed by a concept; the validator refuses an undeclared overlap (CCIS-V5-012). Unit conversion for glucose and creatinine is still left to row 4.5d.
 
+## 2d. The combined analytic (`diabetes-ckd.sample-gap.analytics.json`)
+It reads one fact from each context, the HbA1c and the creatinine collection times, and gives the signed gap in minutes and which came first. It uses no clock, no parameter and no number, and says nothing about any value. A missing diabetes time is `needs-data`; a missing kidney time is `indeterminate`, because the kidney context is optional in the group and its absence must never read as normal (tested in row 4.5f).
+
 ## 3. Rows
 | Row | What it adds |
 |-----|--------------|

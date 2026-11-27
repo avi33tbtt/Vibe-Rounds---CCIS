@@ -6,6 +6,7 @@ JSON Schema 2020-12. Prototype. Synthetic data only. Not for clinical use.
 |------|--------|
 | `manifest.schema.json` | CCIS-REQ-009 to 012, 014 to 016. No integrity fields (gap G-05). |
 | `element.schema.json` | CCIS-REQ-021, 022, 032, 035, 036, 042. |
+| `element-group.schema.json` | CCIS-REQ-023, 024. Member elements (mandatory or optional), shared concepts each with a required `meaning` and no label member, `same-concept` or `related-not-merged`, version policy. |
 | `terminology-binding.schema.json` | CCIS-REQ-039 to 041, 044. |
 | `pathway.schema.json` | CCIS-REQ-025, 027. Stages are `information` or `report` only; no field can hold an action, order, dose or number; timing names a parameter id, never a value. |
 | `decision-node.schema.json` | CCIS-REQ-026. Every outcome has a `next` (stage or end); every node contains an `indeterminate` outcome. |

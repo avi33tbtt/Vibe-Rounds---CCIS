@@ -13,6 +13,9 @@ export const GROUP_RULES = [
   { ruleId: 'CCIS-V5-030', layer: 5, severity: 'error', summary: 'The owner of a shared concept is not one of the fields the concept lists.' },
   { ruleId: 'CCIS-V5-031', layer: 5, severity: 'error', summary: 'A same-concept entry has no owner (error from standard 0.2.0, warning at 0.1.0).' },
   { ruleId: 'CCIS-V5-032', layer: 5, severity: 'error', summary: 'A shared concept code follows neither the legacy camelCase key nor the local key format.' },
+  { ruleId: 'CCIS-V5-033', layer: 5, severity: 'error', summary: 'The same member element is listed more than once.' },
+  { ruleId: 'CCIS-V5-034', layer: 5, severity: 'error', summary: 'The same shared concept code is used by more than one entry.' },
+  { ruleId: 'CCIS-V5-035', layer: 5, severity: 'error', summary: 'A shared concept names fields of fewer than two different member elements.' },
 ];
 const LEGACY_KEY = /^[a-z][A-Za-z0-9]*$/;
 const LOCAL_KEY = /^[a-z0-9][a-z0-9._-]{0,63}$/;
@@ -26,14 +29,19 @@ export function groupChecks(doc, ctx) {
   const [maj, min] = major(isObj(doc.manifest) && isObj(doc.manifest.standard) ? doc.manifest.standard.version : null);
   const strict = maj > 0 || min >= 2;
   const members = new Map(); // member element id -> { fields: Map(key -> field) } or null when not resolved
-  arr(doc.members).forEach((m) => {
+  arr(doc.members).forEach((m, i) => {
     const ref = isObj(m) ? m.element : null;
     if (!isObj(ref) || typeof ref.id !== 'string') return;
+    if (members.has(ref.id)) {
+      out.push(diag('error', 'CCIS-V5-033', `/members/${i}/element`, `The member element \"${ref.id}\" is listed more than once.`, 'List each member element once.'));
+      return;
+    }
     const r = ctx.resolve(ref);
     members.set(ref.id, r.state === 'ok' && isObj(r.doc) ? new Map(fieldsOf(r.doc).map((f) => [f.key, f])) : null);
   });
   const listed = new Set(); // "element\u0000key" seen in a concept
   const use = new Map();
+  const codes = new Set();
   arr(doc.sharedConcepts).forEach((c, i) => {
     if (!isObj(c)) return;
     if (typeof c.concept === 'string' && !LEGACY_KEY.test(c.concept) && !LOCAL_KEY.test(c.concept)) {
@@ -45,6 +53,10 @@ export function groupChecks(doc, ctx) {
       }
     } else if (c.resolution === 'same-concept') {
       out.push(diag(strict ? 'error' : 'warning', 'CCIS-V5-031', `/sharedConcepts/${i}`, `The same-concept entry \"${c.concept}\" has no owner.`, 'Name the one element and field that owns the concept.'));
+    }
+    if (typeof c.concept === 'string') {
+      if (codes.has(c.concept)) out.push(diag('error', 'CCIS-V5-034', `/sharedConcepts/${i}/concept`, `The shared concept code \"${c.concept}\" is used by more than one entry.`, 'Use one entry per concept, or give each concept its own code.'));
+      codes.add(c.concept);
     }
     const found = [];
     arr(c.fields).forEach((f, j) => {
@@ -63,6 +75,10 @@ export function groupChecks(doc, ctx) {
       if (!fields.has(f.field)) out.push(diag('error', 'CCIS-V5-010', `${at}/field`, `The element "${f.element}" does not define the field "${f.field}".`, 'Correct the field key or the element version.'));
       else found.push(fields.get(f.field));
     });
+    const elems = arr(c.fields).filter(isObj).map((f) => f.element);
+    if (elems.length > 0 && elems.every((e) => members.has(e)) && new Set(elems).size < 2) {
+      out.push(diag('error', 'CCIS-V5-035', `/sharedConcepts/${i}/fields`, `The shared concept \"${c.concept}\" names fields of only one member element, so nothing is shared.`, 'Name fields of at least two different members.'));
+    }
     if (c.resolution === 'same-concept' && found.length > 1 && new Set(found.map(shape)).size > 1) {
       out.push(diag('error', 'CCIS-V5-011', `/sharedConcepts/${i}`, `The shared concept "${c.concept}" is declared the same concept, but its fields differ in type or units.`, 'Use related-not-merged, or make the fields the same shape first. Nothing is converted here.'));
     }

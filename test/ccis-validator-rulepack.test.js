@@ -14,7 +14,7 @@ const base = () => ({
   scope: { pathways: [{ id: 'demo.pathway', type: 'pathway', range: '>=0.1.0' }] },
   inputs: [{ id: 'crea', concept: 'creatinine', read: 'count' }],
   parameters: [{ id: 'window', label: 'Window', kind: 'interval', units: ['day'], enabledByDefault: false, suppliedBy: 'Local clinician' }],
-  rules: [{ id: 'dqOne', kind: 'stale', severity: 'info', when: { op: 'and', args: [mk(), { op: 'gt', args: [{ ref: 'parameter', id: 'window' }, { ref: 'input', id: 'crea' }] }] }, message: { template: 'Information gap.' } }],
+  rules: [{ id: 'dqOne', kind: 'stale', severity: 'info', when: { op: 'and', args: [mk(), { op: 'gt', args: [{ ref: 'parameter', id: 'window' }, { op: 'time-diff', args: [{ ref: 'input', id: 'crea' }, { ref: 'input', id: 'crea' }] }] }] }, message: { template: 'Information gap.' } }],
   tests: [{ id: 't1', rule: 'dqOne', fixture: 'synthetic-1', synthetic: true, enables: [{ parameter: 'window', testOnly: true }], expect: 'not-evaluated' }],
   provenance: { origin: 'Synthetic', basis: 'Synthetic' },
   sourceNote: 'Synthetic note.',

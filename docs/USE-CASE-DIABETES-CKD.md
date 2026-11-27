@@ -40,6 +40,9 @@ The group lists both elements at exact version `0.1.0`. The diabetes element is 
 ## 2d. The combined analytic (`diabetes-ckd.sample-gap.analytics.json`)
 It reads one fact from each context, the HbA1c and the creatinine collection times, and gives the signed gap in minutes and which came first. It uses no clock, no parameter and no number, and says nothing about any value. A missing diabetes time is `needs-data`; a missing kidney time is `indeterminate`, because the kidney context is optional in the group and its absence must never read as normal (tested in row 4.5f).
 
+Version 0.1.1 (row 4.5d.1) adds `sampleWithinWindow`: were the two recorded collection times within a window a local clinician supplies. The window and the edge rule are disabled parameters with no value, so the output reads `parameter-not-enabled`; the 0.1.0 file is unchanged.
+Why not "how recent is a result": the operator whitelist has no evaluation-time reference (finding F-13, D-287), so recency is asked between the two recorded times, not against now.
+
 ## 3. Rows
 | Row | What it adds |
 |-----|--------------|

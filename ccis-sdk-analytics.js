@@ -57,3 +57,32 @@ export function conversion(spec) {
 
 // An element the analytics needs, by version range, and the field keys it needs from it.
 export const contextEntry = (spec) => shape(spec, { allowed: { ref: elementRange, fields: keys(1) }, required: ['ref', 'fields'] }, '');
+
+export const OPERATORS = Object.freeze(['and', 'or', 'not', 'is-present', 'state-of', 'eq', 'ne', 'lt', 'le', 'gt', 'ge', 'add', 'sub', 'time-diff', 'convert', 'if', 'count', 'select']);
+export const REF_KINDS = Object.freeze(['input', 'parameter', 'conversion']);
+const MAX_DEPTH = 100; // stack safety only; the run-time limit is executionProfile.maxDepth
+
+// A closed expression tree: operator, reference or literal nodes. No number can be built. Arity, type fit and unknown ids stay with the validator.
+const exprAt = (v, p, depth) => {
+  need(v !== null && typeof v === 'object' && !Array.isArray(v) && depth <= MAX_DEPTH, p);
+  const kind = ['op', 'ref', 'literal'].find((k) => k in v);
+  need(kind !== undefined, p);
+  const child = (y, r) => exprAt(y, r, depth + 1);
+  const allowed = {
+    op: { op: oneOf(OPERATORS), args: (x, q) => list(x, q, 1, child) },
+    ref: { ref: oneOf(REF_KINDS), id: keyText },
+    literal: { literal: (x, q) => { need(typeof x === 'boolean' || typeof x === 'string', q); return x; } },
+  }[kind];
+  return shape(v, { closed: true, allowed, required: Object.keys(allowed) }, p);
+};
+export const expr = (spec) => exprAt(spec, '', 1);
+export const input = (id) => expr({ ref: 'input', id });
+export const param = (id) => expr({ ref: 'parameter', id });
+export const conv = (id) => expr({ ref: 'conversion', id });
+export const lit = (literal) => expr({ literal });
+export const op = (name, ...args) => expr({ op: name, args });
+
+// One closed expression tree per output.
+export const computation = (v, p = '') => list(v, p, 1, (x, q) => shape(x, {
+  closed: true, allowed: { output: keyText, expr: (e, r) => exprAt(e, r, 1) }, required: ['output', 'expr'],
+}, q));

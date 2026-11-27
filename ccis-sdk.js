@@ -25,7 +25,7 @@ export class SdkError extends Error {
 const isPlain = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const token = (v) => typeof v === 'string' && /^\S+$/.test(v);
 const sentence = (v) => typeof v === 'string' && /^\S.*$/s.test(v);
-const at = (path, key) => (path ? `${path}.${key}` : key);
+const at = (path, key) => (path === '' ? String(key) : `${path}.${key}`);
 
 // rules: { allowed: { member: check }, required: [members], closed? }. `x-` members pass as JSON data unless `closed`. Returns a frozen copy.
 export function shape(spec, rules, path) {

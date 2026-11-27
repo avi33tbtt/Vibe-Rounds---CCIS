@@ -99,11 +99,79 @@
           "requirement": { "enum": ["required", "optional"] }
         }
       }
+    },
+    "entryForm": {
+      "description": "Layout only: ordered sections of elements and section items (B5). No number, rule or threshold. Element membership, field existence and the known section list are checked by the validator (B6), not here.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^x-": {} },
+      "required": ["sections"],
+      "properties": {
+        "sections": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/formSection" } }
+      }
+    },
+    "contexts": {
+      "description": "Which elements belong to a condition (B5). Never says what to do for the condition. Known tags are checked by the validator (B6).",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/context" }
     }
   },
   "$defs": {
     "text": { "type": "string", "pattern": "^\\S.*$" },
     "key": { "type": "string", "pattern": "^[a-z][A-Za-z0-9]*$" },
-    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "formSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^x-": {} },
+      "required": ["id", "label", "items"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "$ref": "#/$defs/text" },
+        "items": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/formItem" } }
+      }
+    },
+    "formItem": {
+      "oneOf": [
+        {
+          "description": "An element placed in the form, optionally with a field order and display-only row groups.",
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": { "^x-": {} },
+          "required": ["kind", "element"],
+          "properties": {
+            "kind": { "const": "element" },
+            "element": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/artefactId" },
+            "fields": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/key" } },
+            "rowGroups": { "type": "array", "minItems": 1, "items": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/key" } } },
+            "visibleByDefault": { "type": "boolean" }
+          }
+        },
+        {
+          "description": "A named section of the EMR form. Which names are known is checked by the validator (B6).",
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": { "^x-": {} },
+          "required": ["kind", "section"],
+          "properties": {
+            "kind": { "const": "section" },
+            "section": { "type": "string", "pattern": "^[a-z][a-z0-9.-]*$" },
+            "visibleByDefault": { "type": "boolean" }
+          }
+        }
+      ]
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^x-": {} },
+      "required": ["id", "label", "elements"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "$ref": "#/$defs/text" },
+        "elements": { "type": "array", "minItems": 1, "items": { "$ref": "https://ccis.invalid/schemas/manifest.schema.json#/$defs/artefactId" } }
+      }
+    }
   }
 }

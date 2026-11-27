@@ -1,0 +1,106 @@
+{
+  "case": "failure-03-kidney-time-unknown",
+  "class": "failure-policy",
+  "tests": "Both contexts applied, but the creatinine collection time is recorded as unknown (not absent): gap and order are indeterminate, never a zero gap.",
+  "parameters": "none",
+  "evaluationTime": "2026-03-02T12:00:00Z",
+  "x-analyticVersion": "0.1.3",
+  "results": [
+    {
+      "outputId": "sampleGap",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [
+        "The creatinine collection time is recorded as unknown, so there is no time to compare with."
+      ],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "indeterminate"
+    },
+    {
+      "outputId": "sampleOrder",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [
+        "The creatinine collection time is recorded as unknown, so there is no order to give."
+      ],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "indeterminate"
+    },
+    {
+      "outputId": "sampleWithinWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "sampleWindow",
+        "edgeRule"
+      ]
+    },
+    {
+      "outputId": "documentedFactCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 3,
+        "unit": "1"
+      }
+    },
+    {
+      "outputId": "creatinineUmolL",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 100,
+        "unit": "umol/L"
+      }
+    },
+    {
+      "outputId": "glucoseMgdL",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 90,
+        "unit": "mg/dL"
+      }
+    }
+  ],
+  "workings": [
+    "sampleGap and sampleOrder: the kidney side declares indeterminate for a time that is unknown, as for one that is missing. Not 0, not false, not hba1c-first.",
+    "documentedFactCount 3: two statements and the HbA1c time; an unknown time is not a documented fact. The kidney context is present, so this is a count, unlike failure-01 where the whole context is missing and the count is indeterminate.",
+    "creatinineUmolL 100 and glucoseMgdL 90 unchanged."
+  ],
+  "noValueOutputs": [
+    "sampleGap",
+    "sampleOrder",
+    "sampleWithinWindow"
+  ],
+  "notSpecified": [
+    "Any threshold, target or judgement of a value: none exists in this analytic."
+  ]
+}

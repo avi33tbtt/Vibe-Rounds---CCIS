@@ -35,6 +35,21 @@
       "case": "out-of-scope-01-hba1c-not-performed",
       "class": "out-of-scope",
       "tests": "HbA1c collection time not applicable: gap and order needs-data, never zero or false."
+    },
+    {
+      "case": "failure-01-kidney-context-missing",
+      "class": "failure-policy",
+      "tests": "Kidney element not applied: gap, order, fact count and creatinine are indeterminate; glucose still computed."
+    },
+    {
+      "case": "failure-02-diabetes-context-missing",
+      "class": "failure-policy",
+      "tests": "Diabetes element not applied: gap, order, fact count and glucose are needs-data; creatinine still computed."
+    },
+    {
+      "case": "failure-03-kidney-time-unknown",
+      "class": "failure-policy",
+      "tests": "Creatinine collection time recorded unknown: gap and order indeterminate, fact count 3, never a zero gap."
     }
   ]
 }

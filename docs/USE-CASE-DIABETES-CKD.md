@@ -52,6 +52,9 @@ A value in an unexpected unit is refused, never guessed, and a missing value is 
 ## 2e. Fixtures (`ccis/fixtures/diabetes-ckd/`)
 Row 4.5e adds four synthetic cases for 0.1.3 (two normal, two boundary) with hand-calculated results. The gap is signed (creatinine time minus HbA1c time), so a creatinine sample taken first gives a negative gap. Row 4.5e.1 adds three more: creatinine in an undeclared unit (refused with X-010, no value), two creatinine records (conflicting, so indeterminate), and an HbA1c time recorded as not applicable (gap and order needs-data). Failure-policy cases follow in 4.5f.
 
+## 2f. Failure-policy fixtures
+Row 4.5f adds three more cases to the same folder: the kidney context not applied (gap, order, fact count and creatinine are indeterminate, glucose still computed), the diabetes context not applied (the same outputs plus glucose are needs-data, creatinine still computed), and the creatinine collection time recorded as unknown (gap and order indeterminate, fact count 3). A missing context is never a low count, a zero gap, `false` or `normal`.
+
 ## 3. Rows
 | Row | What it adds |
 |-----|--------------|

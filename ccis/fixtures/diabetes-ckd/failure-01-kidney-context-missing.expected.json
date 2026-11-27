@@ -1,0 +1,106 @@
+{
+  "case": "failure-01-kidney-context-missing",
+  "class": "failure-policy",
+  "tests": "The kidney element is not applied and no kidney record exists: everything that needs a kidney input is indeterminate; glucose still comes from the diabetes context.",
+  "parameters": "none",
+  "evaluationTime": "2026-03-02T12:00:00Z",
+  "x-analyticVersion": "0.1.3",
+  "results": [
+    {
+      "outputId": "sampleGap",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [
+        "The kidney context is missing, so there is no creatinine collection time to compare with."
+      ],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "indeterminate"
+    },
+    {
+      "outputId": "sampleOrder",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [
+        "The kidney context is missing, so there is no order to give."
+      ],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "indeterminate"
+    },
+    {
+      "outputId": "sampleWithinWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "sampleWindow",
+        "edgeRule"
+      ]
+    },
+    {
+      "outputId": "documentedFactCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [
+        "The kidney context is missing, so the count of documented facts across both contexts cannot be given; the two diabetes facts are not reported as a count of 2."
+      ],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "indeterminate"
+    },
+    {
+      "outputId": "creatinineUmolL",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [
+        "The kidney context is missing, so there is no creatinine value to convert."
+      ],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "indeterminate"
+    },
+    {
+      "outputId": "glucoseMgdL",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 90,
+        "unit": "mg/dL"
+      }
+    }
+  ],
+  "workings": [
+    "sampleGap, sampleOrder, documentedFactCount, creatinineUmolL: No kidney context was applied and there are no kidney records, so there is nothing to compare with; the kidney side is optional in the group and a missing kidney input is indeterminate, never a low count or a normal value.",
+    "glucoseMgdL 90 mg/dL is unchanged: the diabetes context is complete.",
+    "sampleWithinWindow: parameter not enabled, as in every case."
+  ],
+  "noValueOutputs": [
+    "sampleGap",
+    "sampleOrder",
+    "sampleWithinWindow",
+    "documentedFactCount",
+    "creatinineUmolL"
+  ],
+  "notSpecified": [
+    "Any threshold, target or judgement of a value: none exists in this analytic."
+  ]
+}

@@ -97,7 +97,7 @@ test('seams: keys, booleans and counts only, no market, context or typed time, n
   const w = await ready();
   typeTime(w);
   btn(w, '#run', 'Run').click();
-  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'draftState', 'exportState', 'importState', 'remoteState', 'resultsState', 'runState', 'selectorState', 'state']);
+  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'draftState', 'exportState', 'formState', 'importState', 'remoteState', 'resultsState', 'runState', 'selectorState', 'state']);
   const rs = w.ccisApp.runState();
   assert.deepEqual(Object.keys(plain(rs)), Object.keys(EMPTY));
   for (const [k, v] of Object.entries(plain(rs))) assert.ok(typeof v === 'boolean' || typeof v === 'number', k);

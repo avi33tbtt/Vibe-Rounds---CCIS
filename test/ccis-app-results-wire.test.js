@@ -110,7 +110,7 @@ test('a run on the needs-data fixture shows the Missing section open with needs-
 test('seams: keys, booleans and counts only, no checksum, record id or typed time, no on* attributes', async () => {
   const w = await ready();
   go(w);
-  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'draftState', 'exportState', 'importState', 'remoteState', 'resultsState', 'runState', 'selectorState', 'state']);
+  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'draftState', 'exportState', 'formState', 'importState', 'remoteState', 'resultsState', 'runState', 'selectorState', 'state']);
   const rs = plain(w.ccisApp.resultsState());
   assert.deepEqual(Object.keys(rs), Object.keys(EMPTY));
   for (const [k, v] of Object.entries(rs)) assert.ok(typeof v === 'boolean' || typeof v === 'number' || v === 'completed' || v === 'none', k);

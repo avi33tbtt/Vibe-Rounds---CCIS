@@ -20,6 +20,13 @@ import { draftForPage } from './ccis-app-draft.js';
 import { makeAiClient } from './ccis-app-ai.js';
 import { DRAFT_TYPES } from './ccis-draft.js';
 import { SOURCE_KINDS } from './ccis-sdk-analytics.js';
+import { mountFormView } from './ccis-app-form-view.js';
+import { mountFormResultsView } from './ccis-app-form-results-view.js';
+import { draftFromForm, FORM_TYPES } from './ccis-app-form.js';
+import { previewModel } from './ccis-app-preview.js';
+import { diffArtefacts } from './ccis-app-diff.js';
+import { EPISTEMIC_STATES, SOURCE_CLASSES, TIME_SEMANTICS } from './ccis-sdk-element.js';
+import { makeDom } from './ccis-app-dom.js';
 
 const app = { marketLoaded: false, entries: 0, runs: 0, refused: false };
 const imp = { imported: false, refused: false, accepted: 0, rejected: 0, unmapped: 0, ambiguous: 0 };
@@ -29,6 +36,7 @@ const results = { shown: false, state: 'none', groups: 0, items: 0, trace: 0, mi
 const remote = { available: false, loaded: false, refused: false, source: 'none' };
 const exported = { shown: false, verified: false, saved: false };
 const drafted = { enabled: false, hasKey: false, ready: false, drafted: false, refused: false, rows: 0 };
+const formed = { fields: 1, touched: false, built: false, refused: false, rows: 0, kept: false };
 const run = { ready: false, selected: 0, ran: false, failed: false, results: 0, skipped: 0, refused: false };
 let market = null;
 let exportView = null;
@@ -191,6 +199,52 @@ if (draftRoot) {
   });
 }
 
+// Row 4.4d: the form view and its results. The kept previous version is one string in this closure: never stored, lost on reload.
+const formRoot = document.getElementById('form');
+if (formRoot) {
+  const { el } = makeDom(document);
+  const formBox = el('div');
+  const resultsBox = el('div');
+  const keep = el('button', 'Keep this version for comparison');
+  const forget = el('button', 'Forget kept version');
+  keep.type = 'button';
+  forget.type = 'button';
+  let keptCanonical = null;
+  let current = null;
+  const refusedDraft = { ok: false, sdk: { code: 'page', path: '', sentence: 'The form could not be processed.' } };
+  const show = () => {
+    formed.kept = keptCanonical !== null;
+    if (!current) return;
+    try {
+      const { draft } = current;
+      const preview = draft.ok ? previewModel(draft.spec) : null;
+      const diff = draft.ok && keptCanonical !== null ? diffArtefacts(keptCanonical, draft.canonical) : null;
+      formResults.show({ draft, preview, diff });
+    } catch {
+      formResults.show({ draft: refusedDraft });
+    }
+  };
+  const formResults = mountFormResultsView({
+    document,
+    root: resultsBox,
+    onState: (s) => { formed.built = s.shown && !s.refused; formed.refused = s.refused; formed.rows = s.rows; },
+  });
+  keep.addEventListener('click', () => { if (current && current.draft.ok) { keptCanonical = current.draft.canonical; show(); } });
+  forget.addEventListener('click', () => { keptCanonical = null; show(); });
+  formRoot.append(formBox, el('p', 'A kept version lives in this page only and is lost on reload.', 'muted'), keep, forget, resultsBox);
+  mountFormView({
+    document,
+    root: formBox,
+    types: FORM_TYPES,
+    lists: { epistemic: EPISTEMIC_STATES, sourceClasses: SOURCE_CLASSES, timeSemantics: TIME_SEMANTICS },
+    onState: (s) => { formed.fields = s.fields; formed.touched = s.touched; },
+    onForm: (form) => {
+      try { current = { draft: draftFromForm(form) }; } catch { current = { draft: refusedDraft }; }
+      show();
+    },
+  });
+}
+
 window.ccisApp = {
   state: () => ({ ...app }),
   importState: () => ({ ...imp }),
@@ -201,5 +255,6 @@ window.ccisApp = {
   resultsState: () => ({ ...results }),
   exportState: () => ({ ...exported }),
   draftState: () => ({ ...drafted }),
+  formState: () => ({ ...formed }),
   checksumOf,
 };

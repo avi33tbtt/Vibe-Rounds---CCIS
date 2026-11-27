@@ -123,7 +123,7 @@ test('seams: keys, booleans only, no checksum, record id, file name or typed tim
   const w = await ready();
   go(w);
   btn(w, '#export', 'Download run record').click();
-  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'draftState', 'exportState', 'importState', 'remoteState', 'resultsState', 'runState', 'selectorState', 'state']);
+  assert.deepEqual(Object.keys(w.ccisApp).sort(), ['catalogueState', 'checksumOf', 'draftState', 'exportState', 'formState', 'importState', 'remoteState', 'resultsState', 'runState', 'selectorState', 'state']);
   const es = plain(w.ccisApp.exportState());
   assert.deepEqual(Object.keys(es), Object.keys(EMPTY));
   for (const [k, v] of Object.entries(es)) assert.equal(typeof v, 'boolean', k);

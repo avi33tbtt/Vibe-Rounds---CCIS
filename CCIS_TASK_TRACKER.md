@@ -140,6 +140,7 @@ If a chat ends midway, nothing is `DONE` until verified: open a new chat, attach
 | ECO-B1 | (Studio tracker) | Ecosystem row B1: optional `concept` (local binding) and `contexts` on an element field; schema and regenerated validators. | DONE | 2026-11-27 | 1 schema edit, 1 test | New test `ccis-element-concept-schema.test.js` (8 cases). Key format and known tags are B2. SDK field builder is B1c. |
 | ECO-B1c | (Studio tracker) | Ecosystem row B1c: SDK field builder accepts `concept` and `contexts` with the schema's rules. | DONE | 2026-11-27 | 1 module edit, 1 test | New test `ccis-sdk-field-concept.test.js` (8 cases); JSON and code routes identical and refuse the same inputs. |
 | ECO-B1a | (Studio tracker) | Ecosystem row B1a: optional `ownedBy` (owner element id and field key) on an element field; requires `concept`; schema and regenerated validators. | DONE | 2026-11-28 | 1 schema edit, 1 test | New test `ccis-element-owned-by-schema.test.js` (8 cases); owner checks wait for B1e. Full npm test not run. |
+| ECO-B1d | (Studio tracker) | Ecosystem row B1d: SDK field builder accepts `ownedBy` (element id and field key) with the schema's rules; requires `concept`. | DONE | 2026-11-28 | 1 module edit, 1 test | New test `ccis-sdk-field-owned-by.test.js` (7 cases); JSON and code routes identical and refuse the same inputs. Owner checks wait for B1e. |
 
 
 ## ITEMS ONLY YOU CAN DO (short list; full history in `docs/OWNER-ITEMS.md`)

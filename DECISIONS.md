@@ -279,3 +279,4 @@ Max 3 rows per task. Append at the bottom.
 | 2026-11-27 | 4.4c.1 | D-268 Diff values are drawn as the diff gives them (strings keep their JSON quotes), not reformatted. The verdict-word check uses whole words, because the fixed line says `not a validation`. |
 | 2026-11-27 | 4.4d | D-269 The kept previous version lives in a page variable only (never storage), is set by an explicit Keep button and cleared by Forget or a reload. The wiring edits five existing wire tests by one word (`formState` joins the `ccisApp` key list). |
 | 2026-11-27 | 4.4d | D-270 The page file grew to exactly 260 lines (the guard says stop past 260). The results box is mounted before the form view, because the form view calls `onForm` at mount. |
+| 2026-11-27 | 4.4e | D-271 The sweep runs the real models (not stubs) so hostile text is also tested on accepted forms, not only refusals. A defect found there stops the row and becomes a new row; 4.4e fixes nothing. |

@@ -24,9 +24,10 @@
 import {
   manifest as vManifest, element as vElement, terminologyBinding as vBinding, decisionNode as vNode,
   pathway as vPathway, analytics as vAnalytics, executionManifest as vExecution, contextEnvelope as vEnvelope,
-  importReport as vReport, validationRecord as vRecord, runResult as vResult, runRecord as vRun,
+  importReport as vReport, validationRecord as vRecord, runResult as vResult, runRecord as vRun, elementGroup as vElementGroup,
 } from './ccis/validators/ccis-validators.js';
 import { semanticLayer, graphLayer, SEMANTIC_RULES } from './ccis-validator-semantic.js';
+import { groupChecks, GROUP_RULES } from './ccis-validator-group.js';
 import { executableSafetyLayer, testVerificationLayer, governanceLayer, GOVERNANCE_RULES } from './ccis-validator-governance.js';
 
 export const LAYER_NAMES = [
@@ -49,6 +50,7 @@ export const RULES = [
   { ruleId: 'CCIS-V3-004', layer: 3, severity: 'error', summary: 'A referenced artefact is not among the known artefacts.' },
   { ruleId: 'CCIS-V3-005', layer: 3, severity: 'error', summary: 'A referenced artefact is known, but no known version satisfies the reference.' },
   ...SEMANTIC_RULES,
+  ...GROUP_RULES,
   ...GOVERNANCE_RULES,
 ];
 
@@ -281,11 +283,11 @@ function layer1(input) {
 const SCHEMAS = {
   manifest: vManifest, element: vElement, terminologyBinding: vBinding, decisionNode: vNode, pathway: vPathway,
   analytics: vAnalytics, executionManifest: vExecution, contextEnvelope: vEnvelope, importReport: vReport,
-  validationRecord: vRecord, runResult: vResult, runRecord: vRun,
+  validationRecord: vRecord, runResult: vResult, runRecord: vRun, elementGroup: vElementGroup,
 };
 
-const TYPE_TO_SCHEMA = { 'contextual-element': 'element', pathway: 'pathway', 'analytics-package': 'analytics' };
-const TYPES_WITHOUT_SCHEMA = ['element-group', 'terminology-package', 'test-validation-package'];
+const TYPE_TO_SCHEMA = { 'contextual-element': 'element', 'element-group': 'elementGroup', pathway: 'pathway', 'analytics-package': 'analytics' };
+const TYPES_WITHOUT_SCHEMA = ['terminology-package', 'test-validation-package'];
 
 // What the artefact is, from its own manifest type or its shape. Decision nodes and bindings have no manifest.
 function identify(doc) {
@@ -400,6 +402,7 @@ const arr = (x) => (Array.isArray(x) ? x : []);
 function collectRefs(doc, kind) {
   const out = [];
   if (kind === 'analytics-package') arr(doc.context).forEach((c, i) => isObj(c) && out.push([`/context/${i}/ref`, c.ref]));
+  if (kind === 'element-group') arr(doc.members).forEach((m, i) => isObj(m) && out.push([`/members/${i}/element`, m.element]));
   if (kind === 'pathway') {
     arr(doc.elements).forEach((r, i) => out.push([`/elements/${i}`, r]));
     arr(doc.analytics).forEach((a, i) => isObj(a) && out.push([`/analytics/${i}/ref`, a.ref]));
@@ -585,7 +588,8 @@ export function validateArtefact(input, options = {}) {
     skip('graph-and-compatibility', stopped('semantic'));
   } else {
     const index = indexKnown(options.known);
-    mark('graph-and-compatibility', graphLayer(first.doc, kind, { resolve: (ref) => resolve(index, ref) }));
+    const ctx = { resolve: (ref) => resolve(index, ref) };
+    mark('graph-and-compatibility', [...graphLayer(first.doc, kind, ctx), ...(kind === 'element-group' ? groupChecks(first.doc, ctx) : [])]);
   }
   // Layers 6 to 8 (row 2.3). Each runs only if the one before passed (fail closed). `options.fixtures` is a list of fixture case names.
   const chain = [

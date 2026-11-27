@@ -20,6 +20,21 @@
       "case": "boundary-02-reversed",
       "class": "boundary",
       "tests": "Creatinine collected before HbA1c: negative gap, order creatinine-first."
+    },
+    {
+      "case": "unit-conversion-01-undeclared-unit",
+      "class": "unit-conversion",
+      "tests": "Creatinine in mmol/L (not declared): the conversion is refused with X-010, no value is invented."
+    },
+    {
+      "case": "conflicting-01-two-creatinine-values",
+      "class": "conflicting",
+      "tests": "Two creatinine value records at one instant: indeterminate, no value chosen."
+    },
+    {
+      "case": "out-of-scope-01-hba1c-not-performed",
+      "class": "out-of-scope",
+      "tests": "HbA1c collection time not applicable: gap and order needs-data, never zero or false."
     }
   ]
 }

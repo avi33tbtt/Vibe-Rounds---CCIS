@@ -1,0 +1,104 @@
+{
+  "case": "conflicting-01-two-creatinine-values",
+  "class": "conflicting",
+  "tests": "Two creatinine value records at the same instant (100 and 101 umol/L): the input is conflicting, so no value is chosen.",
+  "parameters": "none",
+  "evaluationTime": "2026-03-02T12:00:00Z",
+  "x-analyticVersion": "0.1.3",
+  "results": [
+    {
+      "outputId": "sampleGap",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 150,
+        "unit": "min"
+      }
+    },
+    {
+      "outputId": "sampleOrder",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "label": "hba1c-first"
+      }
+    },
+    {
+      "outputId": "sampleWithinWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "sampleWindow",
+        "edgeRule"
+      ]
+    },
+    {
+      "outputId": "documentedFactCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 4,
+        "unit": "1"
+      }
+    },
+    {
+      "outputId": "creatinineUmolL",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [
+        "Two creatinine value records exist for the same time; neither is chosen, so the converted value is indeterminate."
+      ],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "indeterminate"
+    },
+    {
+      "outputId": "glucoseMgdL",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 90,
+        "unit": "mg/dL"
+      }
+    }
+  ],
+  "workings": [
+    "creatinineUmolL: two records (100 and 101 umol/L) make the input conflicting even though they are close; it is treated like a missing kidney input, so indeterminate, never 100, 101 or their mean.",
+    "Everything else as normal-01: gap 150 min, hba1c-first, count 4, glucose 90 mg/dL."
+  ],
+  "noValueOutputs": [
+    "sampleWithinWindow",
+    "creatinineUmolL"
+  ],
+  "notSpecified": [
+    "Any threshold, target or judgement of a value: none exists in this analytic."
+  ]
+}

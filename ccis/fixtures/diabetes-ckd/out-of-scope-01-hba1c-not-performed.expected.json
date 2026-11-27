@@ -1,0 +1,106 @@
+{
+  "case": "out-of-scope-01-hba1c-not-performed",
+  "class": "out-of-scope",
+  "tests": "HbA1c collection time explicitly not applicable: gap and order are needs-data, never 0 and never false.",
+  "parameters": "none",
+  "evaluationTime": "2026-03-02T12:00:00Z",
+  "x-analyticVersion": "0.1.3",
+  "results": [
+    {
+      "outputId": "sampleGap",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [
+        "The HbA1c collection time is recorded as not applicable, so there is no time to compare with."
+      ],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "needs-data"
+    },
+    {
+      "outputId": "sampleOrder",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [
+        "The HbA1c collection time is recorded as not applicable, so there is no order to give."
+      ],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "needs-data"
+    },
+    {
+      "outputId": "sampleWithinWindow",
+      "kind": "classification",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "state": "parameter-not-enabled",
+      "dependsOnParameters": [
+        "sampleWindow",
+        "edgeRule"
+      ]
+    },
+    {
+      "outputId": "documentedFactCount",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 3,
+        "unit": "1"
+      }
+    },
+    {
+      "outputId": "creatinineUmolL",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 100,
+        "unit": "umol/L"
+      }
+    },
+    {
+      "outputId": "glucoseMgdL",
+      "kind": "value",
+      "warnings": [],
+      "limitations": [
+        "Describes when samples were recorded as collected. It says nothing about any value, about the quality or timeliness of care, or about a trend, and it is not decision support."
+      ],
+      "missingDataNotes": [],
+      "x-analytic": "diabetes-ckd.sample-gap",
+      "value": {
+        "amount": 90,
+        "unit": "mg/dL"
+      }
+    }
+  ],
+  "workings": [
+    "sampleGap and sampleOrder: one of the two times is not applicable, so there is nothing to subtract; the diabetes side declares needs-data for a missing HbA1c time. Not 0, not false.",
+    "documentedFactCount: two statements and one collection time = 3. The tree gives the same outputs for not-applicable and not-collected (see D-299).",
+    "creatinineUmolL 100 and glucoseMgdL 90 unchanged."
+  ],
+  "noValueOutputs": [
+    "sampleGap",
+    "sampleOrder",
+    "sampleWithinWindow"
+  ],
+  "notSpecified": [
+    "Any threshold, target or judgement of a value: none exists in this analytic."
+  ]
+}

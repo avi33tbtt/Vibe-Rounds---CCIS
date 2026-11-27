@@ -50,7 +50,7 @@ Version 0.1.3 (row 4.5d.2) declares two unit conversions (creatinine mg/dL to um
 A value in an unexpected unit is refused, never guessed, and a missing value is `indeterminate` or `needs-data`, never zero.
 
 ## 2e. Fixtures (`ccis/fixtures/diabetes-ckd/`)
-Row 4.5e adds four synthetic cases for 0.1.3 (two normal, two boundary) with hand-calculated results. The gap is signed (creatinine time minus HbA1c time), so a creatinine sample taken first gives a negative gap. Refusal, conflicting and out-of-scope cases follow in 4.5e.1.
+Row 4.5e adds four synthetic cases for 0.1.3 (two normal, two boundary) with hand-calculated results. The gap is signed (creatinine time minus HbA1c time), so a creatinine sample taken first gives a negative gap. Row 4.5e.1 adds three more: creatinine in an undeclared unit (refused with X-010, no value), two creatinine records (conflicting, so indeterminate), and an HbA1c time recorded as not applicable (gap and order needs-data). Failure-policy cases follow in 4.5f.
 
 ## 3. Rows
 | Row | What it adds |

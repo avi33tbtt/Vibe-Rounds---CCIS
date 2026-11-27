@@ -13,7 +13,8 @@ const doc = read(new URL('../ccis/examples/diabetes-ckd/diabetes-ckd.sample-gap.
 const RUNTIME = { limits: { maxSteps: 1000, maxDepth: 24, maxOutputBytes: 65536 } };
 const r0 = prepareAnalytic({ analytic: doc, checksum: checksumOf(canonicalize(doc).text), runtime: RUNTIME });
 assert.equal(r0.ok, true, JSON.stringify(r0));
-const cases = index.cases.map((c) => ({ ...c, envelope: read(new URL(`${c.case}.envelope.json`, fx)), expected: read(new URL(`${c.case}.expected.json`, fx)) }));
+const OLD = ['normal-01-targets', 'normal-02-converted', 'boundary-01-same-minute', 'boundary-02-reversed']; // later rows add cases to the same folder (4.5e.1)
+const cases = index.cases.filter((c) => OLD.includes(c.case)).map((c) => ({ ...c, envelope: read(new URL(`${c.case}.envelope.json`, fx)), expected: read(new URL(`${c.case}.expected.json`, fx)) }));
 const byName = Object.fromEntries(cases.map((c) => [c.case, c]));
 
 // Plain arithmetic, independent of the expression trees.
@@ -35,8 +36,8 @@ const run = (c, o) => evaluateOutput({ prepared: r0.prepared, outputId: o, input
 const want = (c, o) => c.expected.results.find((r) => r.outputId === o);
 const close = (a, b) => assert.ok(Math.abs(a - b) < 1e-9, `${a} vs ${b}`);
 
-test('4.5e: the index lists exactly the four cases and the folder holds no other file', () => {
-  assert.deepEqual(index.cases.map((c) => c.case), ['normal-01-targets', 'normal-02-converted', 'boundary-01-same-minute', 'boundary-02-reversed']);
+test('4.5e: the index starts with the four cases and the folder holds no other file', () => {
+  assert.deepEqual(index.cases.slice(0, 4).map((c) => c.case), OLD);
   const want = ['index.json', ...index.cases.flatMap((c) => [`${c.case}.envelope.json`, `${c.case}.expected.json`])].sort();
   assert.deepEqual(readdirSync(fx).sort(), want);
 });

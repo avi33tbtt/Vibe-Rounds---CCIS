@@ -28,7 +28,7 @@ const sentence = (v) => typeof v === 'string' && /^\S.*$/s.test(v);
 const at = (path, key) => (path ? `${path}.${key}` : key);
 
 // rules: { allowed: { member: check }, required: [members], closed? }. `x-` members pass as JSON data unless `closed`. Returns a frozen copy.
-function shape(spec, rules, path) {
+export function shape(spec, rules, path) {
   if (!isPlain(spec)) throw new SdkError('S-003', path);
   const out = {};
   for (const key of Object.keys(spec).sort()) {
@@ -46,9 +46,9 @@ function shape(spec, rules, path) {
   for (const key of rules.required) if (!(key in out)) throw new SdkError('S-002', at(path, key));
   return Object.freeze(out);
 }
-const need = (ok, path) => { if (!ok) throw new SdkError('S-003', path); };
+export const need = (ok, path) => { if (!ok) throw new SdkError('S-003', path); };
 // An array kept in the order given (never sorted); too short or not an array is an unacceptable value.
-const list = (v, path, min, item) => {
+export const list = (v, path, min, item) => {
   need(Array.isArray(v) && v.length >= min, path);
   return Object.freeze(v.map((x, i) => item(x, at(path, i))));
 };
@@ -101,9 +101,9 @@ export function binding(spec) {
 export const OUTCOME_KINDS = Object.freeze(['answer', 'missing-data', 'conflicting', 'indeterminate']);
 export const INPUT_STATES = Object.freeze(['present', 'absent', 'unknown', 'not-collected', 'not-applicable', 'explicitly-negative', 'entered-in-error', 'conflicting']);
 const idText = (x, p) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*$/.test(x), p); return x; };
-const keyText = (x, p) => { need(typeof x === 'string' && /^[a-z][A-Za-z0-9]*$/.test(x), p); return x; };
+export const keyText = (x, p) => { need(typeof x === 'string' && /^[a-z][A-Za-z0-9]*$/.test(x), p); return x; };
 const artefactId = (x, p) => { need(typeof x === 'string' && /^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*$/.test(x), p); return x; };
-const textOf = (x, p) => { need(sentence(x), p); return x; };
+export const textOf = (x, p) => { need(sentence(x), p); return x; };
 
 const nodeInput = (v, p) => shape(v, { allowed: { key: keyText, element: artefactId, field: keyText }, required: ['key', 'element', 'field'] }, p);
 const nodeWhen = (v, p) => shape(v, { closed: true, allowed: { input: keyText, is: (x, q) => { need(INPUT_STATES.includes(x), q); return x; } }, required: ['input', 'is'] }, p);

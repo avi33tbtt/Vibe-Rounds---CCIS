@@ -1,0 +1,70 @@
+{
+  "intent": {
+    "exclusions": [
+      "No treatment choice."
+    ],
+    "population": "Synthetic people only.",
+    "purpose": "Show one shared concept with one owner.",
+    "rationale": "Contract fixture.",
+    "setting": "Any demo setting."
+  },
+  "manifest": {
+    "id": "contract.group",
+    "name": "Contract group: demo",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft",
+    "type": "element-group",
+    "version": "0.1.0"
+  },
+  "members": [
+    {
+      "element": {
+        "id": "core.vitals",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      "required": true
+    },
+    {
+      "element": {
+        "id": "htn.core",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      "required": false
+    }
+  ],
+  "provenance": {
+    "basis": "None. No clinical source and no clinical review.",
+    "origin": "Synthetic contract fixture."
+  },
+  "sharedConcepts": [
+    {
+      "concept": "systolic-pressure",
+      "fields": [
+        {
+          "element": "core.vitals",
+          "field": "bpSys"
+        },
+        {
+          "element": "htn.core",
+          "field": "sbp"
+        }
+      ],
+      "meaning": "The systolic value as recorded; the core element owns it and the condition element uses it.",
+      "owner": {
+        "element": "core.vitals",
+        "field": "bpSys"
+      },
+      "resolution": "same-concept"
+    }
+  ],
+  "versionPolicy": {
+    "conflict": "refuse"
+  }
+}

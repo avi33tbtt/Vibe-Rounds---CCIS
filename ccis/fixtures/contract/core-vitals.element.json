@@ -1,0 +1,93 @@
+{
+  "fields": [
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "concept": {
+        "code": "systolic-pressure",
+        "codeSystem": {
+          "id": "local",
+          "version": "0.1.0"
+        },
+        "display": "Systolic pressure",
+        "mapping": {
+          "status": "mapped"
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected"
+      ],
+      "key": "bpSys",
+      "label": "Systolic value as recorded",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "quantity",
+      "units": [
+        "mmHg"
+      ]
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "concept": {
+        "code": "heart-rate",
+        "codeSystem": {
+          "id": "local",
+          "version": "0.1.0"
+        },
+        "display": "Heart rate",
+        "mapping": {
+          "status": "mapped"
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected"
+      ],
+      "key": "hr",
+      "label": "Pulse as recorded",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "quantity",
+      "units": [
+        "bpm"
+      ]
+    }
+  ],
+  "intent": {
+    "exclusions": [
+      "Diagnosis, severity grading and treatment choice.",
+      "Any product, quantity or amount of anything given."
+    ],
+    "population": "People presenting with a suspected snake bite. No narrower scope is assumed.",
+    "purpose": "Record when things happened and what was documented for a suspected snake bite, so that process measures can be described for local review.",
+    "rationale": "Time and documentation questions can be asked without any clinical number, which lets the whole chain be shown without one.",
+    "setting": "Any care setting that sees people with a suspected snake bite. Narrowing is for the local clinician to declare."
+  },
+  "manifest": {
+    "id": "core.vitals",
+    "name": "Core vital signs: demo",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft",
+    "type": "contextual-element",
+    "version": "0.1.0"
+  },
+  "provenance": {
+    "basis": "Facts F1 to F9 of the use-case dossier. Demonstration only. No clinical review has taken place and no clinician owner is named.",
+    "origin": "Drafted for demonstration from docs/USE-CASE-SNAKE.md"
+  }
+}

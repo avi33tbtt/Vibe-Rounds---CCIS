@@ -1,0 +1,27 @@
+{
+  "conflictReport": {
+    "blockers": [],
+    "concepts": [
+      {
+        "concept": "systolic-pressure",
+        "owner": { "element": "core.vitals", "key": "bpSys" },
+        "status": "ok",
+        "unit": "mmHg",
+        "users": [{ "element": "htn.core", "key": "sbp" }]
+      }
+    ],
+    "sharedElements": ["core.vitals"]
+  },
+  "note": "Written by hand before any run. Pathways used for the report: one with core.vitals, one with core.vitals and htn.core.",
+  "ownerMap": [
+    { "concept": "heart-rate", "keys": ["hr"], "owners": [{ "element": "core.vitals", "key": "hr" }], "status": "ok", "users": [] },
+    { "concept": "systolic-pressure", "keys": ["bpSys", "sbp"], "owners": [{ "element": "core.vitals", "key": "bpSys" }], "status": "ok", "users": [{ "element": "htn.core", "key": "sbp" }] }
+  ],
+  "secondOwner": {
+    "marketRefusal": { "code": "M-014", "concepts": ["systolic-pressure"], "elements": ["core.vitals", "dup.vitals"] },
+    "ownerStatus": "second-owner",
+    "ruleId": "CCIS-V5-028",
+    "severity": "warning",
+    "severityStrict": "error"
+  }
+}

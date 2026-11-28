@@ -1,0 +1,119 @@
+{
+  "note": "Synthetic demo. One owner element per concept (ED-12). Clinician review pending (ED-2).",
+  "owners": [
+    {
+      "concept": "pulse-rate",
+      "owner": {
+        "element": "core.vitals",
+        "key": "hr"
+      },
+      "users": []
+    },
+    {
+      "concept": "systolic-pressure",
+      "owner": {
+        "element": "core.vitals",
+        "key": "bpSys"
+      },
+      "users": [
+        {
+          "element": "htn.core",
+          "key": "sbp"
+        }
+      ]
+    },
+    {
+      "concept": "diastolic-pressure",
+      "owner": {
+        "element": "core.vitals",
+        "key": "bpDia"
+      },
+      "users": [
+        {
+          "element": "htn.core",
+          "key": "dbp"
+        }
+      ]
+    },
+    {
+      "concept": "respiratory-rate",
+      "owner": {
+        "element": "core.vitals",
+        "key": "rr"
+      },
+      "users": []
+    },
+    {
+      "concept": "temperature",
+      "owner": {
+        "element": "core.vitals",
+        "key": "temp"
+      },
+      "users": []
+    },
+    {
+      "concept": "oxygen-saturation",
+      "owner": {
+        "element": "core.vitals",
+        "key": "spo2"
+      },
+      "users": []
+    },
+    {
+      "concept": "fluid-intake-24h",
+      "owner": {
+        "element": "core.fluid-balance",
+        "key": "intake"
+      },
+      "users": []
+    },
+    {
+      "concept": "urine-output-24h",
+      "owner": {
+        "element": "core.fluid-balance",
+        "key": "output"
+      },
+      "users": []
+    },
+    {
+      "concept": "glucose",
+      "owner": {
+        "element": "dm.glycaemic-monitoring",
+        "key": "glu"
+      },
+      "users": []
+    },
+    {
+      "concept": "hba1c",
+      "owner": {
+        "element": "dm.glycaemic-monitoring",
+        "key": "hba1c"
+      },
+      "users": []
+    },
+    {
+      "concept": "egfr",
+      "owner": {
+        "element": "ckd.kidney-function",
+        "key": "egfr"
+      },
+      "users": []
+    },
+    {
+      "concept": "creatinine",
+      "owner": {
+        "element": "ckd.kidney-function",
+        "key": "creat"
+      },
+      "users": []
+    },
+    {
+      "concept": "albumin-creatinine-ratio",
+      "owner": {
+        "element": "ckd.kidney-function",
+        "key": "uacr"
+      },
+      "users": []
+    }
+  ]
+}

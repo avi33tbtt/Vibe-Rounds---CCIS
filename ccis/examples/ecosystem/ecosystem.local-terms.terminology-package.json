@@ -1,0 +1,242 @@
+{
+  "codeSystem": {
+    "id": "local",
+    "version": "0.1.0"
+  },
+  "concepts": [
+    {
+      "category": "observation",
+      "display": "Pulse rate",
+      "key": "pulse-rate"
+    },
+    {
+      "category": "observation",
+      "display": "Systolic blood pressure",
+      "key": "systolic-pressure"
+    },
+    {
+      "category": "observation",
+      "display": "Diastolic blood pressure",
+      "key": "diastolic-pressure"
+    },
+    {
+      "category": "observation",
+      "display": "Respiratory rate",
+      "key": "respiratory-rate"
+    },
+    {
+      "category": "observation",
+      "display": "Body temperature",
+      "key": "temperature"
+    },
+    {
+      "category": "observation",
+      "display": "Oxygen saturation",
+      "key": "oxygen-saturation"
+    },
+    {
+      "category": "observation",
+      "display": "Fluid intake over 24 hours",
+      "key": "fluid-intake-24h"
+    },
+    {
+      "category": "observation",
+      "display": "Urine output over 24 hours",
+      "key": "urine-output-24h"
+    },
+    {
+      "category": "test",
+      "definition": "A glucose measurement as recorded; not the same concept as glycated haemoglobin.",
+      "display": "Glucose",
+      "key": "glucose"
+    },
+    {
+      "category": "test",
+      "definition": "A glycated haemoglobin measurement as recorded; not the same concept as glucose.",
+      "display": "HbA1c",
+      "key": "hba1c"
+    },
+    {
+      "category": "test",
+      "display": "Estimated glomerular filtration rate",
+      "key": "egfr"
+    },
+    {
+      "category": "test",
+      "display": "Creatinine",
+      "key": "creatinine"
+    },
+    {
+      "category": "test",
+      "display": "Albumin-creatinine ratio",
+      "key": "albumin-creatinine-ratio"
+    },
+    {
+      "category": "finding",
+      "display": "T1DM",
+      "key": "dm-type.t1dm"
+    },
+    {
+      "category": "finding",
+      "display": "T2DM",
+      "key": "dm-type.t2dm"
+    },
+    {
+      "category": "finding",
+      "display": "Other",
+      "key": "dm-type.other"
+    },
+    {
+      "category": "finding",
+      "display": "Essential",
+      "key": "htn-type.essential"
+    },
+    {
+      "category": "finding",
+      "display": "Secondary",
+      "key": "htn-type.secondary"
+    },
+    {
+      "category": "finding",
+      "display": "Other",
+      "key": "htn-type.other"
+    },
+    {
+      "category": "finding",
+      "display": "Stage 1",
+      "key": "ckd-stage.1"
+    },
+    {
+      "category": "finding",
+      "display": "Stage 2",
+      "key": "ckd-stage.2"
+    },
+    {
+      "category": "finding",
+      "display": "Stage 3a",
+      "key": "ckd-stage.3a"
+    },
+    {
+      "category": "finding",
+      "display": "Stage 3b",
+      "key": "ckd-stage.3b"
+    },
+    {
+      "category": "finding",
+      "display": "Stage 4",
+      "key": "ckd-stage.4"
+    },
+    {
+      "category": "finding",
+      "display": "Stage 5",
+      "key": "ckd-stage.5"
+    },
+    {
+      "category": "finding",
+      "display": "Exact",
+      "key": "onset-certainty.exact"
+    },
+    {
+      "category": "finding",
+      "display": "Approximate",
+      "key": "onset-certainty.approximate"
+    },
+    {
+      "category": "finding",
+      "display": "Unknown",
+      "key": "onset-certainty.unknown"
+    }
+  ],
+  "manifest": {
+    "id": "ecosystem.local-terms",
+    "name": "Ecosystem local terms",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.2.0"
+    },
+    "status": "draft",
+    "type": "terminology-package",
+    "version": "0.1.0"
+  },
+  "provenance": {
+    "basis": "docs/ELEMENT-LIST-V0.md; clinician review pending (ED-2).",
+    "origin": "Synthetic demo content for the ecosystem prototype."
+  },
+  "valueSets": [
+    {
+      "display": "Diabetes type",
+      "id": "ecosystem.dm-type",
+      "members": [
+        {
+          "key": "dm-type.t1dm"
+        },
+        {
+          "key": "dm-type.t2dm"
+        },
+        {
+          "key": "dm-type.other"
+        }
+      ],
+      "version": "0.1.0"
+    },
+    {
+      "display": "Hypertension type",
+      "id": "ecosystem.htn-type",
+      "members": [
+        {
+          "key": "htn-type.essential"
+        },
+        {
+          "key": "htn-type.secondary"
+        },
+        {
+          "key": "htn-type.other"
+        }
+      ],
+      "version": "0.1.0"
+    },
+    {
+      "display": "CKD stage",
+      "id": "ecosystem.ckd-stage",
+      "members": [
+        {
+          "key": "ckd-stage.1"
+        },
+        {
+          "key": "ckd-stage.2"
+        },
+        {
+          "key": "ckd-stage.3a"
+        },
+        {
+          "key": "ckd-stage.3b"
+        },
+        {
+          "key": "ckd-stage.4"
+        },
+        {
+          "key": "ckd-stage.5"
+        }
+      ],
+      "version": "0.1.0"
+    },
+    {
+      "display": "Onset time certainty",
+      "id": "ecosystem.onset-certainty",
+      "members": [
+        {
+          "key": "onset-certainty.exact"
+        },
+        {
+          "key": "onset-certainty.approximate"
+        },
+        {
+          "key": "onset-certainty.unknown"
+        }
+      ],
+      "version": "0.1.0"
+    }
+  ]
+}

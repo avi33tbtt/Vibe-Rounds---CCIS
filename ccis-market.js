@@ -139,6 +139,18 @@ function layerOf(reason) {
   return m ? { number: Number(m[1]), name: m[2] } : null;
 }
 
+// Concept keys an artefact provides (owns) and requires (uses without owning, or reads as a rule input). Codes only (ED-12, ED-52).
+const sortedUnique = (xs) => [...new Set(xs)].sort();
+export function conceptsOf(doc) {
+  const type = isObj(doc) && isObj(doc.manifest) ? doc.manifest.type : undefined;
+  if (type === 'contextual-element') {
+    const rows = conceptOwners([doc]);
+    return { provides: sortedUnique(rows.filter((c) => c.owners.length > 0).map((c) => c.concept)), requires: sortedUnique(rows.filter((c) => c.owners.length === 0 && c.users.length > 0).map((c) => c.concept)) };
+  }
+  if (type === 'rule-pack') return { provides: [], requires: sortedUnique((Array.isArray(doc.inputs) ? doc.inputs : []).map((i) => (isObj(i) ? i.concept : undefined)).filter(str)) };
+  return { provides: [], requires: [] };
+}
+
 // ---------------------------------------------------------------------------------------------
 // Publish
 // ---------------------------------------------------------------------------------------------
@@ -192,6 +204,7 @@ export function publishArtefact({ market, artefact, fixtures } = {}) {
     status: m.status,
     path: pathOf(subject.id, subject.version),
     warnings,
+    ...conceptsOf(artefact),
     validation: {
       validator: made.record.validator,
       outcome: made.record.outcome,
@@ -265,6 +278,17 @@ export function verifyPin({ market, pin: p } = {}) {
 // Load: every file is checked against its index entry; any problem refuses the whole market
 // ---------------------------------------------------------------------------------------------
 
+// Entries of the highest version of each id that declare the concept. Ids only; entries without the two members are not declared.
+const byConcept = (side) => ({ market, concept } = {}) => {
+  if (!isMarket(market)) return refuse('M-001');
+  const best = new Map();
+  for (const e of market.index.entries) { const c = best.get(e.id); if (!c || (compareSemver(e.version, c.version) ?? 0) > 0) best.set(e.id, e); }
+  const entries = typeof concept !== 'string' ? [] : [...best.values()].filter((e) => Array.isArray(e[side]) && e[side].includes(concept)).map((e) => ({ id: e.id, type: e.type, version: e.version })).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  return { ok: true, entries };
+};
+export const providersOf = byConcept('provides');
+export const requirersOf = byConcept('requires');
+
 const ENTRY_MEMBERS = ['id', 'type', 'version', 'checksum', 'canonicalForm', 'compiler', 'standard', 'status', 'path', 'warnings', 'validation', 'references'];
 
 export function loadMarket({ indexText: text, files } = {}) {
@@ -274,7 +298,11 @@ export function loadMarket({ indexText: text, files } = {}) {
   const parsed = JSON.parse(c.text);
   if (!isObj(parsed) || parsed.format !== MARKET_FORMAT || !Array.isArray(parsed.entries) || Object.keys(parsed).length !== 2) return refuse('M-001');
   for (const e of parsed.entries) {
-    if (!isObj(e) || !ENTRY_MEMBERS.every((k) => k in e) || Object.keys(e).length !== ENTRY_MEMBERS.length) return refuse('M-001');
+    if (!isObj(e) || !ENTRY_MEMBERS.every((k) => k in e)) return refuse('M-001');
+    const extra = Object.keys(e).filter((k) => !ENTRY_MEMBERS.includes(k));
+    const both = 'provides' in e && 'requires' in e;
+    if (extra.length !== (both ? 2 : 0) || (both && !(extra.includes('provides') && extra.includes('requires')))) return refuse('M-001');
+    if (both && ![e.provides, e.requires].every((l) => Array.isArray(l) && l.every(str))) return refuse('M-001');
     if (!str(e.id) || !str(e.type) || !str(e.version) || !str(e.checksum) || !str(e.path)) return refuse('M-001');
   }
   const listed = new Set();
@@ -286,6 +314,8 @@ export function loadMarket({ indexText: text, files } = {}) {
     const again = canonicalize(file);
     const doc = again.ok ? JSON.parse(file) : null;
     const m = isObj(doc) && isObj(doc.manifest) ? doc.manifest : null;
+    const c = 'provides' in e && doc !== null ? conceptsOf(doc) : null;
+    if (c !== null && (JSON.stringify(c.provides) !== JSON.stringify(e.provides) || JSON.stringify(c.requires) !== JSON.stringify(e.requires))) return refuse('M-010', { id: e.id, version: e.version });
     if (!again.ok || again.text !== file || m === null || m.id !== e.id || m.type !== e.type || m.version !== e.version) {
       return refuse('M-010', { id: e.id, version: e.version });
     }

@@ -106,7 +106,7 @@ test('(a) the build script rebuilds the same folder (--check passes) and two bui
 
 test('(a) index entries hold no author prose and no clock; every entry passed all eight layers', () => {
   for (const e of REAL.index.entries) {
-    assert.deepEqual(Object.keys(e).sort(), ['canonicalForm', 'checksum', 'compiler', 'id', 'path', 'references', 'standard', 'status', 'type', 'validation', 'version', 'warnings']);
+    assert.deepEqual(Object.keys(e).sort(), ['canonicalForm', 'checksum', 'compiler', 'id', 'path', 'provides', 'references', 'requires', 'standard', 'status', 'type', 'validation', 'version', 'warnings']);
     assert.equal(e.validation.outcome, 'passed');
     assert.equal(Object.values(e.validation.layers).length, 8);
     assert.ok(Object.values(e.validation.layers).every((o) => o === 'passed'));

@@ -209,7 +209,7 @@ test('(b) not an object, a lone node and a lone binding are refused; so is a typ
   // No manifest: it cannot be named or pinned, so the compiler refuses it (2.4, D-099) and nothing is added.
   for (const lone of [NODE, BINDING]) assert.ok(['CCIS-C-007', 'CCIS-C-008'].includes(refused(pub(emptyMarket(), lone), 'M-005').detail.code));
   for (const type of ['element-group', 'terminology-package', 'test-validation-package']) refused(pub(emptyMarket(), withManifest(ELEMENT, { type })), 'M-002');
-  assert.deepEqual(PUBLISHABLE_TYPES, ['contextual-element', 'analytics-package', 'pathway']);
+  assert.deepEqual(PUBLISHABLE_TYPES, ['contextual-element', 'analytics-package', 'pathway', 'rule-pack']);
 });
 
 test('(b) a fixture warning is kept in the index entry, and a wrong fixture name is refused at layer 7', () => {
@@ -484,7 +484,7 @@ test('(e) the module is pure and imports only committed CCIS modules', () => {
   const forbidden = [/\beval\b/, /\bFunction\b/, /\bimport\s*\(/, /\brequire\s*\(/, /node:/, /\bfs\b/, /\bDate\b/, /Math\.random/, /performance\.now/, /\bfetch\b/, /\bprocess\b/, /XMLHttpRequest/, /WebSocket/, /localStorage/];
   for (const re of forbidden) assert.equal(re.test(src), false, String(re));
   const imports = [...whole.matchAll(/^import .* from '([^']+)';$/gm)].map((m) => m[1]);
-  assert.deepEqual(imports, ['./ccis-compile.js', './ccis-validator.js', './ccis-validation-record.js']);
+  assert.deepEqual(imports, ['./ccis-compile.js', './ccis-validator.js', './ccis-validation-record.js', './ccis-concept-owners.js']);
   for (const banned of ['ccis-import', 'ccis-run', 'ccis-exec', 'ccis-bind', 'ccis-walk', 'ccis-compat', 'ccis-demo']) assert.equal(whole.includes(banned), false, banned);
 });
 
@@ -521,7 +521,7 @@ test('(e) no function takes a context, an envelope or a run record: each is refu
 });
 
 test('(e) every refusal id and every lint rule has been reached', () => {
-  for (const r of M_REFUSALS) assert.ok(reached.has(r.id), `${r.id} not reached`);
+  for (const r of M_REFUSALS) assert.ok(reached.has(r.id) || r.id === 'M-014', `${r.id} not reached`); // M-014 is reached in ccis-market-b15.test.js
   assert.equal(new Set(M_REFUSALS.map((r) => r.id)).size, M_REFUSALS.length);
-  assert.deepEqual(M_REFUSALS.map((r) => r.id), ['M-001', 'M-002', 'M-003', 'M-004', 'M-005', 'M-006', 'M-007', 'M-008', 'M-009', 'M-010', 'M-011', 'M-012', 'M-013']);
+  assert.deepEqual(M_REFUSALS.map((r) => r.id), ['M-001', 'M-002', 'M-003', 'M-004', 'M-005', 'M-006', 'M-007', 'M-008', 'M-009', 'M-010', 'M-011', 'M-012', 'M-013', 'M-014']);
 });

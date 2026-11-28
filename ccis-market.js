@@ -21,9 +21,10 @@
 import { canonicalize, checksumOf, compileArtefact, CANONICAL_FORM } from './ccis-compile.js';
 import { satisfiesReference, compareSemver, validateArtefact } from './ccis-validator.js';
 import { buildValidationRecord } from './ccis-validation-record.js';
+import { conceptOwners } from './ccis-concept-owners.js';
 
 export const MARKET_FORMAT = 'ccis-market/1';
-export const PUBLISHABLE_TYPES = ['contextual-element', 'analytics-package', 'pathway'];
+export const PUBLISHABLE_TYPES = ['contextual-element', 'analytics-package', 'pathway', 'rule-pack'];
 const BLOCKED_STATUS = ['rejected', 'withdrawn'];
 
 const isObj = (x) => x !== null && typeof x === 'object' && !Array.isArray(x) && Object.getPrototypeOf(x) === Object.prototype;
@@ -38,7 +39,7 @@ const compareEntries = (a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : (compareS
 
 export const M_REFUSALS = [
   { id: 'M-001', sentence: 'An input has the wrong shape (the market, the artefact, the reference, the pin or the index text is not what this call needs).' },
-  { id: 'M-002', sentence: 'The artefact type cannot be published here. Only contextual elements, analytics packages and pathways can.' },
+  { id: 'M-002', sentence: 'The artefact type cannot be published here. Only contextual elements, analytics packages, pathways and rule packs can.' },
   { id: 'M-003', sentence: 'The manifest status is rejected or withdrawn, so this version cannot be published. Publish a new version instead.' },
   { id: 'M-004', sentence: 'The patient-data screen refused the artefact. Reword the places named by path. The screen is not a proof either way.' },
   { id: 'M-005', sentence: 'The compiler refused the artefact, so nothing was added.' },
@@ -50,6 +51,7 @@ export const M_REFUSALS = [
   { id: 'M-011', sentence: 'A stored file is not listed in the index, so the whole market is refused.' },
   { id: 'M-012', sentence: 'The market holds no such id, type and version.' },
   { id: 'M-013', sentence: 'The pinned version is rejected or withdrawn, so it blocks use.' },
+  { id: 'M-014', sentence: 'A concept in this element already has an owner element in the market. Name the existing owner instead of owning the concept again.' },
 ];
 const SENTENCE = Object.fromEntries(M_REFUSALS.map((r) => [r.id, r.sentence]));
 const refuse = (id, detail) => ({ ok: false, refusal: detail === undefined ? { id, reason: SENTENCE[id] } : { id, reason: SENTENCE[id], detail } });
@@ -160,6 +162,14 @@ export function publishArtefact({ market, artefact, fixtures } = {}) {
   const { subject, checksum, canonical, warnings } = compiled.compiled;
   if (!PUBLISHABLE_TYPES.includes(subject.type)) return refuse('M-002');
   if (BLOCKED_STATUS.includes(artefact.manifest.status)) return refuse('M-003');
+  if (subject.type === 'contextual-element') {
+    // ED-12: one owner element per concept. Ids and concept codes only; the highest version of an id wins (conceptOwners).
+    const clash = conceptOwners([...known, artefact]).filter((c) => c.status === 'second-owner' && c.owners.some((o) => o.element === subject.id));
+    if (clash.length > 0) {
+      const elements = [...new Set(clash.flatMap((c) => c.owners.map((o) => o.element)))].sort();
+      return refuse('M-014', { concepts: clash.map((c) => c.concept).sort(), elements });
+    }
+  }
 
   const held = market.index.entries.find((e) => e.id === subject.id && compareSemver(e.version, subject.version) === 0);
   if (held) {

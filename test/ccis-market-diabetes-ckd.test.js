@@ -56,11 +56,12 @@ test('(4) the default build is still the committed snake market (market/ untouch
   assert.ok(buildMarket().index.entries.every((e) => e.id.startsWith('snake.')));
 });
 
-test('(5) the group file is refused (documented limit: not an element, analytics package or pathway)', () => {
+test('(5) the group file now publishes into a copy of the market (row B15b); the committed folder is untouched', () => {
   const group = JSON.parse(text(new URL('../ccis/examples/diabetes-ckd/diabetes-ckd.group.json', import.meta.url)));
   const r = publishArtefact({ market: buildMarket(SET), artefact: group });
-  assert.equal(r.ok, false);
-  assert.ok(['M-002', 'M-004'].includes(r.refusal.id), r.refusal.id);
+  assert.equal(r.ok, true, JSON.stringify(r.refusal));
+  assert.equal(r.entry.type, 'element-group');
+  assert.equal(REAL.index.entries.some((e) => e.type === 'element-group'), false);
 });
 
 test('(6) every analytics version references both elements; 0.1.3 declares the unit conversions', () => {

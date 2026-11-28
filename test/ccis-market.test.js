@@ -208,8 +208,8 @@ test('(b) not an object, a lone node and a lone binding are refused; so is a typ
   refused(pub(emptyMarket(), ELEMENT, { fixtures: 'cases' }), 'M-001');
   // No manifest: it cannot be named or pinned, so the compiler refuses it (2.4, D-099) and nothing is added.
   for (const lone of [NODE, BINDING]) assert.ok(['CCIS-C-007', 'CCIS-C-008'].includes(refused(pub(emptyMarket(), lone), 'M-005').detail.code));
-  for (const type of ['element-group', 'terminology-package', 'test-validation-package']) refused(pub(emptyMarket(), withManifest(ELEMENT, { type })), 'M-002');
-  assert.deepEqual(PUBLISHABLE_TYPES, ['contextual-element', 'analytics-package', 'pathway', 'rule-pack']);
+  for (const type of ['terminology-package', 'test-validation-package']) refused(pub(emptyMarket(), withManifest(ELEMENT, { type })), 'M-002');
+  assert.deepEqual(PUBLISHABLE_TYPES, ['contextual-element', 'element-group', 'analytics-package', 'pathway', 'rule-pack']);
 });
 
 test('(b) a fixture warning is kept in the index entry, and a wrong fixture name is refused at layer 7', () => {

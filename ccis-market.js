@@ -24,7 +24,7 @@ import { buildValidationRecord } from './ccis-validation-record.js';
 import { conceptOwners } from './ccis-concept-owners.js';
 
 export const MARKET_FORMAT = 'ccis-market/1';
-export const PUBLISHABLE_TYPES = ['contextual-element', 'analytics-package', 'pathway', 'rule-pack'];
+export const PUBLISHABLE_TYPES = ['contextual-element', 'element-group', 'analytics-package', 'pathway', 'rule-pack'];
 const BLOCKED_STATUS = ['rejected', 'withdrawn'];
 
 const isObj = (x) => x !== null && typeof x === 'object' && !Array.isArray(x) && Object.getPrototypeOf(x) === Object.prototype;
@@ -39,7 +39,7 @@ const compareEntries = (a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : (compareS
 
 export const M_REFUSALS = [
   { id: 'M-001', sentence: 'An input has the wrong shape (the market, the artefact, the reference, the pin or the index text is not what this call needs).' },
-  { id: 'M-002', sentence: 'The artefact type cannot be published here. Only contextual elements, analytics packages, pathways and rule packs can.' },
+  { id: 'M-002', sentence: 'The artefact type cannot be published here. Only contextual elements, element groups, analytics packages, pathways and rule packs can.' },
   { id: 'M-003', sentence: 'The manifest status is rejected or withdrawn, so this version cannot be published. Publish a new version instead.' },
   { id: 'M-004', sentence: 'The patient-data screen refused the artefact. Reword the places named by path. The screen is not a proof either way.' },
   { id: 'M-005', sentence: 'The compiler refused the artefact, so nothing was added.' },
@@ -63,7 +63,7 @@ const refuse = (id, detail) => ({ ok: false, refusal: detail === undefined ? { i
 
 export const LINT_RULES = [
   { id: 'L-001', meaning: 'A member is named like a patient record field (name, id, record number, birth date, address, phone, email, national id).' },
-  { id: 'L-002', meaning: 'A member is named like a cohort or its membership.' },
+  { id: 'L-002', meaning: 'A member is named like a cohort or its membership. The one exception is the root `members` of an element group whose items are exactly { element, required }; its contents are still screened.' },
   { id: 'L-003', meaning: 'An object has the shape of an import envelope (observations and events together, or a case with a ref).' },
   { id: 'L-004', meaning: 'A string looks like an email address.' },
   { id: 'L-005', meaning: 'A string looks like a telephone number.' },
@@ -78,6 +78,9 @@ const EMAIL = /[^\s@]+@[^\s@]+\.[^\s@]+/;
 const PHONE = /\+\d[\d\s().-]{7,}\d|\b\(?\d{3}\)?[ .-]\d{3}[ .-]\d{4}\b/;
 const DIGITS = /(?<![0-9A-Za-z])\d{8,}(?![0-9A-Za-z])/;
 const BIRTH = /\b(date of birth|d\.o\.b\.?|dob|born on|birth ?date|birthday)\b/i;
+// The element-group schema requires a root `members` array of { element, required } items. Only that exact shape is exempt from the cohort-name rule (ED-53).
+const groupMembers = (root) => isObj(root.manifest) && root.manifest.type === 'element-group' && Array.isArray(root.members) && root.members.length > 0
+  && root.members.every((it) => isObj(it) && isObj(it.element) && typeof it.required === 'boolean' && Object.keys(it).filter((k) => !k.startsWith('x-')).sort().join() === 'element,required');
 const normName = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 const textRules = (s) => [[EMAIL, 'L-004'], [PHONE, 'L-005'], [DIGITS, 'L-006'], [BIRTH, 'L-007']].filter(([re]) => re.test(s)).map(([, id]) => id);
 // A member name is also screened as text, but without the date-of-birth phrase: a name like "dob" is L-001 already.
@@ -107,7 +110,7 @@ export function lintArtefact(artefact) {
         const here = `${path}/${seg(name)}`;
         const n = normName(name);
         if (RECORD_NAME.test(n)) add('L-001', here);
-        if (COHORT_NAME.test(n)) add('L-002', here);
+        if (COHORT_NAME.test(n) && !(path === '' && name === 'members' && groupMembers(v))) add('L-002', here);
         for (const id of nameRules(name)) add(id, here);
         walk(v[name], here, depth + 1, stack);
       }

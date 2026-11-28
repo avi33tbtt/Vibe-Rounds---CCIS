@@ -72,7 +72,7 @@ function daysFromCivil(y0, m, d) {
   const doe = yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy;
   return era * 146097 + doe - 719468;
 }
-function instantOf(t) {
+export function instantOf(t) {
   if (!isObj(t) || t.zone !== 'stated' || typeof t.value !== 'string') return null;
   const m = TIME.exec(t.value);
   if (!m) return null;

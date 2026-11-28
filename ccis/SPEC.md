@@ -441,6 +441,20 @@ Columns: requirement id, short statement (the full normative statement is in the
 | CCIS-REQ-090 | Reports retained | Validator | Governance |  | Not started |
 | CCIS-REQ-091 | FHIR Mode is one route | Tooling | Review |  | Not started |
 | CCIS-REQ-092 | Unsupported FHIR reported | Tooling | Semantic |  | Not started |
+| CCIS-REQ-095 | Field concept key | Element | Schema | ccis-element-concept-schema.test.js; ccis-validator-concept.test.js | Implemented |
+| CCIS-REQ-096 | One owner per concept | Element, element group | Semantic | ccis-validator-owner.test.js; ccis-concept-owners.test.js; ccis-group-owner-schema.test.js | Implemented |
+| CCIS-REQ-097 | Second owner refused at publish | Market | Test verification | ccis-market-b15.test.js; ccis-contract-fixtures.test.js | Implemented |
+| CCIS-REQ-098 | Local terminology package | Terminology package | Schema, semantic | ccis-terminology-package-schema.test.js; ccis-validator-terminology.test.js | Implemented |
+| CCIS-REQ-099 | Entry form is layout only | Pathway | Schema, semantic | ccis-pathway-entryform-schema.test.js; ccis-validator-entryform.test.js | Implemented |
+| CCIS-REQ-100 | Pathway contexts | Pathway | Schema, semantic | ccis-validator-contexts.test.js | Implemented |
+| CCIS-REQ-101 | Composition by concept key | Element group, pathway | Test verification | ccis-compose-conflicts.test.js; ccis-compose-group.test.js; ccis-compose-pathway.test.js | Implemented |
+| CCIS-REQ-102 | Rule pack scope | Rule pack | Schema, semantic | ccis-rule-pack-schema.test.js; ccis-validator-rulepack-shape.test.js | Implemented |
+| CCIS-REQ-103 | No number in a rule | Rule pack | Schema, semantic | ccis-rule-pack-rules-schema.test.js; ccis-validator-rulepack-checks.test.js | Implemented |
+| CCIS-REQ-104 | Prompt content | Rule pack | Test verification | ccis-rules.test.js; ccis-rules-bind.test.js | Implemented |
+| CCIS-REQ-105 | Rule tests required | Rule pack | Semantic | ccis-validator-rulepack-cases.test.js | Implemented |
+| CCIS-REQ-106 | Rule pack governance | Rule pack | Governance | ccis-rule-pack-governance-schema.test.js; ccis-validator-rulepack-governance.test.js | Implemented |
+| CCIS-REQ-107 | Operators min, max, coalesce | Analytics package | Test verification | ccis-exec-min-max-coalesce.test.js | Implemented |
+| CCIS-REQ-108 | Standard 0.2.0 | Standard | Test verification | ccis-standard-0-2-0.test.js | Implemented |
 
 ## 14. Not in this draft
 

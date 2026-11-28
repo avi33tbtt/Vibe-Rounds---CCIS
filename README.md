@@ -171,6 +171,16 @@ Shown, but not the real thing. Each is labelled in the viewer.
 - **Cohort view.** Counts from running the real runner over the 32 synthetic fixture cases. It is not the cohort engine (rows 5.x).
 - **Second package.** A roadmap card only (row 4.5).
 
+## Standard 0.2.0 (ecosystem rows B1 to B19)
+
+Prototype. Synthetic data only. Not for clinical use.
+
+Standard 0.2.0 adds: local concept keys with one owner per concept, `entryForm` and `contexts` on a pathway, composition by concept key, the `rule-pack` artefact (data-quality only), and the operators `min`, `max` and `coalesce`. 0.1.0 artefacts still validate. Record stamps stay 0.1.0. The amendments are A-006 to A-009 in `CHANGELOG.md`; the requirements are CCIS-REQ-095 to 108. The contract fixtures are in `ccis/fixtures/contract/`. Run them with:
+
+```
+node --test test/ccis-contract-fixtures.test.js test/ccis-contract-fixtures-2.test.js test/ccis-standard-0-2-0.test.js
+```
+
 ## Limitations
 
 Prototype. Synthetic data only. Not for clinical use.

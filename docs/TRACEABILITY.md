@@ -260,6 +260,10 @@ This matches `CCIS_BUILD_PLAN.md` section 4, plus the items the import contract 
 | Fixture classes (six) | 1.5, 3.11 |
 | What the slice will not prove | 3.11 (limitations list) |
 
+### 5.3 Ecosystem contract fixtures (standard 0.2.0)
+
+`ccis/fixtures/contract/` holds the hand-calculated fixtures for REQ-096, 097, 099, 101 and 104 (`expected.json`, `expected-rules.json`); the tests are `ccis-contract-fixtures.test.js` and `ccis-contract-fixtures-2.test.js`. Rows B18 and B18a.
+
 ## Appendix A. Requirement index
 
 Every requirement in `ccis/SPEC.md`, with the book concepts that justify it and the rows that will implement it.
@@ -360,3 +364,17 @@ Every requirement in `ccis/SPEC.md`, with the book concepts that justify it and 
 | REQ-092 | Unsupported FHIR reported | Ch6 s6.2; Ch7 s8; Ch7 s8.1; Ch10 s6 | 6.1 |
 | REQ-093 | Checksum over canonical bytes (A-005) | Ch6 s3.3; Ch7 s10.2 | 2.4 |
 | REQ-094 | Verify a pinned checksum before use (A-005) | Ch6 s3.3 | 3.6, 4.1 |
+| REQ-095 | Field concept key (A-006) | Ch6 s1.1 | ecosystem rows B1, B2 |
+| REQ-096 | One owner per concept (A-006) | Ch7 s3 | ecosystem rows B1a, B1e, B2a, B3 |
+| REQ-097 | Second owner refused at publish (A-006) | Ch6 s3 | ecosystem rows B15 |
+| REQ-098 | Local terminology package (A-006) | Ch7 s5 | ecosystem rows B1b, B1f |
+| REQ-099 | Entry form is layout only (A-007) | Ch7 s4 | ecosystem rows B5, B6 |
+| REQ-100 | Pathway contexts (A-007) | Ch7 s4 | ecosystem rows B5, B6a |
+| REQ-101 | Composition by concept key (A-007) | Ch7 s4 | ecosystem rows B7, B8, B8a |
+| REQ-102 | Rule pack scope (A-008) | Ch7 s9 | ecosystem rows B10, B13 |
+| REQ-103 | No number in a rule (A-008) | Ch8 s5 | ecosystem rows B11, B12a |
+| REQ-104 | Prompt content (A-008) | Ch7 s9 | ecosystem rows B14, B14a |
+| REQ-105 | Rule tests required (A-008) | Ch9 s8 | ecosystem rows B13a |
+| REQ-106 | Rule pack governance (A-008) | Ch10 s7 | ecosystem rows B13b, B13c |
+| REQ-107 | Operators min, max, coalesce (A-009) | Ch7 s6 | ecosystem rows B9 |
+| REQ-108 | Standard 0.2.0 (A-009) | Ch7 s2 | ecosystem rows B19 |

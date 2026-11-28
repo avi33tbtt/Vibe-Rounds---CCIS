@@ -8,6 +8,38 @@ Newest first. The standard follows semantic versioning (CCIS-REQ-012 in `SPEC.md
 - **Contains:** the snake slice (one pathway, two analytics), the CLI, the browser page, `npm run accept` and the negative tests.
 - **Version:** `package.json` is 0.1.0. The tag `v0.1.0` is made by the owner (`git tag v0.1.0`).
 
+## A-009 (2026-11-28): operators and standard 0.2.0 (0.2.0)
+
+- **Requirements affected:** CCIS-REQ-107 and CCIS-REQ-108; CCIS-REQ-019 (the amendment rule applied).
+- **Change:** The executor gains `min`, `max` and `coalesce` (three-valued; operator set 0.2.0; refusals X-017 and X-018). The validator, the compatibility check and the importer accept standard 0.2.0, 0.1.0 artefacts still validate, and the strict concept and group rules start at minor 2. Record stamps stay 0.1.0.
+- **Reason:** The ecosystem plan needs rules and analytics that compare values, and one standard version that carries the new members.
+- **Raised by:** rows B9 and B19 (`plan-chunks/chunk-B9-exec-min-max-coalesce.md`, `chunk-B19-standard-0-2-0.md` in the Studio repo).
+- **Approved:** by the project owner on 2026-11-28, by approving `plan-chunks/chunk-B20-docs-amendments.md` ("do next"). The text of `ccis/SPEC.md` is not edited; only matrix rows REQ-095 to REQ-108 are appended.
+
+## A-008 (2026-11-28): rule packs (0.2.0)
+
+- **Requirements affected:** CCIS-REQ-102 to CCIS-REQ-106; CCIS-REQ-019.
+- **Change:** A new artefact type `rule-pack`: class `data-quality` only; no number, threshold or parameter value in a rule; each rule has fires, does-not-fire and not-evaluated tests; parameters arrive disabled; a prompt carries the rule id, pack version, pack checksum and record ids, never values; the reviewer is never the author.
+- **Reason:** The EMR needs visible data-quality prompts that never order or change data, and clinical prompts wait for a named clinician owner (ED-2, ED-6).
+- **Raised by:** rows B10 to B14a and B17.
+- **Approved:** by the project owner on 2026-11-28, by approving `plan-chunks/chunk-B20-docs-amendments.md` ("do next"). The text of `ccis/SPEC.md` is not edited; only matrix rows REQ-095 to REQ-108 are appended.
+
+## A-007 (2026-11-28): entry form, contexts and composition (0.2.0)
+
+- **Requirements affected:** CCIS-REQ-099 to CCIS-REQ-101; CCIS-REQ-019.
+- **Change:** A pathway may carry a layout-only `entryForm` (sections, element and section items, row groups) and `contexts`. Composition is by reference and matches fields by concept key, never by label; a conflict report names the owner, the users, the unit and the blockers.
+- **Reason:** The EMR entry form is a pathway, and two pathways must share a field once.
+- **Raised by:** rows B5 to B8a and B16a.
+- **Approved:** by the project owner on 2026-11-28, by approving `plan-chunks/chunk-B20-docs-amendments.md` ("do next"). The text of `ccis/SPEC.md` is not edited; only matrix rows REQ-095 to REQ-108 are appended.
+
+## A-006 (2026-11-28): concept keys and ownership (0.2.0)
+
+- **Requirements affected:** CCIS-REQ-095 to CCIS-REQ-098; CCIS-REQ-019.
+- **Change:** A field may carry a concept key in the `local` code system (optional `concept`, `contexts`, `ownedBy`). A concept has exactly one owner element; others reference it; the market refuses a second owner (M-014). A new local `terminology-package` holds keys, value sets and replacement links; no licensed code list. Note: `docs/TRACEABILITY.md` calls the checksum amendment (REQ-093, 094) "A-005" while this file uses A-005 for administrations; both are left as written (ED-61).
+- **Reason:** Concepts must follow a patient across pathways without matching by label.
+- **Raised by:** rows B1 to B4, B15 and B16.
+- **Approved:** by the project owner on 2026-11-28, by approving `plan-chunks/chunk-B20-docs-amendments.md` ("do next"). The text of `ccis/SPEC.md` is not edited; only matrix rows REQ-095 to REQ-108 are appended.
+
 ## A-005 (2026-11-26): envelope section administrations (0.3.0)
 
 - **Requirements affected:** CCIS-REQ-082 and CCIS-REQ-084 (clarified, not changed); CCIS-REQ-019 (the amendment rule applied).

@@ -131,7 +131,7 @@ export function decisionNode(spec) {
   return n;
 }
 
-export const ARTEFACT_TYPES = Object.freeze(['contextual-element', 'element-group', 'pathway', 'analytics-package', 'terminology-package', 'test-validation-package']);
+export const ARTEFACT_TYPES = Object.freeze(['contextual-element', 'element-group', 'pathway', 'analytics-package', 'terminology-package', 'test-validation-package', 'rule-pack']);
 export const MANIFEST_STATUSES = Object.freeze(['draft', 'submitted', 'in-review', 'reviewed', 'validated', 'conditionally-validated', 'deprecated', 'withdrawn', 'rejected']);
 const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 const RANGE = /^(?:[~^]|[<>]=?)?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?: [<>]=?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))*$/;

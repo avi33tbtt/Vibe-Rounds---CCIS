@@ -63,19 +63,23 @@ export const REF_KINDS = Object.freeze(['input', 'parameter', 'conversion']);
 const MAX_DEPTH = 100; // stack safety only; the run-time limit is executionProfile.maxDepth
 
 // A closed expression tree: operator, reference or literal nodes. No number can be built. Arity, type fit and unknown ids stay with the validator.
-const exprAt = (v, p, depth) => {
-  need(v !== null && typeof v === 'object' && !Array.isArray(v) && depth <= MAX_DEPTH, p);
-  const kind = ['op', 'ref', 'literal'].find((k) => k in v);
-  need(kind !== undefined, p);
-  const child = (y, r) => exprAt(y, r, depth + 1);
-  const allowed = {
-    op: { op: oneOf(OPERATORS), args: (x, q) => list(x, q, 1, child) },
-    ref: { ref: oneOf(REF_KINDS), id: keyText },
-    literal: { literal: (x, q) => { need(typeof x === 'boolean' || typeof x === 'string', q); return x; } },
-  }[kind];
-  return shape(v, { closed: true, allowed, required: Object.keys(allowed) }, p);
+// `exprWith` fixes the operator and reference lists, so a rule pack (ccis-sdk-rules.js) uses its own while analytics keeps these.
+export const exprWith = (operators, refKinds) => {
+  const exprAt = (v, p, depth) => {
+    need(v !== null && typeof v === 'object' && !Array.isArray(v) && depth <= MAX_DEPTH, p);
+    const kind = ['op', 'ref', 'literal'].find((k) => k in v);
+    need(kind !== undefined, p);
+    const child = (y, r) => exprAt(y, r, depth + 1);
+    const allowed = {
+      op: { op: oneOf(operators), args: (x, q) => list(x, q, 1, child) },
+      ref: { ref: oneOf(refKinds), id: keyText },
+      literal: { literal: (x, q) => { need(typeof x === 'boolean' || typeof x === 'string', q); return x; } },
+    }[kind];
+    return shape(v, { closed: true, allowed, required: Object.keys(allowed) }, p);
+  };
+  return (spec, p = '') => exprAt(spec, p, 1);
 };
-export const expr = (spec) => exprAt(spec, '', 1);
+export const expr = exprWith(OPERATORS, REF_KINDS);
 export const input = (id) => expr({ ref: 'input', id });
 export const param = (id) => expr({ ref: 'parameter', id });
 export const conv = (id) => expr({ ref: 'conversion', id });
@@ -84,7 +88,7 @@ export const op = (name, ...args) => expr({ op: name, args });
 
 // One closed expression tree per output.
 export const computation = (v, p = '') => list(v, p, 1, (x, q) => shape(x, {
-  closed: true, allowed: { output: keyText, expr: (e, r) => exprAt(e, r, 1) }, required: ['output', 'expr'],
+  closed: true, allowed: { output: keyText, expr: (e, r) => expr(e, r) }, required: ['output', 'expr'],
 }, q));
 
 // Row 4.2d.2: outputs and the closing members. No default is ever added (no carries, limits or unit).

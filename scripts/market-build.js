@@ -35,8 +35,14 @@ export const DC_ORDER = [
   'diabetes-ckd.sample-gap.analytics.0.1.2.json',
   'diabetes-ckd.sample-gap.analytics.0.1.3.json',
 ];
+// Row ECO-C15: the ecosystem content (ED-73): a separate folder, no fixtures. The terminology package is left out (see C15a).
+export const ECO_ORDER = [
+  'core.presentation', 'core.examination', 'core.assessment-plan', 'core.vitals', 'core.fluid-balance', 'core.event-times',
+  'dm.core', 'dm.glycaemic-monitoring', 'ckd.core', 'ckd.kidney-function', 'htn.core',
+].map((id) => `${id}.element.json`).concat(['basic-emr.pathway.json', 'dm.pathway.json', 'ckd.pathway.json', 'dm-ckd.group.json', 'dm-ckd.pathway.json']);
 export const SETS = {
   snake: { order: ORDER, ex: EX, fix: FIX, dir: MARKET_DIR },
+  ecosystem: { order: ECO_ORDER, ex: new URL('../ccis/examples/ecosystem/', import.meta.url), fix: null, dir: new URL('../market-ecosystem/', import.meta.url) },
   'diabetes-ckd': {
     order: DC_ORDER,
     ex: new URL('../ccis/examples/diabetes-ckd/', import.meta.url),
@@ -47,7 +53,7 @@ export const SETS = {
 
 export function buildMarket(set = 'snake') {
   const { order, ex, fix } = SETS[set];
-  const fixtures = JSON.parse(readFileSync(fix, 'utf8')).cases.map((c) => c.case);
+  const fixtures = fix === null ? [] : JSON.parse(readFileSync(fix, 'utf8')).cases.map((c) => c.case);
   let market = emptyMarket();
   for (const name of order) {
     const text = readFileSync(new URL(name, ex), 'utf8');
@@ -72,10 +78,12 @@ function walk(dir, base = '') {
   return out;
 }
 
+const label = (set) => (set === 'snake' ? 'market/' : `market-${set}/`);
+
 export function main(argv = process.argv.slice(2)) {
   const at = argv.indexOf('--set');
   const set = at === -1 ? 'snake' : argv[at + 1];
-  if (!Object.hasOwn(SETS, set)) { console.error('Unknown market set. Use snake or diabetes-ckd.'); return 1; }
+  if (!Object.hasOwn(SETS, set)) { console.error('Unknown market set. Use snake, diabetes-ckd or ecosystem.'); return 1; }
   const MARKET_DIR = SETS[set].dir;
   const want = marketFiles(buildMarket(set));
   if (argv.includes('--check')) {
@@ -87,7 +95,7 @@ export function main(argv = process.argv.slice(2)) {
     }
     for (const rel of have) if (!(rel in want)) problems.push(`unlisted: ${rel}`);
     if (problems.length > 0) { console.error(problems.join('\n')); return 1; }
-    console.log(`${set === 'snake' ? 'market/' : 'market-diabetes-ckd/'} matches a fresh build (${Object.keys(want).length} files).`);
+    console.log(`${label(set)} matches a fresh build (${Object.keys(want).length} files).`);
     return 0;
   }
   if (existsSync(MARKET_DIR)) for (const rel of walk(MARKET_DIR)) rmSync(new URL(rel, MARKET_DIR));
@@ -96,7 +104,7 @@ export function main(argv = process.argv.slice(2)) {
     mkdirSync(dirname(target.pathname), { recursive: true });
     writeFileSync(target, text);
   }
-  console.log(`${set === 'snake' ? 'market/' : 'market-diabetes-ckd/'} written (${Object.keys(want).length} files).`);
+  console.log(`${label(set)} written (${Object.keys(want).length} files).`);
   return 0;
 }
 

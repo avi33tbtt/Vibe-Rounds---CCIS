@@ -1,0 +1,215 @@
+{
+  "contexts": [
+    {
+      "elements": [
+        "ckd.core",
+        "ckd.kidney-function"
+      ],
+      "id": "ckd",
+      "label": "Chronic kidney disease"
+    }
+  ],
+  "elements": [
+    {
+      "id": "core.presentation",
+      "range": "0.1.0",
+      "type": "contextual-element"
+    },
+    {
+      "id": "core.examination",
+      "range": "0.1.0",
+      "type": "contextual-element"
+    },
+    {
+      "id": "core.assessment-plan",
+      "range": "0.1.0",
+      "type": "contextual-element"
+    },
+    {
+      "id": "core.vitals",
+      "range": "0.1.0",
+      "type": "contextual-element"
+    },
+    {
+      "id": "core.fluid-balance",
+      "range": "0.1.0",
+      "type": "contextual-element"
+    },
+    {
+      "id": "core.event-times",
+      "range": "0.1.0",
+      "type": "contextual-element"
+    },
+    {
+      "id": "ckd.core",
+      "range": "0.1.0",
+      "type": "contextual-element"
+    },
+    {
+      "id": "ckd.kidney-function",
+      "range": "0.1.0",
+      "type": "contextual-element"
+    }
+  ],
+  "entryForm": {
+    "sections": [
+      {
+        "id": "history",
+        "items": [
+          {
+            "element": "core.presentation",
+            "kind": "element"
+          },
+          {
+            "element": "core.event-times",
+            "kind": "element"
+          },
+          {
+            "kind": "section",
+            "section": "core.problems"
+          },
+          {
+            "kind": "section",
+            "section": "core.allergies"
+          },
+          {
+            "kind": "section",
+            "section": "core.medications"
+          }
+        ],
+        "label": "History"
+      },
+      {
+        "id": "examination",
+        "items": [
+          {
+            "element": "core.examination",
+            "kind": "element"
+          },
+          {
+            "element": "core.vitals",
+            "kind": "element",
+            "rowGroups": [
+              [
+                "hr",
+                "bpSys",
+                "bpDia",
+                "rr",
+                "temp",
+                "spo2"
+              ]
+            ]
+          },
+          {
+            "element": "core.fluid-balance",
+            "kind": "element"
+          }
+        ],
+        "label": "Examination"
+      },
+      {
+        "id": "assessment",
+        "items": [
+          {
+            "element": "core.assessment-plan",
+            "kind": "element"
+          },
+          {
+            "kind": "section",
+            "section": "core.investigations"
+          }
+        ],
+        "label": "Assessment"
+      },
+      {
+        "id": "ckd",
+        "items": [
+          {
+            "element": "ckd.core",
+            "kind": "element"
+          },
+          {
+            "element": "ckd.kidney-function",
+            "kind": "element"
+          }
+        ],
+        "label": "Chronic kidney disease"
+      }
+    ]
+  },
+  "exclusions": [
+    "Diagnosis, severity grading and treatment choice.",
+    "Any product, quantity or amount of anything given.",
+    "Any rule, prompt or limit on a value."
+  ],
+  "intendedUse": "Descriptive entry form. It does not authorise, direct or recommend any treatment, order or action.",
+  "manifest": {
+    "id": "ckd",
+    "name": "Chronic kidney disease documentation",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "references": [
+      {
+        "id": "core.presentation",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      {
+        "id": "core.examination",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      {
+        "id": "core.assessment-plan",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      {
+        "id": "core.vitals",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      {
+        "id": "core.fluid-balance",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      {
+        "id": "core.event-times",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      {
+        "id": "ckd.core",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      },
+      {
+        "id": "ckd.kidney-function",
+        "type": "contextual-element",
+        "version": "0.1.0"
+      }
+    ],
+    "standard": {
+      "version": "0.2.0"
+    },
+    "status": "draft",
+    "type": "pathway",
+    "version": "0.1.0"
+  },
+  "scope": "Documentation of the information recorded for a person with chronic kidney disease in the synthetic demo. Describes information needed only.",
+  "stages": [
+    {
+      "entry": [
+        "A case is open."
+      ],
+      "exit": [
+        "The information is recorded."
+      ],
+      "id": "documentation",
+      "kind": "report",
+      "label": "Documentation"
+    }
+  ]
+}

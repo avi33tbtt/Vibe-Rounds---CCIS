@@ -33,6 +33,7 @@ import { rulePackSemantic, RULEPACK_RULES } from './ccis-validator-rulepack.js';
 import { rulePackChecks, RULEPACK_CHECK_RULES } from './ccis-validator-rulepack-checks.js';
 import { rulePackShape, RULEPACK_SHAPE_RULES } from './ccis-validator-rulepack-shape.js';
 import { rulePackCases, RULEPACK_CASE_RULES } from './ccis-validator-rulepack-cases.js';
+import { rulePackGovernance, RULEPACK_GOVERNANCE_RULES } from './ccis-validator-rulepack-governance.js';
 import { contextsChecks, CONTEXTS_RULES } from './ccis-validator-contexts.js';
 import { ownerChecks, OWNER_RULES } from './ccis-validator-owner.js';
 import { terminologyChecks, TERMINOLOGY_RULES } from './ccis-validator-terminology.js';
@@ -74,6 +75,7 @@ export const RULES = [
   ...PACKAGE_RULES,
   ...OWNERSHIP_RULES,
   ...GOVERNANCE_RULES,
+  ...RULEPACK_GOVERNANCE_RULES,
 ];
 
 const isObj = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
@@ -618,7 +620,7 @@ export function validateArtefact(input, options = {}) {
   const chain = [
     ['executable-safety', 'graph-and-compatibility', () => [...executableSafetyLayer(first.doc), ...(kind === 'rule-pack' ? rulePackShape(first.doc) : [])]],
     ['test-verification', 'executable-safety', () => [...testVerificationLayer(first.doc, kind, { fixtures: options.fixtures }), ...(kind === 'rule-pack' ? rulePackCases(first.doc, { fixtures: options.fixtures }) : [])]],
-    ['governance', 'test-verification', () => governanceLayer(first.doc)],
+    ['governance', 'test-verification', () => [...governanceLayer(first.doc), ...(kind === 'rule-pack' ? rulePackGovernance(first.doc) : [])]],
   ];
   for (const [name, before, check] of chain) {
     if (layers[before].outcome !== 'passed') skip(name, stopped(before));

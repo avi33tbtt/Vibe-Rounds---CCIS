@@ -1,0 +1,98 @@
+{
+  "fields": [
+    {
+      "cardinality": {
+        "max": "unbounded",
+        "min": 0
+      },
+      "concept": {
+        "code": "glucose",
+        "codeSystem": {
+          "id": "local",
+          "version": "0.1.0"
+        },
+        "display": "Glucose",
+        "mapping": {
+          "status": "mapped"
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "entered-in-error"
+      ],
+      "key": "glu",
+      "label": "Glucose reading",
+      "sourceClasses": [
+        "clinician-entered",
+        "device",
+        "imported"
+      ],
+      "type": "quantity",
+      "units": [
+        "mg/dL"
+      ],
+      "x-emrFieldId": "glu"
+    },
+    {
+      "cardinality": {
+        "max": "unbounded",
+        "min": 0
+      },
+      "concept": {
+        "code": "hba1c",
+        "codeSystem": {
+          "id": "local",
+          "version": "0.1.0"
+        },
+        "display": "HbA1c",
+        "mapping": {
+          "status": "mapped"
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "entered-in-error"
+      ],
+      "key": "hba1c",
+      "label": "HbA1c reading",
+      "sourceClasses": [
+        "clinician-entered",
+        "device",
+        "imported"
+      ],
+      "type": "quantity",
+      "units": [
+        "%"
+      ],
+      "x-emrFieldId": "hba1c"
+    }
+  ],
+  "intent": {
+    "exclusions": [],
+    "population": "Synthetic demo cases only.",
+    "purpose": "Records repeated glucose and HbA1c readings as entered or taken from a device. A missing reading is never zero.",
+    "rationale": "Carried over from the EMR sets as recorded values only.",
+    "setting": "Any clinical setting in the synthetic demo."
+  },
+  "manifest": {
+    "id": "dm.glycaemic-monitoring",
+    "name": "Glycaemic monitoring",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.2.0"
+    },
+    "status": "draft",
+    "type": "contextual-element",
+    "version": "0.1.0"
+  },
+  "provenance": {
+    "basis": "docs/ELEMENT-LIST-V0.md; clinician review pending (ED-2).",
+    "origin": "Synthetic demo content for the ecosystem prototype."
+  }
+}

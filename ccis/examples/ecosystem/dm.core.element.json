@@ -1,0 +1,144 @@
+{
+  "fields": [
+    {
+      "binding": {
+        "code": "dm-type",
+        "codeSystem": {
+          "id": "local",
+          "version": "0.1.0"
+        },
+        "display": "Diabetes type",
+        "mapping": {
+          "note": "Local code, unverified.",
+          "status": "mapped"
+        },
+        "valueSet": {
+          "id": "ecosystem.dm-type",
+          "version": "0.1.0"
+        }
+      },
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "dmType",
+      "label": "Type of diabetes",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "code",
+      "x-emrFieldId": "dm_type"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "entered-in-error"
+      ],
+      "key": "dmDuration",
+      "label": "Duration of diabetes as entered",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "quantity",
+      "units": [
+        "a"
+      ],
+      "x-emrFieldId": "dm_duration"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "entered-in-error"
+      ],
+      "key": "dmMeds",
+      "label": "Diabetes medicines taken",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "string",
+      "x-emrFieldId": "dm_meds"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "entered-in-error"
+      ],
+      "key": "dmComp",
+      "label": "Reported complications",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "string",
+      "x-emrFieldId": "dm_comp"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "dmHypo",
+      "label": "Hypoglycaemia episode reported",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "boolean",
+      "x-emrFieldId": "dm_hypo"
+    }
+  ],
+  "intent": {
+    "exclusions": [],
+    "population": "Synthetic demo cases only.",
+    "purpose": "Records the diabetes type, duration as entered, medicines taken and reported complications. It suggests no regimen.",
+    "rationale": "Carried over from the EMR sets as recorded values only.",
+    "setting": "Any clinical setting in the synthetic demo."
+  },
+  "manifest": {
+    "id": "dm.core",
+    "name": "Diabetes core",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.2.0"
+    },
+    "status": "draft",
+    "type": "contextual-element",
+    "version": "0.1.0"
+  },
+  "provenance": {
+    "basis": "docs/ELEMENT-LIST-V0.md; clinician review pending (ED-2).",
+    "origin": "Synthetic demo content for the ecosystem prototype."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "blockers": [],
+  "concepts": [],
+  "sharedElements": [
+    "core.presentation",
+    "core.examination",
+    "core.assessment-plan",
+    "core.vitals",
+    "core.fluid-balance",
+    "core.event-times"
+  ]
+}

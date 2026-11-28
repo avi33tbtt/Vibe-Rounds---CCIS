@@ -1,0 +1,25 @@
+{
+  "asOf": "2026-11-28T10:00:00Z",
+  "bound": {
+    "absent": { "sbp": { "refs": [], "state": "absent" } },
+    "enteredInError": { "sbp": { "refs": [], "state": "absent" } },
+    "present": { "sbp": { "refs": ["obs-sbp-1"], "state": "present", "value": { "t": "text", "v": "recorded" } } }
+  },
+  "formSections": [
+    { "id": "vitals", "items": [
+      { "element": "core.vitals", "fields": null },
+      { "element": "htn.core", "fields": ["htnNote"] },
+      { "section": "core.problems" }
+    ] }
+  ],
+  "note": "Written by hand before any run; the present record is kind code because a quantity is present but unreadable to rules and would count as not present (ED-59). The pack checksum is not typed here: the test compares it with checksumOf of the canonical pack.",
+  "prompts": {
+    "absent": [
+      { "kind": "missing", "message": "No systolic record found.", "recordRefs": [], "ruleId": "contract.rules.sbpMissing", "severity": "info" }
+    ],
+    "enteredInError": [
+      { "kind": "missing", "message": "No systolic record found.", "recordRefs": [], "ruleId": "contract.rules.sbpMissing", "severity": "info" }
+    ],
+    "present": []
+  }
+}

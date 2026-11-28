@@ -1,0 +1,68 @@
+{
+  "absent": {
+    "contextForm": "ccis-context/1",
+    "observations": []
+  },
+  "enteredInError": {
+    "contextForm": "ccis-context/1",
+    "observations": [
+      {
+        "concept": {
+          "codes": [
+            {
+              "code": "systolic-pressure",
+              "system": "local",
+              "verification": "unverified"
+            }
+          ],
+          "id": "htn.core.sbp"
+        },
+        "effective": {
+          "value": "2026-11-28T08:00Z",
+          "zone": "stated"
+        },
+        "id": "obs-sbp-1",
+        "kind": "code",
+        "recorded": {
+          "value": "2026-11-28T08:00Z",
+          "zone": "stated"
+        },
+        "status": "entered-in-error",
+        "value": {
+          "code": "recorded"
+        }
+      }
+    ]
+  },
+  "present": {
+    "contextForm": "ccis-context/1",
+    "observations": [
+      {
+        "concept": {
+          "codes": [
+            {
+              "code": "systolic-pressure",
+              "system": "local",
+              "verification": "unverified"
+            }
+          ],
+          "id": "htn.core.sbp"
+        },
+        "effective": {
+          "value": "2026-11-28T08:00Z",
+          "zone": "stated"
+        },
+        "id": "obs-sbp-1",
+        "kind": "code",
+        "recorded": {
+          "value": "2026-11-28T08:00Z",
+          "zone": "stated"
+        },
+        "status": "final",
+        "value": {
+          "code": "recorded"
+        }
+      }
+    ]
+  }
+}

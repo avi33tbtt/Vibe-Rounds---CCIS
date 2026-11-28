@@ -1,0 +1,89 @@
+{
+  "contexts": [
+    {
+      "elements": [
+        "core.vitals",
+        "htn.core"
+      ],
+      "id": "hypertension",
+      "label": "Hypertension"
+    }
+  ],
+  "elements": [
+    {
+      "id": "core.vitals",
+      "range": "^0.1.0",
+      "type": "contextual-element"
+    },
+    {
+      "id": "htn.core",
+      "range": "^0.1.0",
+      "type": "contextual-element"
+    }
+  ],
+  "entryForm": {
+    "sections": [
+      {
+        "id": "vitals",
+        "items": [
+          {
+            "element": "core.vitals",
+            "kind": "element",
+            "rowGroups": [
+              [
+                "bpSys",
+                "hr"
+              ]
+            ],
+            "visibleByDefault": true
+          },
+          {
+            "element": "htn.core",
+            "fields": [
+              "htnNote"
+            ],
+            "kind": "element",
+            "visibleByDefault": true
+          },
+          {
+            "kind": "section",
+            "section": "core.problems",
+            "visibleByDefault": true
+          }
+        ],
+        "label": "Vitals"
+      }
+    ]
+  },
+  "exclusions": [
+    "Diagnosis, severity grading and treatment choice."
+  ],
+  "intendedUse": "Describes the information to record. Descriptive only.",
+  "manifest": {
+    "id": "contract.pathway",
+    "name": "Contract pathway: demo",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft",
+    "type": "pathway",
+    "version": "0.1.0"
+  },
+  "scope": "Demonstration of a pathway with an entry form. Synthetic.",
+  "stages": [
+    {
+      "entry": [
+        "A person is seen."
+      ],
+      "exit": [
+        "The record is complete."
+      ],
+      "id": "record",
+      "kind": "report",
+      "label": "Record"
+    }
+  ]
+}

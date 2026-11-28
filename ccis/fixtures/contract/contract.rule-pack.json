@@ -1,0 +1,96 @@
+{
+  "class": "data-quality",
+  "inputs": [
+    {
+      "concept": "systolic-pressure",
+      "element": "htn.core",
+      "id": "sbp",
+      "read": "latest"
+    }
+  ],
+  "manifest": {
+    "id": "contract.rules",
+    "name": "Contract rules: demo",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "references": [
+      {
+        "id": "htn.core",
+        "range": "^0.1.0",
+        "type": "contextual-element"
+      }
+    ],
+    "standard": {
+      "version": "0.1.0"
+    },
+    "status": "draft",
+    "type": "rule-pack",
+    "version": "0.1.0"
+  },
+  "parameters": [],
+  "provenance": {
+    "basis": "Synthetic test",
+    "origin": "Synthetic test"
+  },
+  "rules": [
+    {
+      "id": "sbpMissing",
+      "kind": "missing",
+      "message": {
+        "template": "No systolic record found."
+      },
+      "severity": "info",
+      "when": {
+        "args": [
+          {
+            "args": [
+              {
+                "id": "sbp",
+                "ref": "input"
+              }
+            ],
+            "op": "is-present"
+          }
+        ],
+        "op": "not"
+      }
+    }
+  ],
+  "scope": {
+    "pathways": [
+      {
+        "id": "contract.pathway",
+        "range": "^0.1.0",
+        "type": "pathway"
+      }
+    ]
+  },
+  "sourceNote": "Synthetic note about a missing record.",
+  "tests": [
+    {
+      "enables": [],
+      "expect": "fires",
+      "fixture": "absent",
+      "id": "firesWhenAbsent",
+      "rule": "sbpMissing",
+      "synthetic": true
+    },
+    {
+      "enables": [],
+      "expect": "does-not-fire",
+      "fixture": "present",
+      "id": "quietWhenPresent",
+      "rule": "sbpMissing",
+      "synthetic": true
+    },
+    {
+      "enables": [],
+      "expect": "not-evaluated",
+      "fixture": "conflicting",
+      "id": "notEvaluatedCase",
+      "rule": "sbpMissing",
+      "synthetic": true
+    }
+  ]
+}

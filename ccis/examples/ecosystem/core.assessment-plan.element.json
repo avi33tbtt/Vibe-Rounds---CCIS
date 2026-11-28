@@ -1,0 +1,68 @@
+{
+  "fields": [
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "assessment",
+      "label": "Assessment",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "string",
+      "x-emrFieldId": "assessment"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "plan",
+      "label": "Plan",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "string",
+      "x-emrFieldId": "plan"
+    }
+  ],
+  "intent": {
+    "exclusions": [],
+    "population": "Synthetic demo cases only.",
+    "purpose": "Records the assessment and the plan as free text written by a clinician. The plan holds what a clinician wrote; the element never suggests, orders or automates anything.",
+    "rationale": "Free text carried over from the EMR basic_emr set; no value, band or threshold.",
+    "setting": "Any clinical setting in the synthetic demo."
+  },
+  "manifest": {
+    "id": "core.assessment-plan",
+    "name": "Assessment and plan",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.2.0"
+    },
+    "status": "draft",
+    "type": "contextual-element",
+    "version": "0.1.0"
+  },
+  "provenance": {
+    "basis": "docs/ELEMENT-LIST-V0.md, source set basic_emr; clinician review pending (ED-2).",
+    "origin": "Synthetic demo content for the ecosystem prototype."
+  }
+}

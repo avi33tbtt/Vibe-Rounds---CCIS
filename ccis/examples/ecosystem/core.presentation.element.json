@@ -1,0 +1,89 @@
+{
+  "fields": [
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "cc",
+      "label": "Chief complaint",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "string",
+      "x-emrFieldId": "cc"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "hpi",
+      "label": "History of present illness",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "string",
+      "x-emrFieldId": "hpi"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error",
+        "explicitly-negative"
+      ],
+      "key": "pmh",
+      "label": "Past medical history",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "string",
+      "x-emrFieldId": "pmh"
+    }
+  ],
+  "intent": {
+    "exclusions": [],
+    "population": "Synthetic demo cases only.",
+    "purpose": "Records the presenting complaint, its history and the past medical history as free text written by a clinician.",
+    "rationale": "Free text carried over from the EMR basic_emr set; no value, band or threshold.",
+    "setting": "Any clinical setting in the synthetic demo."
+  },
+  "manifest": {
+    "id": "core.presentation",
+    "name": "Presentation",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.2.0"
+    },
+    "status": "draft",
+    "type": "contextual-element",
+    "version": "0.1.0"
+  },
+  "provenance": {
+    "basis": "docs/ELEMENT-LIST-V0.md, source set basic_emr; clinician review pending (ED-2).",
+    "origin": "Synthetic demo content for the ecosystem prototype."
+  }
+}

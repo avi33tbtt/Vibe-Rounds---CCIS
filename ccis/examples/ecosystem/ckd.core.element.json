@@ -1,0 +1,84 @@
+{
+  "fields": [
+    {
+      "binding": {
+        "code": "ckd-stage",
+        "codeSystem": {
+          "id": "local",
+          "version": "0.1.0"
+        },
+        "display": "CKD stage",
+        "mapping": {
+          "note": "Local code, unverified.",
+          "status": "mapped"
+        },
+        "valueSet": {
+          "id": "ecosystem.ckd-stage",
+          "version": "0.1.0"
+        }
+      },
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "ckdStage",
+      "label": "Stage of kidney disease",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "code",
+      "x-emrFieldId": "ckd_stage"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "ckdCause",
+      "label": "Recorded cause of kidney disease",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "string",
+      "x-emrFieldId": "ckd_cause"
+    }
+  ],
+  "intent": {
+    "exclusions": [],
+    "population": "Synthetic demo cases only.",
+    "purpose": "Records the kidney disease stage as entered and the recorded cause. Nothing here derives a stage from a measurement.",
+    "rationale": "Carried over from the EMR sets as recorded values only.",
+    "setting": "Any clinical setting in the synthetic demo."
+  },
+  "manifest": {
+    "id": "ckd.core",
+    "name": "Chronic kidney disease core",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.2.0"
+    },
+    "status": "draft",
+    "type": "contextual-element",
+    "version": "0.1.0"
+  },
+  "provenance": {
+    "basis": "docs/ELEMENT-LIST-V0.md; clinician review pending (ED-2).",
+    "origin": "Synthetic demo content for the ecosystem prototype."
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "fields": [
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "concept": {
+        "code": "fluid-intake-24h",
+        "codeSystem": {
+          "id": "local",
+          "version": "0.1.0"
+        },
+        "display": "Fluid intake over 24 hours",
+        "mapping": {
+          "status": "mapped"
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "entered-in-error"
+      ],
+      "key": "intake",
+      "label": "Total fluid intake over 24 hours",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "integer",
+      "units": [
+        "mL"
+      ],
+      "x-emrFieldId": "intake"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "concept": {
+        "code": "urine-output-24h",
+        "codeSystem": {
+          "id": "local",
+          "version": "0.1.0"
+        },
+        "display": "Urine output over 24 hours",
+        "mapping": {
+          "status": "mapped"
+        }
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "entered-in-error"
+      ],
+      "key": "output",
+      "label": "Total urine output over 24 hours",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "integer",
+      "units": [
+        "mL"
+      ],
+      "x-emrFieldId": "output"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "entered-in-error"
+      ],
+      "key": "balance",
+      "label": "Fluid balance over 24 hours",
+      "sourceClasses": [
+        "derived"
+      ],
+      "type": "integer",
+      "units": [
+        "mL"
+      ],
+      "x-emrFieldId": "balance"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "catheter",
+      "label": "Urinary catheter in place",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "boolean",
+      "x-emrFieldId": "catheter"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "ioNotes",
+      "label": "Intake and output notes",
+      "sourceClasses": [
+        "clinician-entered"
+      ],
+      "type": "string",
+      "x-emrFieldId": "io_notes"
+    }
+  ],
+  "intent": {
+    "exclusions": [],
+    "population": "Synthetic demo cases only.",
+    "purpose": "Records fluid intake and urine output totals over 24 hours. A missing total is never read as zero.",
+    "rationale": "Carried over from the EMR sets as recorded values only.",
+    "setting": "Any clinical setting in the synthetic demo."
+  },
+  "manifest": {
+    "id": "core.fluid-balance",
+    "name": "Fluid balance",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.2.0"
+    },
+    "status": "draft",
+    "type": "contextual-element",
+    "version": "0.1.0"
+  },
+  "provenance": {
+    "basis": "docs/ELEMENT-LIST-V0.md; clinician review pending (ED-2).",
+    "origin": "Synthetic demo content for the ecosystem prototype."
+  },
+  "relationships": [
+    {
+      "from": "balance",
+      "kind": "derived-from",
+      "to": "intake"
+    },
+    {
+      "from": "balance",
+      "kind": "derived-from",
+      "to": "output"
+    }
+  ]
+}

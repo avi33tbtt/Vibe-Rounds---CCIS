@@ -1,0 +1,115 @@
+{
+  "fields": [
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "onsetTime",
+      "label": "Time of onset",
+      "sourceClasses": [
+        "clinician-entered",
+        "patient-reported",
+        "informant-reported"
+      ],
+      "timeSemantics": "event-time",
+      "type": "datetime"
+    },
+    {
+      "binding": {
+        "code": "onset-certainty",
+        "codeSystem": {
+          "id": "local",
+          "version": "0.1.0"
+        },
+        "display": "Onset time certainty",
+        "mapping": {
+          "note": "Local code, unverified.",
+          "status": "mapped"
+        },
+        "valueSet": {
+          "id": "ecosystem.onset-certainty",
+          "version": "0.1.0"
+        }
+      },
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "onsetTimeCertainty",
+      "label": "How certain the onset time is",
+      "sourceClasses": [
+        "clinician-entered",
+        "patient-reported",
+        "informant-reported"
+      ],
+      "type": "code"
+    },
+    {
+      "cardinality": {
+        "max": 1,
+        "min": 0
+      },
+      "epistemic": [
+        "absent",
+        "unknown",
+        "not-collected",
+        "not-applicable",
+        "entered-in-error"
+      ],
+      "key": "arrivalTime",
+      "label": "Time of arrival",
+      "sourceClasses": [
+        "clinician-entered",
+        "imported"
+      ],
+      "timeSemantics": "event-time",
+      "type": "datetime"
+    }
+  ],
+  "intent": {
+    "exclusions": [],
+    "population": "Synthetic demo cases only.",
+    "purpose": "Records when an event began and arrived, with how certain the start time is. An unknown time is never replaced by a default.",
+    "rationale": "Carried over from the EMR sets as recorded values only.",
+    "setting": "Any clinical setting in the synthetic demo."
+  },
+  "manifest": {
+    "id": "core.event-times",
+    "name": "Event times",
+    "publisher": {
+      "name": "Synthetic test publisher"
+    },
+    "standard": {
+      "version": "0.2.0"
+    },
+    "status": "draft",
+    "type": "contextual-element",
+    "version": "0.1.0"
+  },
+  "provenance": {
+    "basis": "docs/ELEMENT-LIST-V0.md; clinician review pending (ED-2).",
+    "origin": "Synthetic demo content for the ecosystem prototype."
+  },
+  "relationships": [
+    {
+      "from": "onsetTimeCertainty",
+      "kind": "refines",
+      "to": "onsetTime"
+    }
+  ]
+}
